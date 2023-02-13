@@ -1,0 +1,10 @@
+[
+  { "baseUnit": { "name": "штука" } },
+  {
+    "baseUnit": { "name": "метр" },
+    "units": [
+      { "name": "дециметр", "coefficient": 10, "isMultiply":  false },
+      { "name": "километр", "coefficient": 1000 }
+    ]
+  }
+]
