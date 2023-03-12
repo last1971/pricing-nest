@@ -1,5 +1,5 @@
 import { Controller, Get, Query } from '@nestjs/common';
-import { PriceRequestDto } from './price.request.dto';
+import { PriceRequestDto } from './dtos/price.request.dto';
 import { PriceService } from './price.service';
 import { GoodDto } from '../good/dtos/good.dto';
 

@@ -1,7 +1,7 @@
 import { GoodDto } from '../good/dtos/good.dto';
 import { IParsers } from '../interfaces/IParsers';
 import { SupplierDto } from '../supplier/supplier.dto';
-import { PriceRequestDto } from '../price/price.request.dto';
+import { PriceRequestDto } from '../price/dtos/price.request.dto';
 import { catchError, firstValueFrom, map } from 'rxjs';
 import { Source } from '../good/dtos/source.enum';
 import { AxiosError } from 'axios';

@@ -5,7 +5,7 @@ import { SupplierService } from '../supplier/supplier.service';
 import { Cache } from 'cache-manager';
 import { HttpService } from '@nestjs/axios';
 import { SupplierDto } from '../supplier/supplier.dto';
-import { PriceRequestDto } from '../price/price.request.dto';
+import { PriceRequestDto } from '../price/dtos/price.request.dto';
 import { GoodDto } from '../good/dtos/good.dto';
 import { AbstractParser } from './AbstractParser';
 import { at } from 'lodash';

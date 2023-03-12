@@ -5,19 +5,21 @@ import { Model } from 'mongoose';
 import { GoodDto } from './dtos/good.dto';
 import { omit, pick } from 'lodash';
 import { Source } from './dtos/source.enum';
-import { PriceRequestDto } from '../price/price.request.dto';
+import { PriceRequestDto } from '../price/dtos/price.request.dto';
 import { SupplierDto } from '../supplier/supplier.dto';
 import { SupplierService } from '../supplier/supplier.service';
 
 @Injectable()
 export class GoodService {
-    private suppliers: SupplierDto[];
+    private dbSuppliers: SupplierDto[];
+    private allSuppliers: SupplierDto[];
     constructor(
         @InjectModel(Good.name) private goodModel: Model<GoodDocument>,
         private supplierService: SupplierService,
     ) {}
     async onModuleInit() {
-        this.suppliers = await this.supplierService.dbOnly();
+        this.dbSuppliers = await this.supplierService.dbOnly();
+        this.allSuppliers = await this.supplierService.all();
     }
     async createOrUpdate(good: GoodDto): Promise<void> {
         good.source = Source.Db;
@@ -29,9 +31,10 @@ export class GoodService {
         return this.goodModel.find(filter);
     }
     async search(priceRequestDto: PriceRequestDto): Promise<GoodDto[]> {
+        const searchSuppliers = priceRequestDto.dbOnly ? this.allSuppliers : this.dbSuppliers;
         const suppliers = priceRequestDto.suppliers
-            ? this.suppliers.filter((supplier) => priceRequestDto.suppliers.includes(supplier.id))
-            : this.suppliers;
+            ? searchSuppliers.filter((supplier) => priceRequestDto.suppliers.includes(supplier.id))
+            : searchSuppliers;
         return this.goodModel.find({
             supplier: { $in: suppliers.map((supplier) => supplier.id) },
             alias: { $regex: new RegExp(priceRequestDto.search, 'i') },
