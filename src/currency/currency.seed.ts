@@ -1,7 +1,7 @@
 import { InjectModel } from '@nestjs/mongoose';
 import { Currency, CurrencyDocument } from './currency.schema';
 import { Model } from 'mongoose';
-import { CurrencyCreateDto } from './currency.create.dto';
+import { CurrencyCreateDto } from './dto/currency.create.dto';
 import currency from './currency.json';
 import { Injectable } from '@nestjs/common';
 

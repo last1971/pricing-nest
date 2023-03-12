@@ -2,11 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Currency, CurrencyDocument } from './currency.schema';
 import { Model } from 'mongoose';
-import { CurrencyDto } from './currency.dto';
+import { CurrencyDto } from './dto/currency.dto';
+import { ModelToDto } from '../decorators/modelToDto';
 
 @Injectable()
 export class CurrencyService {
     constructor(@InjectModel(Currency.name) private currencyModel: Model<CurrencyDocument>) {}
+    @ModelToDto(CurrencyDto)
     async all(): Promise<CurrencyDto[]> {
         return this.currencyModel.find();
     }

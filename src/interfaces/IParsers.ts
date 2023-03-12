@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { Cache } from 'cache-manager';
 import { HttpService } from '@nestjs/axios';
 import { Queue } from 'bull';
-import { CurrencyDto } from '../currency/currency.dto';
+import { CurrencyDto } from '../currency/dto/currency.dto';
 export interface IParsers {
     getSuppliers(): Map<string, SupplierDto>;
     getCurrencies(): Map<string, CurrencyDto>;

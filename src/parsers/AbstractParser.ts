@@ -5,7 +5,7 @@ import { PriceRequestDto } from '../price/dtos/price.request.dto';
 import { catchError, firstValueFrom, map } from 'rxjs';
 import { Source } from '../good/dtos/source.enum';
 import { AxiosError } from 'axios';
-import { CurrencyDto } from '../currency/currency.dto';
+import { CurrencyDto } from '../currency/dto/currency.dto';
 
 export abstract class AbstractParser {
     protected search: string;

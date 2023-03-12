@@ -19,7 +19,7 @@ import { WarehouseDto } from '../good/dtos/warehouse.dto';
 import { Source } from '../good/dtos/source.enum';
 import { GoodService } from '../good/good.service';
 import { CurrencyService } from '../currency/currency.service';
-import { CurrencyDto } from '../currency/currency.dto';
+import { CurrencyDto } from '../currency/dto/currency.dto';
 import { DateTime } from 'luxon';
 
 @Injectable()
