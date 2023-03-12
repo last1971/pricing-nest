@@ -4,6 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Supplier, SupplierDocument } from './supplier.schema';
 import { Model } from 'mongoose';
 import supplier from './supplier.json';
+import { omit, pick } from 'lodash';
 
 @Injectable()
 export class SupplierSeed implements ICommand {
@@ -15,7 +16,9 @@ export class SupplierSeed implements ICommand {
 
     async seed(dtos: SupplierCreateDto[]): Promise<void> {
         await Promise.all(
-            dtos.map((dto: SupplierCreateDto) => this.supplierModel.findOneAndUpdate(dto, {}, { upsert: true })),
+            dtos.map((dto: SupplierCreateDto) =>
+                this.supplierModel.findOneAndUpdate(pick(dto, ['alias']), omit(dto, ['alias']), { upsert: true }),
+            ),
         );
     }
     async execute(): Promise<void> {

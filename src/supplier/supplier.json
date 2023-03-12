@@ -1,4 +1,5 @@
 [
-  {"alias" : "compel"},
-  {"alias" : "promelec"}
+  {"alias" : "compel", "deliveryTime":  6},
+  {"alias" : "promelec", "deliveryTime":  8},
+  {"alias" :  "rct", "deliveryTime": 12}
 ]

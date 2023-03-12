@@ -12,4 +12,7 @@ db.createUser({
     db: "$MONGO_INITDB_DATABASE"
   }]
 })
+
+chown -R mongodb:mongodb /var/lib/mongodb
+chown mongodb:mongodb /tmp/mongodb-27017.sock
 EOF

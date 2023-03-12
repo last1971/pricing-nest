@@ -1,5 +1,5 @@
-import { Price } from './schemas/price.schema';
+import { GoodDto } from '../good/dtos/good.dto';
 
 export class PriceResponseDto {
-    data: Array<Price>;
+    data: Array<GoodDto>;
 }

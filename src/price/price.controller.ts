@@ -1,11 +1,13 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { PriceRequestDto } from './price.request.dto';
+import { PriceService } from './price.service';
+import { GoodDto } from '../good/dtos/good.dto';
 
 @Controller('price')
 export class PriceController {
+    constructor(private service: PriceService) {}
     @Get()
-    findAll(@Query() request: PriceRequestDto): string {
-        console.log(request);
-        return 'This action returns all cats';
+    async findAll(@Query() request: PriceRequestDto): Promise<GoodDto[]> {
+        return this.service.getPrices(request);
     }
 }

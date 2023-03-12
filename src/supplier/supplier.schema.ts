@@ -6,6 +6,8 @@ export type SupplierDocument = HydratedDocument<Supplier>;
 export class Supplier {
     @Prop({ required: true, unique: true })
     alias: string;
+    @Prop({ required: true })
+    deliveryTime: number;
 }
 
 export const SupplierSchema = SchemaFactory.createForClass(Supplier);

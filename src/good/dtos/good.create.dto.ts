@@ -1,6 +1,6 @@
 import { Types } from 'mongoose';
-import { WarehouseCreateDto } from './warehouse.create.dto';
-import { ParameterCreateDto } from './parameter.create.dto';
+import { WarehouseCreateDto } from '../../price/dtos/warehouse.create.dto';
+import { ParameterCreateDto } from '../../price/dtos/parameter.create.dto';
 
 export class GoodCreateDto {
     supplier: Types.ObjectId;

@@ -1,9 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Price, PriceSchema } from './price.schema';
+import { Price, PriceSchema } from '../../price/schemas/price.schema';
 
 @Schema()
 export class Warehouse {
-    @Prop({ required: true, unique: true })
+    @Prop({ required: true, sparse: true })
     name: string;
 
     @Prop({ required: true })
@@ -15,8 +15,8 @@ export class Warehouse {
     @Prop({ required: true })
     multiple: number;
 
-    @Prop({ type: [PriceSchema] })
-    prices: Price[];
+    @Prop({ type: [PriceSchema], required: false })
+    prices?: Price[];
 }
 
 export const WarehouseSchema = SchemaFactory.createForClass(Warehouse);

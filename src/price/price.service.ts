@@ -1,14 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { PriceRequestDto } from './price.request.dto';
-import { PriceResponseDto } from './price.response.dto';
-import { PriceStrategiesService } from './price.strategies.service';
-import { flatten } from 'lodash';
+import { GoodDto } from '../good/dtos/good.dto';
+import { ParsersService } from '../parsers/parsers.service';
+import { GoodService } from '../good/good.service';
 
 @Injectable()
 export class PriceService {
-    async getPrices(request: PriceRequestDto): Promise<PriceResponseDto> {
-        const strategiesService = new PriceStrategiesService(request);
-        const strategies = strategiesService.execute();
-        return { data: flatten(strategies.map((strategy) => strategy.execute())) };
+    constructor(private parses: ParsersService, private goodService: GoodService) {}
+    async getPrices(request: PriceRequestDto): Promise<GoodDto[]> {
+        return (await Promise.all([this.parses.search(request), this.goodService.search(request)])).flat();
+        //const strategiesService = new PriceStrategiesService(request);
+        //const strategies = strategiesService.execute();
+        //return { data: flatten(strategies.map((strategy) => strategy.execute())) };
     }
 }
