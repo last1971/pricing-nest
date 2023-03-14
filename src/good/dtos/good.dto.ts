@@ -5,6 +5,6 @@ export class GoodDto {
     supplier: string;
     code: string;
     alias: string;
-    source: Source;
+    source?: Source = Source.Db;
     warehouses: WarehouseDto[];
 }
