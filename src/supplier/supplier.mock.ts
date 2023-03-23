@@ -30,8 +30,8 @@ class MockParserClass extends AbstractParser {
 export const MockParser = MockParserClass as jest.Mock<MockParserClass>;
 export const SupplierMock = {
     apiOnly: async () => [
-        { alias: 'first', id: 'first' },
-        { alias: 'second', id: 'second' },
+        { alias: 'first', id: 'first', deliveryTime: 1 },
+        { alias: 'second', id: 'second', deliveryTime: 2 },
     ],
     apiParsers: () => ({
         first: MockParser,

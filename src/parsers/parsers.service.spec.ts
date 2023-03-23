@@ -11,6 +11,7 @@ import { CurrencyMock } from '../currency/currency.mock';
 import { CacheMock } from '../mocks/cache.mock';
 import { QueueMock } from '../mocks/queue.mock';
 import { SupplierMock } from '../supplier/supplier.mock';
+import { SupplierDto } from '../supplier/supplier.dto';
 
 describe('ParsersService', () => {
     let service: ParsersService;
@@ -63,6 +64,13 @@ describe('ParsersService', () => {
 
     it('should be defined', () => {
         expect(service).toBeDefined();
+    });
+
+    it('Test Get Suppliers', async () => {
+        const suppliers = service.getSuppliers();
+        const suppliersMap = new Map<string, SupplierDto>();
+        (await SupplierMock.apiOnly()).forEach((supplier) => suppliersMap.set(supplier.alias, supplier));
+        expect(suppliers).toEqual(suppliersMap);
     });
 
     it('Test cache search', async () => {
