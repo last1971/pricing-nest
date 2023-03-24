@@ -3,7 +3,7 @@ import { GoodDto } from '../good/dtos/good.dto';
 import { isArray } from 'lodash';
 import { Source } from '../good/dtos/source.enum';
 
-class MockParserClass extends AbstractParser {
+export class MockParser extends AbstractParser {
     getAlias(): string {
         return 'first';
     }
@@ -27,7 +27,15 @@ class MockParserClass extends AbstractParser {
         return response;
     }
 }
-export const MockParser = MockParserClass as jest.Mock<MockParserClass>;
+export const parseResponse = jest
+    .spyOn(MockParser.prototype, 'parseResponse')
+    .mockImplementation((response: any): GoodDto[] => {
+        if (isArray(response)) {
+            response.forEach((item) => (item.source = Source.Api));
+        }
+        return response;
+    });
+
 export const SupplierMock = {
     apiOnly: async () => [
         { alias: 'first', id: 'first', deliveryTime: 1 },
