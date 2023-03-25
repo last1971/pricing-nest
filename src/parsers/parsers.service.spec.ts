@@ -61,6 +61,9 @@ describe('ParsersService', () => {
 
         service = module.get<ParsersService>(ParsersService);
         await service.onModuleInit();
+        CacheSet.mockClear();
+        QueueAdd.mockClear();
+        parseResponse.mockClear();
     });
 
     it('should be defined', () => {
