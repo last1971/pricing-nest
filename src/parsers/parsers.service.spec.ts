@@ -89,8 +89,16 @@ describe('ParsersService', () => {
         expect(QueueAdd.mock.calls).toHaveLength(0);
     });
 
+    it('Test no cache search', async () => {
+        const response = await service.search({ search: '123', withCache: false, dbOnly: false });
+        expect(response).toHaveLength(4);
+        expect(response[0]).toEqual({ source: 'Api' });
+        expect(CacheSet.mock.calls).toHaveLength(2);
+        expect(QueueAdd.mock.calls).toHaveLength(2);
+    });
+
     it('Test http search', async () => {
-        const response = await service.search({ search: '1234', withCache: false, dbOnly: false });
+        const response = await service.search({ search: '1234', withCache: true, dbOnly: false });
         expect(response).toHaveLength(4);
         expect(response[0]).toEqual({ source: 'Api' });
         expect(parseResponse.mock.results).toHaveLength(2);

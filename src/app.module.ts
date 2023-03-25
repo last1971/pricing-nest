@@ -1,7 +1,6 @@
 import { CacheModule, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { SandboxModule } from './sandbox/sandbox.module';
 import { PriceModule } from './price/price.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -42,7 +41,6 @@ const configService = new ConfigService();
             },
         }),
         ScheduleModule.forRoot(),
-        SandboxModule,
         PriceModule,
         SupplierModule,
         UnitModule,
