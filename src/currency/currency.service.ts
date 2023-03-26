@@ -12,4 +12,8 @@ export class CurrencyService {
     async all(): Promise<CurrencyDto[]> {
         return this.currencyModel.find();
     }
+    @ModelToDto(CurrencyDto)
+    async alfa3(alfa3: string): Promise<CurrencyDto> {
+        return this.currencyModel.findOne({ alfa3 });
+    }
 }

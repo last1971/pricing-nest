@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ParsersService } from './parsers.service';
 import { SupplierService } from '../supplier/supplier.service';
-import { GoodService } from '../good/good.service';
 import { CurrencyService } from '../currency/currency.service';
 import { ConfigService } from '@nestjs/config';
 import { CACHE_MANAGER } from '@nestjs/common';
@@ -24,11 +23,6 @@ describe('ParsersService', () => {
                 {
                     provide: SupplierService,
                     useValue: SupplierMock,
-                },
-                // for delete
-                {
-                    provide: GoodService,
-                    useValue: {},
                 },
                 {
                     provide: CurrencyService,

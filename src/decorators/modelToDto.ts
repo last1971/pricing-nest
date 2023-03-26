@@ -6,9 +6,11 @@ export function ModelToDto<T>(dto: ClassConstructor<T>) {
         const original = descriptor.value;
         descriptor.value = async function (...args) {
             const result = await original.apply(this, args);
-            return (isArray(result) ? result : [result]).map((item: any) => {
-                return plainToInstance(dto, item.toObject({ virtuals: true }));
-            });
+            return isArray(result)
+                ? result.map((item: any) => {
+                      return plainToInstance(dto, item.toObject({ virtuals: true }));
+                  })
+                : plainToInstance(dto, result.toObject({ virtuals: true }));
         };
         return descriptor;
     };

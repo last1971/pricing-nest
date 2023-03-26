@@ -7,6 +7,7 @@ import { BullModule } from '@nestjs/bull';
 import { ParserProcessor } from './parser.processor';
 import { GoodModule } from '../good/good.module';
 import { CurrencyModule } from '../currency/currency.module';
+import { ParserSchedule } from './parser.schedule';
 
 @Module({
     imports: [
@@ -19,7 +20,7 @@ import { CurrencyModule } from '../currency/currency.module';
             name: 'api',
         }),
     ],
-    providers: [ParsersService, ParserProcessor],
+    providers: [ParsersService, ParserProcessor, ParserSchedule],
     exports: [ParsersService],
 })
 export class ParsersModule {}

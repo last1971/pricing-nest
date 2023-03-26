@@ -1,7 +1,7 @@
 import { AbstractParser } from './AbstractParser';
-import { Source } from '../good/dtos/source.enum';
-import { GoodDto } from '../good/dtos/good.dto';
-import { PriceDto } from '../good/dtos/price.dto';
+import { Source } from '../../good/dtos/source.enum';
+import { GoodDto } from '../../good/dtos/good.dto';
+import { PriceDto } from '../../good/dtos/price.dto';
 
 export class PromelecParser extends AbstractParser {
     getAlias(): string {

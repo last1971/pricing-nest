@@ -1,16 +1,16 @@
-import { GoodDto } from '../good/dtos/good.dto';
-import { IParsers } from '../interfaces/IParsers';
-import { SupplierDto } from '../supplier/supplier.dto';
-import { PriceRequestDto } from '../price/dtos/price.request.dto';
+import { GoodDto } from '../../good/dtos/good.dto';
+import { IApiParsers } from '../../interfaces/IApiParsers';
+import { SupplierDto } from '../../supplier/supplier.dto';
+import { PriceRequestDto } from '../../price/dtos/price.request.dto';
 import { catchError, firstValueFrom, map } from 'rxjs';
-import { Source } from '../good/dtos/source.enum';
+import { Source } from '../../good/dtos/source.enum';
 import { AxiosError } from 'axios';
-import { CurrencyDto } from '../currency/dto/currency.dto';
+import { CurrencyDto } from '../../currency/dto/currency.dto';
 
 export abstract class AbstractParser {
     protected search: string;
     protected withCache: boolean;
-    public constructor(priceRequest: PriceRequestDto, protected parsers: IParsers) {
+    public constructor(priceRequest: PriceRequestDto, protected parsers: IApiParsers) {
         ({ search: this.search, withCache: this.withCache } = priceRequest);
     }
     abstract getAlias(): string;

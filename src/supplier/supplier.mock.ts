@@ -1,4 +1,4 @@
-import { AbstractParser } from '../parsers/AbstractParser';
+import { AbstractParser } from '../parsers/api-parsers/AbstractParser';
 import { GoodDto } from '../good/dtos/good.dto';
 import { isArray } from 'lodash';
 import { Source } from '../good/dtos/source.enum';

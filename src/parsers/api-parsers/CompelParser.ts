@@ -1,9 +1,9 @@
 import { AbstractParser } from './AbstractParser';
 import { v4 } from 'uuid';
-import { GoodDto } from '../good/dtos/good.dto';
-import { Source } from '../good/dtos/source.enum';
-import { WarehouseDto } from '../good/dtos/warehouse.dto';
-import { PriceDto } from '../good/dtos/price.dto';
+import { GoodDto } from '../../good/dtos/good.dto';
+import { Source } from '../../good/dtos/source.enum';
+import { WarehouseDto } from '../../good/dtos/warehouse.dto';
+import { PriceDto } from '../../good/dtos/price.dto';
 export class CompelParser extends AbstractParser {
     getAlias(): string {
         return 'compel';

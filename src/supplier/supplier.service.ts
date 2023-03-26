@@ -3,8 +3,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Supplier, SupplierDocument } from './supplier.schema';
 import { Model } from 'mongoose';
 import { SupplierDto } from './supplier.dto';
-import { CompelParser } from '../parsers/CompelParser';
-import { PromelecParser } from '../parsers/PromelecParser';
+import { CompelParser } from '../parsers/api-parsers/CompelParser';
+import { PromelecParser } from '../parsers/api-parsers/PromelecParser';
 import { ModelToDto } from '../decorators/modelToDto';
 
 @Injectable()
