@@ -65,6 +65,7 @@ describe('GoodService', () => {
         for (const item of [
             { search: '123', dbOnly: true, withCache: true },
             { search: '123', dbOnly: false, withCache: false },
+            { search: '123_!zя', dbOnly: false, withCache: false },
         ]) {
             await service.search(item);
         }
@@ -72,9 +73,10 @@ describe('GoodService', () => {
         [
             { supplier: ['first', 'second'], alias },
             { supplier: ['first'], alias },
+            { supplier: ['first'], alias: { $regex: /123zя/i } },
         ].forEach((item, index) => {
             expect(find.mock.calls[index][0].supplier.$in).toEqual(item.supplier);
-            expect(find.mock.calls[index][0].alias).toEqual(alias);
+            expect(find.mock.calls[index][0].alias).toEqual(item.alias);
         });
     });
 });

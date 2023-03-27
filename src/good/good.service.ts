@@ -8,6 +8,7 @@ import { Source } from './dtos/source.enum';
 import { PriceRequestDto } from '../price/dtos/price.request.dto';
 import { SupplierDto } from '../supplier/supplier.dto';
 import { SupplierService } from '../supplier/supplier.service';
+import { alias } from '../helpers';
 
 @Injectable()
 export class GoodService {
@@ -23,11 +24,15 @@ export class GoodService {
     }
     async createOrUpdate(good: GoodDto): Promise<void> {
         good.source = Source.Db;
+        good.alias = alias(good.alias);
         await this.goodModel.findOneAndUpdate(pick(good, ['code', 'supplier']), omit(good, ['code', 'supplier']), {
             upsert: true,
         });
     }
     async find(filter: any): Promise<GoodDto[]> {
+        if (filter.alias) {
+            filter.alias = alias(filter.alias);
+        }
         return this.goodModel.find(filter);
     }
     async search(priceRequestDto: PriceRequestDto): Promise<GoodDto[]> {
@@ -37,7 +42,7 @@ export class GoodService {
             : searchSuppliers;
         return this.goodModel.find({
             supplier: { $in: suppliers.map((supplier) => supplier.id) },
-            alias: { $regex: new RegExp(priceRequestDto.search, 'i') },
+            alias: { $regex: new RegExp(alias(priceRequestDto.search), 'i') },
         });
     }
 }

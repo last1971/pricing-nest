@@ -1,6 +1,6 @@
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { SchedulerRegistry } from '@nestjs/schedule';
-import { TestParser } from './schedule-parsers/test.parser';
+// import { TestParser } from './schedule-parsers/test.parser';
 import { CronJob } from 'cron';
 import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
@@ -15,7 +15,7 @@ import { RctParser } from './schedule-parsers/rct.parser';
 export class ParserSchedule implements IScheduleParsers {
     private readonly logger = new Logger('ScheduleParser');
     private parsers = {
-        '0 * * * * *': [TestParser],
+        //'0 * * * * *': [TestParser],
         '0 2 * * * *': [RctParser],
     };
     constructor(

@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 import { Supplier } from '../../supplier/supplier.schema';
 import { Warehouse, WarehouseSchema } from './warehouse.schema';
-import { Parameter, ParameterSchema } from '../../price/schemas/parameter.schema';
+import { Parameter, ParameterSchema } from './parameter.schema';
 import { Source } from '../dtos/source.enum';
 
 export type GoodDocument = HydratedDocument<Good>;
