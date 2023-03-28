@@ -25,9 +25,10 @@ export class PromelecParser extends AbstractParser {
     }
     parseResponse(response: any): GoodDto[] {
         return response.map((item) => ({
+            updatedAt: new Date(),
             source: Source.Api,
-            alias: item.name,
-            code: item.item_id,
+            alias: item.name.toString(),
+            code: item.item_id.toString(),
             supplier: this.getSupplier().id,
             parameters: [
                 { name: 'name', stringValue: item.name },

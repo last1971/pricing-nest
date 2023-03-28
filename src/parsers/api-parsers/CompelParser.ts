@@ -32,9 +32,10 @@ export class CompelParser extends AbstractParser {
         if (response.error) throw response.error;
         return response.result.items.map(
             (item): GoodDto => ({
+                updatedAt: new Date(),
                 supplier: this.getSupplier().id,
-                code: item.item_id,
-                alias: item.item_name,
+                code: item.item_id.toString(),
+                alias: item.item_name.toString(),
                 source: Source.Api,
                 parameters: [
                     { name: 'name', stringValue: item.item_name },

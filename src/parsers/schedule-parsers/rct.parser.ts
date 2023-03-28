@@ -11,7 +11,8 @@ export class RctParser extends ScheduleParser {
     async execute(): Promise<void> {
         this.schedule.getLog().debug('Start rct import');
         const start = DateTime.now().toISO();
-        const res = await this.schedule.getHttp().get('https://www.rct.ru/price/all', { responseType: 'stream' });
+        const url = this.schedule.getConfigService().get<string>('API_RCT_URL');
+        const res = await this.schedule.getHttp().get(url, { responseType: 'stream' });
         const response = await firstValueFrom(res);
         const workbook = new Excel.Workbook();
         await workbook.xlsx.read(response.data);
@@ -21,7 +22,7 @@ export class RctParser extends ScheduleParser {
         const currency = await this.schedule.getCurrencies().alfa3('USD');
         const piece = await this.schedule.getUnitService().name('штука');
         worksheet.eachRow((row, rowNumber) => {
-            const code = <string>row.getCell(5).value;
+            const code = <string>row.getCell(5).value?.toString();
             if (code && rowNumber > 8) {
                 const multiple: number = <number>row.getCell(10).value ?? 1;
                 const nextQuantity1 = multiple * 2;
@@ -96,6 +97,7 @@ export class RctParser extends ScheduleParser {
                 const producer = <string>row.getCell(8).value?.toString();
                 const body = <string>row.getCell(7).value?.toString();
                 const good: GoodDto = {
+                    updatedAt: new Date(),
                     code,
                     source: Source.Db,
                     supplier: supplier.id,

@@ -9,4 +9,5 @@ export class GoodDto {
     source?: Source = Source.Db;
     warehouses: WarehouseDto[];
     parameters?: ParameterDto[];
+    updatedAt: Date;
 }
