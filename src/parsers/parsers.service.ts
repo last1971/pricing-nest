@@ -13,16 +13,20 @@ import { Queue } from 'bull';
 import { InjectQueue } from '@nestjs/bull';
 import { CurrencyService } from '../currency/currency.service';
 import { CurrencyDto } from '../currency/dto/currency.dto';
+import { UnitService } from '../unit/unit.service';
+import { UnitDto } from '../unit/dtos/unit.dto';
 
 @Injectable()
 export class ParsersService implements IApiParsers {
     private suppliers: Map<string, SupplierDto>;
     private currencies: Map<string, CurrencyDto>;
+    private piece: UnitDto;
     private readonly logger = new Logger(ParsersService.name);
     constructor(
         protected configService: ConfigService,
         private supplierService: SupplierService,
         private currencyService: CurrencyService,
+        private unitService: UnitService,
         @Inject(CACHE_MANAGER) private cache: Cache,
         private http: HttpService,
         @InjectQueue('api') private readonly apiQueue: Queue,
@@ -36,7 +40,12 @@ export class ParsersService implements IApiParsers {
         const currencies = await this.currencyService.all();
         currencies.forEach((currency) => this.currencies.set(currency.alfa3, currency));
 
-        this.logger.debug('init');
+        this.piece = await this.unitService.name('штука');
+
+        this.logger.log('Start');
+    }
+    getPiece(): UnitDto {
+        return this.piece;
     }
     getSuppliers(): Map<string, SupplierDto> {
         return this.suppliers;

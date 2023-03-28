@@ -40,7 +40,15 @@ export class CompelParser extends AbstractParser {
                     { name: 'name', stringValue: item.item_name },
                     { name: 'producer', stringValue: item.item_brend },
                     ...(item.package_name ? [{ name: 'case', stringValue: item.package_name }] : []),
-                    ...(item.qty_in_pack ? [{ name: 'packageQuantity', numericValue: item.qty_in_pack }] : []),
+                    ...(item.qty_in_pack
+                        ? [
+                              {
+                                  name: 'packageQuantity',
+                                  numericValue: item.qty_in_pack,
+                                  unit: this.parsers.getPiece().id,
+                              },
+                          ]
+                        : []),
                 ],
                 warehouses: item.locations.map(
                     (location): WarehouseDto => ({

@@ -10,13 +10,14 @@ import { SupplierService } from '../supplier/supplier.service';
 import { GoodService } from '../good/good.service';
 import { CurrencyService } from '../currency/currency.service';
 import { RctParser } from './schedule-parsers/rct.parser';
+import { UnitService } from '../unit/unit.service';
 
 @Injectable()
 export class ParserSchedule implements IScheduleParsers {
     private readonly logger = new Logger('ScheduleParser');
     private parsers = {
         //'0 * * * * *': [TestParser],
-        '0 41 * * * *': [RctParser],
+        '0 13 * * * *': [RctParser],
     };
     constructor(
         private schedulerRegistry: SchedulerRegistry,
@@ -25,6 +26,7 @@ export class ParserSchedule implements IScheduleParsers {
         private supplierService: SupplierService,
         @Inject(forwardRef(() => GoodService)) private goodService: GoodService,
         private currencyService: CurrencyService,
+        private unitService: UnitService,
     ) {
         Object.keys(this.parsers).forEach((key) => {
             this.parsers[key].forEach((parserClass) => {
@@ -58,5 +60,8 @@ export class ParserSchedule implements IScheduleParsers {
     }
     getGoods(): GoodService {
         return this.goodService;
+    }
+    getUnitService(): UnitService {
+        return this.unitService;
     }
 }

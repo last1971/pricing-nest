@@ -8,6 +8,7 @@ import { ParserProcessor } from './parser.processor';
 import { GoodModule } from '../good/good.module';
 import { CurrencyModule } from '../currency/currency.module';
 import { ParserSchedule } from './parser.schedule';
+import { UnitModule } from '../unit/unit.module';
 
 @Module({
     imports: [
@@ -16,6 +17,7 @@ import { ParserSchedule } from './parser.schedule';
         SupplierModule,
         CurrencyModule,
         GoodModule,
+        UnitModule,
         BullModule.registerQueue({
             name: 'api',
         }),

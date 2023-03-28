@@ -19,6 +19,7 @@ export class RctParser extends ScheduleParser {
         const promises: Promise<any>[] = [];
         const supplier = await this.schedule.getSuppliers().alias('rct');
         const currency = await this.schedule.getCurrencies().alfa3('USD');
+        const piece = await this.schedule.getUnitService().name('штука');
         worksheet.eachRow((row, rowNumber) => {
             const code = <string>row.getCell(5).value;
             if (code && rowNumber > 8) {
@@ -102,7 +103,7 @@ export class RctParser extends ScheduleParser {
                     alias,
                     parameters: [
                         { name: 'name', stringValue: alias },
-                        { name: 'packageQuantity', numericValue: multiple },
+                        { name: 'packageQuantity', numericValue: multiple, unit: piece.id },
                         ...(remark ? [{ name: 'remark', stringValue: remark }] : []),
                         ...(producer ? [{ name: 'producer', stringValue: producer }] : []),
                         ...(body ? [{ name: 'case', stringValue: body }] : []),

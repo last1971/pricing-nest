@@ -12,6 +12,7 @@ import { QueueAdd, QueueMock } from '../mocks/queue.mock';
 import { parseResponse, SupplierMock } from '../supplier/supplier.mock';
 import { SupplierDto } from '../supplier/supplier.dto';
 import { CurrencyDto } from '../currency/dto/currency.dto';
+import { UnitService } from '../unit/unit.service';
 
 describe('ParsersService', () => {
     let service: ParsersService;
@@ -31,6 +32,12 @@ describe('ParsersService', () => {
                 {
                     provide: ConfigService,
                     useValue: {},
+                },
+                {
+                    provide: UnitService,
+                    useValue: {
+                        name: jest.fn(),
+                    },
                 },
                 {
                     provide: CACHE_MANAGER,

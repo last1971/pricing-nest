@@ -34,7 +34,9 @@ export class PromelecParser extends AbstractParser {
                 ...(item.producer_name ? [{ name: 'producer', stringValue: item.producer_name }] : []),
                 ...(item.package ? [{ name: 'case', stringValue: item.package }] : []),
                 ...(item.description ? [{ name: 'remark', stringValue: item.description }] : []),
-                ...(item.pack_quant ? [{ name: 'packageQuantity', numericValue: item.pack_quant }] : []),
+                ...(item.pack_quant
+                    ? [{ name: 'packageQuantity', numericValue: item.pack_quant, unit: this.parsers.getPiece().id }]
+                    : []),
             ],
             warehouses: [
                 {
@@ -46,7 +48,7 @@ export class PromelecParser extends AbstractParser {
                 },
             ].concat(
                 (item.vendors ?? []).map((vendor) => ({
-                    name: 'PromelecVendor' + vendor.vendor,
+                    name: 'Vendor' + vendor.vendor,
                     deliveryTime: 8 + vendor.delivery,
                     quantity: vendor.quant,
                     multiple: vendor.mpq ?? 1,
