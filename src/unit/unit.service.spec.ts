@@ -3,6 +3,7 @@ import { UnitService } from './unit.service';
 import { Unit } from './unit.schema';
 import { getModelToken } from '@nestjs/mongoose';
 
+const findOne = jest.fn().mockResolvedValue({ toObject: () => ({}) });
 describe('UnitService', () => {
     let service: UnitService;
 
@@ -12,7 +13,9 @@ describe('UnitService', () => {
                 UnitService,
                 {
                     provide: getModelToken(Unit.name),
-                    useValue: {},
+                    useValue: {
+                        findOne,
+                    },
                 },
             ],
         }).compile();
@@ -22,5 +25,10 @@ describe('UnitService', () => {
 
     it('should be defined', () => {
         expect(service).toBeDefined();
+    });
+
+    it('test name', async () => {
+        await service.name('test');
+        expect(findOne.mock.calls[0]).toEqual([{ name: 'test' }]);
     });
 });

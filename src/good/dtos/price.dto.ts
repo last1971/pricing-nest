@@ -1,8 +1,8 @@
-import { IsInt, IsNotEmpty } from 'class-validator';
+import { IsBoolean, IsInt, IsNotEmpty, IsNumber } from 'class-validator';
 
 export class PriceDto {
     @IsNotEmpty()
-    @IsInt()
+    @IsNumber()
     value: number;
 
     @IsNotEmpty()
@@ -15,4 +15,8 @@ export class PriceDto {
 
     @IsNotEmpty()
     currency: string;
+
+    @IsNotEmpty()
+    @IsBoolean()
+    isOrdinary: boolean;
 }

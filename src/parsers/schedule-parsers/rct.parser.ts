@@ -35,6 +35,7 @@ export class RctParser extends ScheduleParser {
                         min: multiple,
                         max: price2 === 0 ? 0 : nextQuantity1,
                         currency: currency.id,
+                        isOrdinary: false,
                     });
                 }
                 if (price2 !== 0) {
@@ -52,6 +53,7 @@ export class RctParser extends ScheduleParser {
                         min: nextQuantity1 + multiple,
                         max: nextQuantity2 !== 0 ? nextQuantity2 - multiple : 0,
                         currency: currency.id,
+                        isOrdinary: false,
                     });
                 }
                 if (price3 !== 0) {
@@ -60,6 +62,7 @@ export class RctParser extends ScheduleParser {
                         min: nextQuantity2,
                         max: 0,
                         currency: currency.id,
+                        isOrdinary: false,
                     });
                 }
                 const warehouses: WarehouseDto[] = [];
@@ -87,12 +90,23 @@ export class RctParser extends ScheduleParser {
                         prices,
                     });
                 }
+                const alias = <string>row.getCell(3).value.toString();
+                const remark = <string>row.getCell(4).value?.toString();
+                const producer = <string>row.getCell(8).value?.toString();
+                const body = <string>row.getCell(7).value?.toString();
                 const good: GoodDto = {
                     code,
                     source: Source.Db,
                     supplier: supplier.id,
                     warehouses,
-                    alias: <string>row.getCell(3).value.toString(),
+                    alias,
+                    parameters: [
+                        { name: 'name', stringValue: alias },
+                        { name: 'packageQuantity', numericValue: multiple },
+                        ...(remark ? [{ name: 'remark', stringValue: remark }] : []),
+                        ...(producer ? [{ name: 'producer', stringValue: producer }] : []),
+                        ...(body ? [{ name: 'case', stringValue: body }] : []),
+                    ],
                 };
                 promises.push(this.schedule.getGoods().createOrUpdate(good));
             }

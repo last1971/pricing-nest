@@ -37,22 +37,10 @@ export class CompelParser extends AbstractParser {
                 alias: item.item_name,
                 source: Source.Api,
                 parameters: [
-                    {
-                        name: 'name',
-                        stringValue: item.item_name,
-                    },
-                    {
-                        name: 'producer',
-                        stringValue: item.item_brend,
-                    },
-                    ...(item.package_name
-                        ? [
-                              {
-                                  name: 'case',
-                                  stringValue: item.package_name,
-                              },
-                          ]
-                        : []),
+                    { name: 'name', stringValue: item.item_name },
+                    { name: 'producer', stringValue: item.item_brend },
+                    ...(item.package_name ? [{ name: 'case', stringValue: item.package_name }] : []),
+                    ...(item.qty_in_pack ? [{ name: 'packageQuantity', numericValue: item.qty_in_pack }] : []),
                 ],
                 warehouses: item.locations.map(
                     (location): WarehouseDto => ({
@@ -66,6 +54,7 @@ export class CompelParser extends AbstractParser {
                                 min: price.min_qty,
                                 max: price.max_qty,
                                 currency: this.getCurrency().id,
+                                isOrdinary: false,
                             }),
                         ),
                     }),

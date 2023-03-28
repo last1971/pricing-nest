@@ -29,6 +29,13 @@ export class PromelecParser extends AbstractParser {
             alias: item.name,
             code: item.item_id,
             supplier: this.getSupplier().id,
+            parameters: [
+                { name: 'name', stringValue: item.name },
+                ...(item.producer_name ? [{ name: 'producer', stringValue: item.producer_name }] : []),
+                ...(item.package ? [{ name: 'case', stringValue: item.package }] : []),
+                ...(item.description ? [{ name: 'remark', stringValue: item.description }] : []),
+                ...(item.pack_quant ? [{ name: 'packageQuantity', numericValue: item.pack_quant }] : []),
+            ],
             warehouses: [
                 {
                     name: 'CENTER',
@@ -50,13 +57,29 @@ export class PromelecParser extends AbstractParser {
     }
 
     private parsePrices(data: any, item: any): any {
-        return (data ?? []).map(
-            (price, index, prices): PriceDto => ({
-                value: price.price / (item.price_unit ?? 1),
-                min: item.moq > price.quant ? item.moq : price.quant,
-                max: index + 1 === prices.length ? 0 : prices[index + 1].quant - 1,
-                currency: this.getCurrency().id,
-            }),
-        );
+        return (data ?? [])
+            .map((price, index, prices): PriceDto[] => {
+                return [
+                    {
+                        value: price.price / (item.price_unit ?? 1),
+                        min: item.moq > price.quant ? item.moq : price.quant,
+                        max: index + 1 === prices.length ? 0 : prices[index + 1].quant - 1,
+                        currency: this.getCurrency().id,
+                        isOrdinary: false,
+                    },
+                    ...(!item.vendors
+                        ? []
+                        : [
+                              {
+                                  value: price.pureprice / (item.price_unit ?? 1),
+                                  min: item.moq > price.quant ? item.moq : price.quant,
+                                  max: index + 1 === prices.length ? 0 : prices[index + 1].quant - 1,
+                                  currency: this.getCurrency().id,
+                                  isOrdinary: true,
+                              },
+                          ]),
+                ];
+            })
+            .flat();
     }
 }
