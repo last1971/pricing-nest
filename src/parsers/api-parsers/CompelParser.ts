@@ -36,6 +36,24 @@ export class CompelParser extends AbstractParser {
                 code: item.item_id,
                 alias: item.item_name,
                 source: Source.Api,
+                parameters: [
+                    {
+                        name: 'name',
+                        stringValue: item.item_name,
+                    },
+                    {
+                        name: 'producer',
+                        stringValue: item.item_brend,
+                    },
+                    ...(item.package_name
+                        ? [
+                              {
+                                  name: 'case',
+                                  stringValue: item.package_name,
+                              },
+                          ]
+                        : []),
+                ],
                 warehouses: item.locations.map(
                     (location): WarehouseDto => ({
                         name: location.item_id,

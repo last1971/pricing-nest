@@ -5,10 +5,10 @@ export class ParameterDto {
     name: string;
     @ValidateIf((o) => !o.numericValue)
     @IsNotEmpty()
-    stringValue: string;
+    stringValue?: string;
     @ValidateIf((o) => !o.stringValue)
     @IsNotEmpty()
-    numericValue: number;
+    numericValue?: number;
     @IsOptional()
     unit?: string;
 }

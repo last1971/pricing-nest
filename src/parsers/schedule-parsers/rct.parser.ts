@@ -92,7 +92,7 @@ export class RctParser extends ScheduleParser {
                     source: Source.Db,
                     supplier: supplier.id,
                     warehouses,
-                    alias: <string>row.getCell(3).value,
+                    alias: <string>row.getCell(3).value.toString(),
                 };
                 promises.push(this.schedule.getGoods().createOrUpdate(good));
             }
