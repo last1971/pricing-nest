@@ -41,6 +41,7 @@
     "lodash": "^4.17.21",
     "luxon": "^3.3.0",
     "mongoose": "^6.8.2",
+    "qs": "^6.11.1",
     "redis": "^4.6.4",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",

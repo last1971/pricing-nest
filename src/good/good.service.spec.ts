@@ -49,7 +49,13 @@ describe('GoodService', () => {
     });
 
     it('test createOrUpdate', async () => {
-        await service.createOrUpdate({ alias: 'max232', code: 'code', warehouses: [], supplier: 'compel' });
+        await service.createOrUpdate({
+            alias: 'max232',
+            code: 'code',
+            warehouses: [],
+            supplier: 'compel',
+            updatedAt: new Date(),
+        });
         expect(findOneAndUpdate.mock.calls.length).toEqual(1);
         const args = findOneAndUpdate.mock.calls[0];
         expect(args.length).toEqual(3);

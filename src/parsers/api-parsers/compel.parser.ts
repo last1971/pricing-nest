@@ -1,9 +1,11 @@
-import { AbstractParser } from './AbstractParser';
+import { AbstractParser } from './abstract.parser';
 import { v4 } from 'uuid';
 import { GoodDto } from '../../good/dtos/good.dto';
 import { Source } from '../../good/dtos/source.enum';
 import { WarehouseDto } from '../../good/dtos/warehouse.dto';
 import { PriceDto } from '../../good/dtos/price.dto';
+import { Observable } from 'rxjs';
+import { AxiosResponse } from 'axios';
 export class CompelParser extends AbstractParser {
     getAlias(): string {
         return 'compel';
@@ -11,8 +13,11 @@ export class CompelParser extends AbstractParser {
     getCurrencyAlfa(): string {
         return 'USD';
     }
-    getParams(): any {
-        return {
+    useGetMethod(): boolean {
+        return false;
+    }
+    getResponse(): Observable<AxiosResponse<any, any>> {
+        return this.parsers.getHttp().post(this.parsers.getConfigService().get<string>('API_COMPEL_URL'), {
             id: v4(),
             method: 'search_item_name_h',
             params: {
@@ -21,14 +26,9 @@ export class CompelParser extends AbstractParser {
                 calc_price: true,
                 calc_qty: true,
             },
-        };
+        });
     }
-
-    getUrl(): string {
-        return this.parsers.getConfigService().get<string>('API_COMPEL_URL');
-    }
-
-    parseResponse(response: any): GoodDto[] {
+    async parseResponse(response: any): Promise<GoodDto[]> {
         if (response.error) throw response.error;
         return response.result.items.map(
             (item): GoodDto => ({

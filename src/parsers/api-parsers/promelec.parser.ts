@@ -1,7 +1,9 @@
-import { AbstractParser } from './AbstractParser';
+import { AbstractParser } from './abstract.parser';
 import { Source } from '../../good/dtos/source.enum';
 import { GoodDto } from '../../good/dtos/good.dto';
 import { PriceDto } from '../../good/dtos/price.dto';
+import { Observable } from 'rxjs';
+import { AxiosResponse } from 'axios';
 
 export class PromelecParser extends AbstractParser {
     getAlias(): string {
@@ -10,20 +12,17 @@ export class PromelecParser extends AbstractParser {
     getCurrencyAlfa(): string {
         return 'RUB';
     }
-    getParams(): any {
-        return {
+    getResponse(): Observable<AxiosResponse<any, any>> {
+        return this.parsers.getHttp().post(this.parsers.getConfigService().get<string>('API_PROM_URL'), {
             method: 'items_data_find',
             login: this.parsers.getConfigService().get<string>('API_PROM_LOGIN'),
             password: this.parsers.getConfigService().get<string>('API_PROM_PASS'),
             customer_id: this.parsers.getConfigService().get<string>('API_PROM_ID'),
             name: this.search,
             extended: 1,
-        };
+        });
     }
-    getUrl(): string {
-        return this.parsers.getConfigService().get<string>('API_PROM_URL');
-    }
-    parseResponse(response: any): GoodDto[] {
+    async parseResponse(response: any): Promise<GoodDto[]> {
         return response.map((item) => ({
             updatedAt: new Date(),
             source: Source.Api,

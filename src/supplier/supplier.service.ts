@@ -3,9 +3,10 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Supplier, SupplierDocument } from './supplier.schema';
 import { Model } from 'mongoose';
 import { SupplierDto } from './supplier.dto';
-import { CompelParser } from '../parsers/api-parsers/CompelParser';
-import { PromelecParser } from '../parsers/api-parsers/PromelecParser';
+import { CompelParser } from '../parsers/api-parsers/compel.parser';
+import { PromelecParser } from '../parsers/api-parsers/promelec.parser';
 import { ModelToDto } from '../decorators/modelToDto';
+import { PlatanParser } from '../parsers/api-parsers/platan.parser';
 
 @Injectable()
 export class SupplierService {
@@ -14,6 +15,7 @@ export class SupplierService {
         this.parsers = {
             compel: CompelParser,
             promelec: PromelecParser,
+            platan: PlatanParser,
         };
     }
     //@ModelToDto(SupplierDto)

@@ -1,26 +1,21 @@
-import { AbstractParser } from '../parsers/api-parsers/AbstractParser';
+import { AbstractParser } from '../parsers/api-parsers/abstract.parser';
 import { GoodDto } from '../good/dtos/good.dto';
 import { isArray } from 'lodash';
 import { Source } from '../good/dtos/source.enum';
+import { Observable } from 'rxjs';
+import { AxiosResponse } from 'axios';
 
 export class MockParser extends AbstractParser {
     getAlias(): string {
         return 'first';
     }
-
     getCurrencyAlfa(): string {
         return 'V01';
     }
-
-    getParams(): any {
-        return [];
+    getResponse(): Observable<AxiosResponse<any, any>> {
+        return this.parsers.getHttp().post('url');
     }
-
-    getUrl(): string {
-        return 'url';
-    }
-
-    parseResponse(response: any): GoodDto[] {
+    async parseResponse(response: any): Promise<GoodDto[]> {
         if (isArray(response)) {
             response.forEach((item) => (item.source = Source.Api));
         }
@@ -29,7 +24,7 @@ export class MockParser extends AbstractParser {
 }
 export const parseResponse = jest
     .spyOn(MockParser.prototype, 'parseResponse')
-    .mockImplementation((response: any): GoodDto[] => {
+    .mockImplementation(async (response: any): Promise<GoodDto[]> => {
         if (isArray(response)) {
             response.forEach((item) => (item.source = Source.Api));
         }

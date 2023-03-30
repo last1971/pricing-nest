@@ -2,9 +2,9 @@ import { GoodDto } from '../../good/dtos/good.dto';
 import { IApiParsers } from '../../interfaces/IApiParsers';
 import { SupplierDto } from '../../supplier/supplier.dto';
 import { PriceRequestDto } from '../../price/dtos/price.request.dto';
-import { catchError, firstValueFrom, map } from 'rxjs';
+import { catchError, firstValueFrom, map, Observable } from 'rxjs';
 import { Source } from '../../good/dtos/source.enum';
-import { AxiosError } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import { CurrencyDto } from '../../currency/dto/currency.dto';
 
 export abstract class AbstractParser {
@@ -15,15 +15,14 @@ export abstract class AbstractParser {
     }
     abstract getAlias(): string;
     abstract getCurrencyAlfa(): string;
-    abstract getUrl(): string;
-    abstract getParams(): any;
+    abstract getResponse(): Observable<AxiosResponse<any, any>>;
     getSupplier(): SupplierDto {
         return this.parsers.getSuppliers().get(this.getAlias());
     }
     getCurrency(): CurrencyDto {
         return this.parsers.getCurrencies().get(this.getCurrencyAlfa());
     }
-    abstract parseResponse(response: any): GoodDto[];
+    abstract parseResponse(response: any): Promise<GoodDto[]>;
     async parse(): Promise<GoodDto[]> {
         const key = this.getAlias() + ' : ' + this.search;
         let response: GoodDto[];
@@ -32,11 +31,9 @@ export abstract class AbstractParser {
         }
         if (!response) {
             response = await firstValueFrom(
-                this.parsers
-                    .getHttp()
-                    .post(this.getUrl(), this.getParams())
+                this.getResponse()
                     .pipe(map((res) => res.data))
-                    .pipe(map((res) => this.parseResponse(res)))
+                    .pipe(map(async (res) => await this.parseResponse(res)))
                     .pipe(
                         catchError((error: AxiosError) => {
                             throw error.message;

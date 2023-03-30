@@ -7,7 +7,7 @@ import { HttpService } from '@nestjs/axios';
 import { SupplierDto } from '../supplier/supplier.dto';
 import { PriceRequestDto } from '../price/dtos/price.request.dto';
 import { GoodDto } from '../good/dtos/good.dto';
-import { AbstractParser } from './api-parsers/AbstractParser';
+import { AbstractParser } from './api-parsers/abstract.parser';
 import { at } from 'lodash';
 import { Queue } from 'bull';
 import { InjectQueue } from '@nestjs/bull';
