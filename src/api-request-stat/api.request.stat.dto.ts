@@ -6,4 +6,5 @@ export class ApiRequestStatDto {
     errorMessage?: string;
     dateTime: DateTime;
     duration: number;
+    search: string;
 }

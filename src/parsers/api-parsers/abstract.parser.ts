@@ -6,6 +6,8 @@ import { catchError, firstValueFrom, map, Observable } from 'rxjs';
 import { Source } from '../../good/dtos/source.enum';
 import { AxiosError, AxiosResponse } from 'axios';
 import { CurrencyDto } from '../../currency/dto/currency.dto';
+import { DateTime } from 'luxon';
+import { ApiRequestStatDto } from '../../api-request-stat/api.request.stat.dto';
 
 export abstract class AbstractParser {
     protected search: string;
@@ -30,18 +32,34 @@ export abstract class AbstractParser {
             response = await this.parsers.getCache().get<GoodDto[]>(key);
         }
         if (!response) {
+            const dateTime = DateTime.now();
+            let errorMessage = null;
+            let isSuccess = true;
             response = await firstValueFrom(
                 this.getResponse()
                     .pipe(map((res) => res.data))
                     .pipe(map(async (res) => await this.parseResponse(res)))
                     .pipe(
-                        catchError((error: AxiosError) => {
-                            throw error.message;
+                        catchError(async (error: AxiosError) => {
+                            errorMessage = error.message;
+                            isSuccess = false;
+                            return [];
                         }),
                     ),
             );
-            await this.parsers.getCache().set(key, response);
-            await this.parsers.getQueue().add('keys', key);
+            const apiRequestStat: ApiRequestStatDto = {
+                dateTime,
+                duration: DateTime.now().diff(dateTime, 'milliseconds').milliseconds,
+                supplier: this.getSupplier().id,
+                search: this.search,
+                isSuccess,
+                errorMessage,
+            };
+            await this.parsers.getQueue().add('apiRequestStats', apiRequestStat);
+            if (isSuccess) {
+                await this.parsers.getCache().set(key, response);
+                await this.parsers.getQueue().add('keys', key);
+            }
         } else {
             response.forEach((good) => {
                 good.source = Source.Cache;

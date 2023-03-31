@@ -16,5 +16,7 @@ export class ApiRequestStat {
     dateTime: DateTime;
     @Prop({ required: true })
     duration: number;
+    @Prop({ required: true })
+    search: string;
 }
 export const ApiRequestStatSchema = SchemaFactory.createForClass(ApiRequestStat);

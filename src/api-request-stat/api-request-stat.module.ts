@@ -6,5 +6,6 @@ import { ApiRequestStat, ApiRequestStatSchema } from './api.request.stat.schema'
 @Module({
     imports: [MongooseModule.forFeature([{ name: ApiRequestStat.name, schema: ApiRequestStatSchema }])],
     providers: [ApiRequestStatService],
+    exports: [ApiRequestStatService],
 })
 export class ApiRequestStatModule {}

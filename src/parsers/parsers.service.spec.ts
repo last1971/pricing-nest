@@ -5,7 +5,7 @@ import { CurrencyService } from '../currency/currency.service';
 import { ConfigService } from '@nestjs/config';
 import { CACHE_MANAGER } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { CurrencyMock } from '../currency/currency.mock';
 import { CacheMock, CacheSet } from '../mocks/cache.mock';
 import { QueueAdd, QueueMock } from '../mocks/queue.mock';
@@ -51,6 +51,8 @@ describe('ParsersService', () => {
                                 data: [{}, {}],
                             }),
                         ),
+                        get: () =>
+                            new Observable((s) => s.error({ response: 'resp', status: '4xx', message: 'test error' })),
                     },
                 },
                 {
@@ -87,27 +89,31 @@ describe('ParsersService', () => {
 
     it('Test cache search', async () => {
         const response = await service.search({ search: '123', withCache: true, dbOnly: false });
-        expect(response).toHaveLength(2);
+        expect(response).toHaveLength(1);
         expect(response[0]).toEqual({ source: 'Cache' });
         expect(CacheSet.mock.calls).toHaveLength(0);
-        expect(QueueAdd.mock.calls).toHaveLength(0);
+        expect(QueueAdd.mock.calls).toHaveLength(1);
+        expect(QueueAdd.mock.calls[0][1]).toHaveProperty('isSuccess', false);
     });
 
     it('Test no cache search', async () => {
         const response = await service.search({ search: '123', withCache: false, dbOnly: false });
-        expect(response).toHaveLength(4);
+        expect(response).toHaveLength(2);
         expect(response[0]).toEqual({ source: 'Api' });
-        expect(CacheSet.mock.calls).toHaveLength(2);
-        expect(QueueAdd.mock.calls).toHaveLength(2);
+        expect(CacheSet.mock.calls).toHaveLength(1);
+        expect(QueueAdd.mock.calls).toHaveLength(3);
+        expect(QueueAdd.mock.calls[0][1]).toHaveProperty('isSuccess', false);
+        expect(QueueAdd.mock.calls[1][1]).toHaveProperty('isSuccess', true);
+        expect(QueueAdd.mock.calls[2]).toEqual(['keys', 'first : 123']);
     });
 
     it('Test http search', async () => {
         const response = await service.search({ search: '1234', withCache: true, dbOnly: false });
-        expect(response).toHaveLength(4);
+        expect(response).toHaveLength(2);
         expect(response[0]).toEqual({ source: 'Api' });
-        expect(parseResponse.mock.results).toHaveLength(2);
-        expect(CacheSet.mock.calls).toHaveLength(2);
-        expect(QueueAdd.mock.calls).toHaveLength(2);
+        expect(parseResponse.mock.results).toHaveLength(1);
+        expect(CacheSet.mock.calls).toHaveLength(1);
+        expect(QueueAdd.mock.calls).toHaveLength(3);
     });
 
     it('Test http search first supplier', async () => {
@@ -120,6 +126,8 @@ describe('ParsersService', () => {
         expect(response).toHaveLength(2);
         expect(response[0]).toEqual({ source: 'Api' });
         expect(CacheSet.mock.calls).toHaveLength(1);
-        expect(QueueAdd.mock.calls).toHaveLength(1);
+        expect(QueueAdd.mock.calls).toHaveLength(2);
+        expect(QueueAdd.mock.calls[0][1]).toHaveProperty('isSuccess', true);
+        expect(QueueAdd.mock.calls[1]).toEqual(['keys', 'first : 1234']);
     });
 });

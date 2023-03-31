@@ -9,6 +9,7 @@ import { GoodModule } from '../good/good.module';
 import { CurrencyModule } from '../currency/currency.module';
 import { ParserSchedule } from './parser.schedule';
 import { UnitModule } from '../unit/unit.module';
+import { ApiRequestStatModule } from '../api-request-stat/api-request-stat.module';
 
 @Module({
     imports: [
@@ -18,6 +19,7 @@ import { UnitModule } from '../unit/unit.module';
         CurrencyModule,
         GoodModule,
         UnitModule,
+        ApiRequestStatModule,
         BullModule.registerQueue({
             name: 'api',
         }),
