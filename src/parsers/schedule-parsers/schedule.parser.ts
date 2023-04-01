@@ -30,7 +30,7 @@ export class ScheduleParser implements ICommand {
                 return this.schedule.getGoods().createOrUpdate(rancidGood);
             }),
         );
-        this.schedule.getLog().debug(`Finish ${this.supplierAlias} parse`);
+        this.schedule.getLog().log(`Finish ${this.supplierAlias} parse`);
     }
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     protected async parse(): Promise<void> {}

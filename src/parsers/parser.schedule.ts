@@ -17,7 +17,7 @@ export class ParserSchedule implements IScheduleParsers {
     private readonly logger = new Logger('ScheduleParser');
     private parsers = {
         //'0 * * * * *': [TestParser],
-        '0 0 0 * * *': [RctParser],
+        '0 40 15 * * *': [RctParser],
     };
     constructor(
         private schedulerRegistry: SchedulerRegistry,
@@ -38,6 +38,7 @@ export class ParserSchedule implements IScheduleParsers {
                 job.start();
             });
         });
+        this.logger.log('Start');
     }
 
     getConfigService(): ConfigService {
