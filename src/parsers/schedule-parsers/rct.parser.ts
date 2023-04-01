@@ -8,9 +8,9 @@ import { Source } from '../../good/dtos/source.enum';
 import { ScheduleParser } from './schedule.parser';
 
 export class RctParser extends ScheduleParser {
-    async execute(): Promise<void> {
-        this.schedule.getLog().debug('Start rct import');
-        const start = DateTime.now().toISO();
+    protected supplierAlias = 'rct';
+    protected currencyAlfa3 = 'USD';
+    async parse(): Promise<void> {
         const url = this.schedule.getConfigService().get<string>('API_RCT_URL');
         const res = await this.schedule.getHttp().get(url, { responseType: 'stream' });
         const response = await firstValueFrom(res);
@@ -18,9 +18,6 @@ export class RctParser extends ScheduleParser {
         await workbook.xlsx.read(response.data);
         const worksheet = workbook.getWorksheet(1);
         const promises: Promise<any>[] = [];
-        const supplier = await this.schedule.getSuppliers().alias('rct');
-        const currency = await this.schedule.getCurrencies().alfa3('USD');
-        const piece = await this.schedule.getUnitService().name('штука');
         worksheet.eachRow((row, rowNumber) => {
             const code = <string>row.getCell(5).value?.toString();
             if (code && rowNumber > 8) {
@@ -36,7 +33,7 @@ export class RctParser extends ScheduleParser {
                         value: price1,
                         min: multiple,
                         max: price2 === 0 ? 0 : nextQuantity1,
-                        currency: currency.id,
+                        currency: this.currency.id,
                         isOrdinary: false,
                     });
                 }
@@ -54,7 +51,7 @@ export class RctParser extends ScheduleParser {
                         value: price2,
                         min: nextQuantity1 + multiple,
                         max: nextQuantity2 !== 0 ? nextQuantity2 - multiple : 0,
-                        currency: currency.id,
+                        currency: this.currency.id,
                         isOrdinary: false,
                     });
                 }
@@ -63,7 +60,7 @@ export class RctParser extends ScheduleParser {
                         value: price3,
                         min: nextQuantity2,
                         max: 0,
-                        currency: currency.id,
+                        currency: this.currency.id,
                         isOrdinary: false,
                     });
                 }
@@ -73,7 +70,7 @@ export class RctParser extends ScheduleParser {
                 if (quantity) {
                     warehouses.push({
                         name: 'CENTER',
-                        deliveryTime: supplier.deliveryTime,
+                        deliveryTime: this.supplier.deliveryTime,
                         quantity,
                         multiple,
                         prices,
@@ -86,7 +83,7 @@ export class RctParser extends ScheduleParser {
                     );
                     warehouses.push({
                         name: 'TRANSIT',
-                        deliveryTime: supplier.deliveryTime + days,
+                        deliveryTime: this.supplier.deliveryTime + days,
                         quantity: transit,
                         multiple,
                         prices,
@@ -100,12 +97,12 @@ export class RctParser extends ScheduleParser {
                     updatedAt: new Date(),
                     code,
                     source: Source.Db,
-                    supplier: supplier.id,
+                    supplier: this.supplier.id,
                     warehouses,
                     alias,
                     parameters: [
                         { name: 'name', stringValue: alias },
-                        { name: 'packageQuantity', numericValue: multiple, unit: piece.id },
+                        { name: 'packageQuantity', numericValue: multiple, unit: this.piece.id },
                         ...(remark ? [{ name: 'remark', stringValue: remark }] : []),
                         ...(producer ? [{ name: 'producer', stringValue: producer }] : []),
                         ...(body ? [{ name: 'case', stringValue: body }] : []),
@@ -115,13 +112,5 @@ export class RctParser extends ScheduleParser {
             }
         });
         await Promise.all(promises);
-        const rancidGoods = await this.schedule.getGoods().find({ updatedAt: { $lt: start }, supplier: supplier.id });
-        await Promise.all(
-            rancidGoods.map((rancidGood) => {
-                rancidGood.warehouses = [];
-                return this.schedule.getGoods().createOrUpdate(rancidGood);
-            }),
-        );
-        this.schedule.getLog().debug('Finish rct import');
     }
 }
