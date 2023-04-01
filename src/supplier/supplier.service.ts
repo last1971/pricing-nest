@@ -7,6 +7,8 @@ import { CompelParser } from '../parsers/api-parsers/compel.parser';
 import { PromelecParser } from '../parsers/api-parsers/promelec.parser';
 import { ModelToDto } from '../decorators/modelToDto';
 import { PlatanParser } from '../parsers/api-parsers/platan.parser';
+import { ElcoParser } from '../parsers/api-parsers/elco.parser';
+import { ElectronicaParser } from '../parsers/api-parsers/electronica.parser';
 
 @Injectable()
 export class SupplierService {
@@ -16,6 +18,8 @@ export class SupplierService {
             compel: CompelParser,
             promelec: PromelecParser,
             platan: PlatanParser,
+            elcopro: ElcoParser,
+            electronica: ElectronicaParser,
         };
     }
     //@ModelToDto(SupplierDto)
