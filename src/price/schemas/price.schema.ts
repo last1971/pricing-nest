@@ -15,6 +15,9 @@ export class Price {
 
     @Prop({ type: Types.ObjectId, required: true, ref: 'Currency' })
     currency: Currency;
+
+    @Prop({ required: true })
+    isOrdinary: boolean;
 }
 
 export const PriceSchema = SchemaFactory.createForClass(Price);
