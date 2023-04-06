@@ -1,5 +1,7 @@
 import { IsBoolean, IsNotEmpty, IsOptional, MinLength } from 'class-validator';
 import { Transform } from 'class-transformer';
+import { SupplierDto } from '../../supplier/supplier.dto';
+
 export class PriceRequestDto {
     @MinLength(3)
     @IsNotEmpty()
@@ -7,6 +9,9 @@ export class PriceRequestDto {
 
     @IsOptional()
     suppliers?: string[];
+
+    @IsOptional()
+    supplier?: string | SupplierDto;
 
     @IsOptional()
     @IsBoolean()

@@ -45,4 +45,8 @@ export class SupplierService {
     async dbOnly(): Promise<SupplierDto[]> {
         return this.supplierModel.find({ alias: { $nin: Object.keys(this.parsers) } });
     }
+    @ModelToDto(SupplierDto)
+    async id(id: string): Promise<SupplierDto> {
+        return this.supplierModel.findById(id);
+    }
 }

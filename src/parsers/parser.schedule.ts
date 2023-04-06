@@ -12,6 +12,7 @@ import { CurrencyService } from '../currency/currency.service';
 import { RctParser } from './schedule-parsers/rct.parser';
 import { UnitService } from '../unit/unit.service';
 import { MarsParser } from './schedule-parsers/mars.parser';
+import { DanParser } from './schedule-parsers/dan.parser';
 
 @Injectable()
 export class ParserSchedule implements IScheduleParsers {
@@ -20,6 +21,7 @@ export class ParserSchedule implements IScheduleParsers {
         //'0 * * * * *': [TestParser],
         '0 40 15 * * *': [RctParser],
         '0 32 7 * * *': [MarsParser],
+        '0 28 14 * * *': [DanParser],
     };
     constructor(
         private schedulerRegistry: SchedulerRegistry,
