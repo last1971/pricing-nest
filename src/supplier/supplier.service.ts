@@ -5,7 +5,7 @@ import { Model } from 'mongoose';
 import { SupplierDto } from './supplier.dto';
 import { CompelParser } from '../parsers/api-parsers/compel.parser';
 import { PromelecParser } from '../parsers/api-parsers/promelec.parser';
-import { ModelToDto } from '../decorators/modelToDto';
+import { ModelToDto } from '../decorators/model.to.dto';
 import { PlatanParser } from '../parsers/api-parsers/platan.parser';
 import { ElcoParser } from '../parsers/api-parsers/elco.parser';
 import { ElectronicaParser } from '../parsers/api-parsers/electronica.parser';

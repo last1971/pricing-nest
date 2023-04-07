@@ -5,6 +5,7 @@ import { Supplier } from './supplier.schema';
 
 const find = jest.fn().mockResolvedValue({ toObject: () => ({}) });
 const findOne = jest.fn().mockResolvedValue({ toObject: () => ({}) });
+const findById = jest.fn().mockResolvedValue({ toObject: () => ({}) });
 
 describe('SupplierService', () => {
     let service: SupplierService;
@@ -15,7 +16,7 @@ describe('SupplierService', () => {
                 SupplierService,
                 {
                     provide: getModelToken(Supplier.name),
-                    useValue: { find, findOne },
+                    useValue: { find, findOne, findById },
                 },
             ],
         }).compile();
@@ -32,6 +33,11 @@ describe('SupplierService', () => {
     it('test alias', async () => {
         await service.alias('test');
         expect(findOne.mock.calls[0]).toMatchObject([{ alias: 'test' }]);
+    });
+
+    it('test id', async () => {
+        await service.id('test');
+        expect(findById.mock.calls[0]).toMatchObject(['test']);
     });
 
     it('test all', async () => {

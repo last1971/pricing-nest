@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Currency, CurrencyDocument } from './currency.schema';
 import { Model } from 'mongoose';
 import { CurrencyDto } from './dto/currency.dto';
-import { ModelToDto } from '../decorators/modelToDto';
+import { ModelToDto } from '../decorators/model.to.dto';
 
 @Injectable()
 export class CurrencyService {

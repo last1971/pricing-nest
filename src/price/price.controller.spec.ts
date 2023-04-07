@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { PriceController } from './price.controller';
 import { PriceService } from './price.service';
 import { GoodDto } from '../good/dtos/good.dto';
+import { SupplierService } from '../supplier/supplier.service';
 
 describe('PriceController', () => {
     let controller: PriceController;
@@ -15,6 +16,10 @@ describe('PriceController', () => {
                     useValue: {
                         getPrices: async () => [new GoodDto()],
                     },
+                },
+                {
+                    provide: SupplierService,
+                    useValue: {},
                 },
             ],
         }).compile();

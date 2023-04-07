@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Unit, UnitDocument } from './unit.schema';
 import { Model } from 'mongoose';
 import { UnitDto } from './dtos/unit.dto';
-import { ModelToDto } from '../decorators/modelToDto';
+import { ModelToDto } from '../decorators/model.to.dto';
 
 @Injectable()
 export class UnitService {

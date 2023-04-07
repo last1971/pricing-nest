@@ -1,4 +1,4 @@
-import { ModelToDto } from './modelToDto';
+import { ModelToDto } from './model.to.dto';
 import { IsNotEmpty } from 'class-validator';
 
 class TestDto {
