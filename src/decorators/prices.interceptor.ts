@@ -8,13 +8,19 @@ export class PriceInterceptor implements NestInterceptor {
     intercept(context: ExecutionContext, next: CallHandler<any>): Observable<any> | Promise<Observable<any>> {
         return next.handle().pipe(
             map((data: PriceResponseDto) => {
-                if ((data.request.supplier as SupplierDto).supplierCodes) {
-                    const { supplierCodes } = data.request.supplier as SupplierDto;
-                    data.data.forEach((good: GoodDto) => {
-                        good.supplier = supplierCodes[good.supplier];
-                    });
-                }
-                return data;
+                const supplier = data.request.supplier as SupplierDto;
+                return data.data.map((good: GoodDto) => {
+                    if (!supplier) {
+                        delete good.goodId;
+                    }
+                    if (supplier && supplier.supplierCodes) {
+                        good.supplier = supplier.supplierCodes[good.supplier];
+                    }
+                    if (supplier && good.goodId) {
+                        good.goodId = good.goodId[supplier.id];
+                    }
+                    return good;
+                });
             }),
         );
     }

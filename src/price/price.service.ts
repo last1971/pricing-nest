@@ -3,12 +3,10 @@ import { PriceRequestDto } from './dtos/price.request.dto';
 import { GoodDto } from '../good/dtos/good.dto';
 import { ParsersService } from '../parsers/parsers.service';
 import { GoodService } from '../good/good.service';
-import { ModelToDto } from '../decorators/model.to.dto';
 
 @Injectable()
 export class PriceService {
     constructor(private parsers: ParsersService, private goodService: GoodService) {}
-    @ModelToDto(GoodDto)
     async getPrices(request: PriceRequestDto): Promise<GoodDto[]> {
         const searchers: Promise<GoodDto[]>[] = [this.goodService.search(request)];
         if (!request.dbOnly) {

@@ -5,6 +5,7 @@ import { ParameterDto } from './parameter.dto';
 export class GoodDto {
     supplier: string;
     code: string;
+    goodId?: string | any;
     alias: string;
     source?: Source = Source.Db;
     warehouses: WarehouseDto[];

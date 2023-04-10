@@ -4,6 +4,7 @@ import { Supplier } from '../../supplier/supplier.schema';
 import { Warehouse, WarehouseSchema } from './warehouse.schema';
 import { Parameter, ParameterSchema } from './parameter.schema';
 import { Source } from '../dtos/source.enum';
+import mongoose from 'mongoose';
 
 export type GoodDocument = HydratedDocument<Good>;
 @Schema({ timestamps: true })
@@ -19,6 +20,9 @@ export class Good {
 
     @Prop({ type: String, enum: Source })
     source: Source;
+
+    @Prop({ required: false, type: mongoose.Schema.Types.Mixed })
+    goodId?: any;
 
     @Prop({ type: [WarehouseSchema], required: true })
     warehouses: Warehouse[];
