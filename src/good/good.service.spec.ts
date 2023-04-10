@@ -21,7 +21,7 @@ describe('GoodService', () => {
     };
 
     const findOneAndUpdate = jest.fn();
-    const find = jest.fn();
+    const find = jest.fn().mockReturnValue({ toObject: () => ({}) });
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
