@@ -15,6 +15,7 @@ import { CurrencyService } from '../currency/currency.service';
 import { CurrencyDto } from '../currency/dto/currency.dto';
 import { UnitService } from '../unit/unit.service';
 import { UnitDto } from '../unit/dtos/unit.dto';
+import { GoodService } from '../good/good.service';
 
 @Injectable()
 export class ParsersService implements IApiParsers {
@@ -27,6 +28,7 @@ export class ParsersService implements IApiParsers {
         private supplierService: SupplierService,
         private currencyService: CurrencyService,
         private unitService: UnitService,
+        private goodService: GoodService,
         @Inject(CACHE_MANAGER) private cache: Cache,
         private http: HttpService,
         @InjectQueue('api') private readonly apiQueue: Queue,
@@ -52,6 +54,9 @@ export class ParsersService implements IApiParsers {
     }
     getCurrencies(): Map<string, CurrencyDto> {
         return this.currencies;
+    }
+    getGoodService(): GoodService {
+        return this.goodService;
     }
     getConfigService(): ConfigService {
         return this.configService;

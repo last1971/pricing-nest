@@ -22,7 +22,7 @@ const configService = new ConfigService();
         CacheModule.registerAsync({
             isGlobal: true,
             useFactory: async () => ({
-                store: await redisStore({ ttl: 600000 }),
+                store: await redisStore({ ttl: configService.get<number>('CACHE_DEFAULT_EXP') }),
             }),
         }),
         MongooseModule.forRoot(

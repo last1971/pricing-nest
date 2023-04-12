@@ -42,10 +42,31 @@ describe('GoodService', () => {
         }).compile();
 
         service = module.get<GoodService>(GoodService);
+
+        find.mockClear();
     });
 
     it('should be defined', async () => {
         expect(service).toBeDefined();
+    });
+
+    it('test find', async () => {
+        for (const filter of [
+            { supplier: '1' },
+            { alias: '123' },
+            { alias: '123_' },
+            { alias: { $in: ['1', '2', '3'] } },
+        ]) {
+            await service.find(filter);
+        }
+        [
+            { supplier: '1' },
+            { alias: { $regex: /123/i } },
+            { alias: { $regex: /123/i } },
+            { alias: { $in: ['1', '2', '3'] } },
+        ].forEach((value, index) => {
+            expect(find.mock.calls[index][0]).toEqual(value);
+        });
     });
 
     it('test createOrUpdate', async () => {

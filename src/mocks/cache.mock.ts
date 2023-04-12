@@ -8,6 +8,8 @@ export const CacheMock = {
                 return [{}];
             case 'test : 123':
                 return [new GoodDto()];
+            case 'error : third':
+                return true;
             default:
                 return null;
         }

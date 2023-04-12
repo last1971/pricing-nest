@@ -10,6 +10,7 @@ import { SupplierDto } from '../supplier/supplier.dto';
 import { SupplierService } from '../supplier/supplier.service';
 import { alias } from '../helpers';
 import { ModelToDto } from '../decorators/model.to.dto';
+import { isString } from 'lodash';
 
 @Injectable()
 export class GoodService {
@@ -32,8 +33,8 @@ export class GoodService {
     }
     @ModelToDto(GoodDto)
     async find(filter: any): Promise<GoodDto[]> {
-        if (filter.alias) {
-            filter.alias = alias(filter.alias);
+        if (filter.alias && isString(filter.alias)) {
+            filter.alias = { $regex: new RegExp(alias(filter.alias), 'i') };
         }
         return this.goodModel.find(filter);
     }
