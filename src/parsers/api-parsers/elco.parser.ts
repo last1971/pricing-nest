@@ -39,7 +39,7 @@ export class ElcoParser extends AbstractParser {
         response.data.forEach((item: any) => {
             let good: GoodDto = result.get(item.code);
             if (!good) {
-                good = {
+                good = new GoodDto({
                     alias: item.name,
                     supplier: this.getSupplier().id,
                     code: item.code,
@@ -59,7 +59,7 @@ export class ElcoParser extends AbstractParser {
                             prices: [],
                         },
                     ],
-                };
+                });
                 result.set(item.code, good);
             }
             good.warehouses[0].prices.push({

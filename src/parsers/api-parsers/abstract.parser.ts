@@ -8,7 +8,7 @@ import { CurrencyDto } from '../../currency/dto/currency.dto';
 import { DateTime } from 'luxon';
 import { ApiRequestStatDto } from '../../api-request-stat/api.request.stat.dto';
 import { ApiResponseDto } from './api.response.dto';
-import { isEmpty } from 'lodash';
+import { Source } from '../../good/dtos/source.enum';
 
 export abstract class AbstractParser {
     protected search: string;
@@ -35,17 +35,23 @@ export abstract class AbstractParser {
         });
     }
     async getFromCache(response: ApiResponseDto): Promise<ApiResponseDto> {
-        if (this.withCache && isEmpty(response.data)) {
-            response.data = (await this.parsers.getCache().get<GoodDto[]>(this.getCacheKey())) ?? [];
-            //response.data.forEach((good) => {
-            //    good.source = Source.Cache;
-            //});
+        if (this.withCache && !response.isFinished) {
+            const result = await this.parsers.getCache().get<GoodDto[]>(this.getCacheKey());
+            if (result) {
+                response.data = result.map((good) => {
+                    good = new GoodDto(good);
+                    good.source = Source.Cache;
+                    return good;
+                });
+                response.isFinished = true;
+            }
         }
         return response;
     }
     async checkError(response: ApiResponseDto): Promise<ApiResponseDto> {
         if (await this.parsers.getCache().get<string>('error : ' + this.getAlias())) {
             response.data = await this.getFromDb();
+            response.isFinished = true;
         }
         return response;
     }
@@ -69,12 +75,12 @@ export abstract class AbstractParser {
     }
     async saveToCache(response: ApiResponseDto): Promise<void> {
         if (response.isSuccess) {
-            await this.parsers.getCache().set(this.getCacheKey(), response);
+            await this.parsers.getCache().set(this.getCacheKey(), response.data);
             await this.parsers.getQueue().add('keys', this.getCacheKey());
         }
     }
     async getFromHttp(response): Promise<ApiResponseDto> {
-        if (isEmpty(response.data)) {
+        if (!response.isFinished) {
             response.data = await firstValueFrom(
                 this.getResponse()
                     .pipe(map((res) => res.data))
@@ -86,6 +92,7 @@ export abstract class AbstractParser {
                         }),
                     ),
             );
+            response.isFinished = true;
             await this.saveStat(response);
             await this.saveToCache(response);
         }

@@ -36,7 +36,7 @@ describe('Test PriceInterceptor', () => {
             warehouses: [],
             updatedAt,
         },
-    ];
+    ].map((data) => new GoodDto(data));
     let expectedData: GoodDto[];
     beforeEach(() => {
         priceInterceptor = new PriceInterceptor();
@@ -52,7 +52,8 @@ describe('Test PriceInterceptor', () => {
             ),
         };
         const response = await firstValueFrom(priceInterceptor.intercept(context, handler) as Observable<any>);
-        delete expectedData[0].goodId;
+        expectedData[0].goodId = null;
+        expectedData[1].goodId = null;
         expect(response).toEqual(expectedData);
     });
     it('With supplier', async () => {

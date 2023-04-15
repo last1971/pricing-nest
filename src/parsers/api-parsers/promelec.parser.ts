@@ -23,39 +23,48 @@ export class PromelecParser extends AbstractParser {
         });
     }
     async parseResponse(response: any): Promise<GoodDto[]> {
-        return response.map((item) => ({
-            updatedAt: new Date(),
-            source: Source.Api,
-            alias: item.name.toString(),
-            code: item.item_id.toString(),
-            supplier: this.getSupplier().id,
-            parameters: [
-                { name: 'name', stringValue: item.name },
-                ...(item.producer_name ? [{ name: 'producer', stringValue: item.producer_name }] : []),
-                ...(item.package ? [{ name: 'case', stringValue: item.package }] : []),
-                ...(item.description ? [{ name: 'remark', stringValue: item.description }] : []),
-                ...(item.pack_quant
-                    ? [{ name: 'packageQuantity', numericValue: item.pack_quant, unit: this.parsers.getPiece().id }]
-                    : []),
-            ],
-            warehouses: [
-                {
-                    name: 'CENTER',
-                    deliveryTime: 8,
-                    quantity: item.quant,
-                    multiple: item.price_unit ?? 1,
-                    prices: this.parsePrices(item.pricebreaks, item),
-                },
-            ].concat(
-                (item.vendors ?? []).map((vendor) => ({
-                    name: 'Vendor' + vendor.vendor,
-                    deliveryTime: 8 + vendor.delivery,
-                    quantity: vendor.quant,
-                    multiple: vendor.mpq ?? 1,
-                    prices: this.parsePrices(vendor.pricebreaks, vendor),
-                })),
-            ),
-        }));
+        return response.map(
+            (item): GoodDto =>
+                new GoodDto({
+                    updatedAt: new Date(),
+                    source: Source.Api,
+                    alias: item.name.toString(),
+                    code: item.item_id.toString(),
+                    supplier: this.getSupplier().id,
+                    parameters: [
+                        { name: 'name', stringValue: item.name },
+                        ...(item.producer_name ? [{ name: 'producer', stringValue: item.producer_name }] : []),
+                        ...(item.package ? [{ name: 'case', stringValue: item.package }] : []),
+                        ...(item.description ? [{ name: 'remark', stringValue: item.description }] : []),
+                        ...(item.pack_quant
+                            ? [
+                                  {
+                                      name: 'packageQuantity',
+                                      numericValue: item.pack_quant,
+                                      unit: this.parsers.getPiece().id,
+                                  },
+                              ]
+                            : []),
+                    ],
+                    warehouses: [
+                        {
+                            name: 'CENTER',
+                            deliveryTime: 8,
+                            quantity: item.quant,
+                            multiple: item.price_unit ?? 1,
+                            prices: this.parsePrices(item.pricebreaks, item),
+                        },
+                    ].concat(
+                        (item.vendors ?? []).map((vendor) => ({
+                            name: 'Vendor' + vendor.vendor,
+                            deliveryTime: 8 + vendor.delivery,
+                            quantity: vendor.quant,
+                            multiple: vendor.mpq ?? 1,
+                            prices: this.parsePrices(vendor.pricebreaks, vendor),
+                        })),
+                    ),
+                }),
+        );
     }
 
     private parsePrices(data: any, item: any): any {

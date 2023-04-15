@@ -154,7 +154,7 @@ describe('ParsersService', () => {
         const response = new ApiResponseDto();
         const parser = new MockParser1({ search: '123', withCache: false, dbOnly: false }, service);
         await parser.saveToCache(response);
-        expect(CacheSet.mock.calls[0]).toEqual(['first : 123', response]);
+        expect(CacheSet.mock.calls[0]).toEqual(['first : 123', response.data]);
         expect(QueueAdd.mock.calls).toHaveLength(1);
         expect(QueueAdd.mock.calls[0]).toEqual(['keys', 'first : 123']);
     });
@@ -174,7 +174,7 @@ describe('ParsersService', () => {
         expect(response).toEqual([{ source: 'Api' }, { source: 'Api' }, { source: 'Db' }, { source: 'Db' }]);
         expect(CacheSet.mock.calls).toHaveLength(2);
         expect(CacheSet.mock.calls[0]).toEqual(['error : second', true, null]);
-        expect(CacheSet.mock.calls[1][1]).toHaveProperty('isSuccess', true);
+        expect(CacheSet.mock.calls[1]).toEqual(['first : 123', [{ source: 'Api' }, { source: 'Api' }]]);
         expect(QueueAdd.mock.calls).toHaveLength(3);
         expect(QueueAdd.mock.calls[0][1]).toHaveProperty('isSuccess', true);
         expect(QueueAdd.mock.calls[2][1]).toHaveProperty('isSuccess', false);

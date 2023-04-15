@@ -91,7 +91,7 @@ export class PlatanParser extends AbstractParser {
                     });
                 }
             }
-            return {
+            return new GoodDto({
                 updatedAt: new Date(),
                 source: Source.Api,
                 alias: item.NAME,
@@ -103,7 +103,7 @@ export class PlatanParser extends AbstractParser {
                     { name: 'packageQuantity', numericValue: item.QUANTY_PACK, unit: this.parsers.getPiece().id },
                 ],
                 warehouses,
-            };
+            });
         });
     }
 }

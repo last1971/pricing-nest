@@ -93,7 +93,7 @@ export class RctParser extends ScheduleParser {
                 const remark = <string>row.getCell(4).value?.toString();
                 const producer = <string>row.getCell(8).value?.toString();
                 const body = <string>row.getCell(7).value?.toString();
-                const good: GoodDto = {
+                const good: GoodDto = new GoodDto({
                     updatedAt: new Date(),
                     code,
                     source: Source.Db,
@@ -107,7 +107,7 @@ export class RctParser extends ScheduleParser {
                         ...(producer ? [{ name: 'producer', stringValue: producer }] : []),
                         ...(body ? [{ name: 'case', stringValue: body }] : []),
                     ],
-                };
+                });
                 promises.push(this.schedule.getGoods().createOrUpdate(good));
             }
         });

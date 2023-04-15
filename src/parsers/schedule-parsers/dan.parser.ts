@@ -53,7 +53,7 @@ export class DanParser extends ScheduleParser {
             } else if (row.remark2) {
                 remark = row.remark2.toString();
             }
-            const good: GoodDto = {
+            const good: GoodDto = new GoodDto({
                 alias: row.name.toString(),
                 code: row.code,
                 supplier: this.supplier.id,
@@ -73,7 +73,7 @@ export class DanParser extends ScheduleParser {
                         prices,
                     },
                 ],
-            };
+            });
             promises.push(this.schedule.getGoods().createOrUpdate(good));
         });
         await Promise.all(promises);

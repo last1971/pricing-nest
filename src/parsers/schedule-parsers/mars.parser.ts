@@ -88,7 +88,7 @@ export class MarsParser extends ScheduleParser {
                     });
                 }
                 const alias = row.name.replace(row.producer, '');
-                const good: GoodDto = {
+                const good: GoodDto = new GoodDto({
                     alias,
                     code: row.code,
                     supplier: this.supplier.id,
@@ -99,7 +99,7 @@ export class MarsParser extends ScheduleParser {
                         { name: 'packageQuantity', numericValue: packageQuantity, unit: this.piece.id },
                     ],
                     warehouses,
-                };
+                });
                 promises.push(this.schedule.getGoods().createOrUpdate(good));
             }
         });

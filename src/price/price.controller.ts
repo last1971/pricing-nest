@@ -16,4 +16,13 @@ export class PriceController {
             request,
         });
     }
+
+    @Get('trade')
+    @UseInterceptors(PriceInterceptor)
+    async findForTrade(@Query(TransformSuppliers) request: PriceRequestDto): Promise<any> {
+        return new PriceResponseDto({
+            data: await this.service.getPrices(request),
+            request,
+        });
+    }
 }
