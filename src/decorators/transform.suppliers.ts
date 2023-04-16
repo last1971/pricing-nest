@@ -9,6 +9,8 @@ export class TransformSuppliers implements PipeTransform {
     async transform(value: PriceRequestDto) {
         if (value.supplier) {
             value.supplier = await this.supplierService.id(value.supplier as string);
+        } else if (value.supplierAlias) {
+            value.supplier = await this.supplierService.alias(value.supplierAlias);
         }
         if (value.suppliers && (value.supplier as SupplierDto)?.supplierCodes) {
             value.suppliers = value.suppliers.map(

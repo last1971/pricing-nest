@@ -14,6 +14,9 @@ export class PriceRequestDto {
     supplier?: string | SupplierDto;
 
     @IsOptional()
+    supplierAlias?: string;
+
+    @IsOptional()
     @IsBoolean()
     @Transform(({ value }) => value === 'true')
     withCache = true;

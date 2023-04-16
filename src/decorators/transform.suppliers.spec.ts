@@ -13,6 +13,11 @@ describe('GoodService', () => {
                 {
                     provide: SupplierService,
                     useValue: {
+                        alias: async () => ({
+                            id: '1',
+                            alias: 'first',
+                            deliveryTime: 1,
+                        }),
                         id: async (id: string): Promise<SupplierDto | null> => {
                             switch (id) {
                                 case '0':
@@ -58,6 +63,26 @@ describe('GoodService', () => {
             search: '123',
             withCache: false,
             dbOnly: false,
+        });
+    });
+    it('with alias', async () => {
+        const request: PriceRequestDto = {
+            search: '123',
+            withCache: false,
+            dbOnly: false,
+            supplierAlias: '1',
+        };
+        const response = await decorator.transform(request);
+        expect(response).toEqual({
+            search: '123',
+            withCache: false,
+            dbOnly: false,
+            supplierAlias: '1',
+            supplier: {
+                id: '1',
+                alias: 'first',
+                deliveryTime: 1,
+            },
         });
     });
     it('with supplier', async () => {
