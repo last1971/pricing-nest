@@ -4,6 +4,7 @@ import { PriceService } from './price.service';
 import { TransformSuppliers } from '../decorators/transform.suppliers';
 import { PriceResponseDto } from './dtos/price.response.dto';
 import { PriceInterceptor } from '../decorators/prices.interceptor';
+import { TradeInterceptor } from '../decorators/trade.interceptor';
 
 @Controller('price')
 export class PriceController {
@@ -18,7 +19,7 @@ export class PriceController {
     }
 
     @Get('trade')
-    @UseInterceptors(PriceInterceptor)
+    @UseInterceptors(TradeInterceptor, PriceInterceptor)
     async findForTrade(@Query(TransformSuppliers) request: PriceRequestDto): Promise<any> {
         return new PriceResponseDto({
             data: await this.service.getPrices(request),

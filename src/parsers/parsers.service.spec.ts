@@ -17,6 +17,7 @@ import { ApiResponseDto } from './api-parsers/api.response.dto';
 import { AxiosError } from 'axios';
 import { GoodService } from '../good/good.service';
 import { GoodDto } from '../good/dtos/good.dto';
+import { omit } from 'lodash';
 
 describe('ParsersService', () => {
     let service: ParsersService;
@@ -129,7 +130,8 @@ describe('ParsersService', () => {
         const response = new ApiResponseDto();
         const parser3 = new MockParser3({ search: '123', withCache: false, dbOnly: false }, service);
         await parser3.checkError(response);
-        expect(response.data).toEqual([new GoodDto()]);
+        expect(response.data).toHaveLength(1);
+        expect(response.data[0]).toHaveProperty('source', 'Db');
     });
 
     it('Test abstract parser obtain error', async () => {
@@ -162,7 +164,7 @@ describe('ParsersService', () => {
     it('Test cache search', async () => {
         const response = await service.search({ search: '123', withCache: true, dbOnly: false });
         expect(response).toHaveLength(3);
-        expect(response).toEqual([{ source: 'Cache' }, { source: 'Db' }, { source: 'Db' }]);
+        expect(response.map((d) => omit(d, 'id'))).toEqual([{ source: 'Cache' }, { source: 'Db' }, { source: 'Db' }]);
         expect(CacheSet.mock.calls).toHaveLength(1);
         expect(QueueAdd.mock.calls).toHaveLength(1);
         expect(QueueAdd.mock.calls[0][1]).toHaveProperty('isSuccess', false);
@@ -171,7 +173,12 @@ describe('ParsersService', () => {
     it('Test no cache search', async () => {
         const response = await service.search({ search: '123', withCache: false, dbOnly: false });
         expect(response).toHaveLength(4);
-        expect(response).toEqual([{ source: 'Api' }, { source: 'Api' }, { source: 'Db' }, { source: 'Db' }]);
+        expect(response.map((d) => omit(d, 'id'))).toEqual([
+            { source: 'Api' },
+            { source: 'Api' },
+            { source: 'Db' },
+            { source: 'Db' },
+        ]);
         expect(CacheSet.mock.calls).toHaveLength(2);
         expect(CacheSet.mock.calls[0]).toEqual(['error : second', true, null]);
         expect(CacheSet.mock.calls[1]).toEqual(['first : 123', [{ source: 'Api' }, { source: 'Api' }]]);
