@@ -28,7 +28,6 @@ export class GoodService {
         const newValues = good as any;
         newValues.source = Source.Db;
         newValues.alias = alias(good.alias);
-        newValues._id = good.id;
         await this.goodModel.findOneAndUpdate(pick(good, ['code', 'supplier']), omit(newValues, ['code', 'supplier']), {
             upsert: true,
         });

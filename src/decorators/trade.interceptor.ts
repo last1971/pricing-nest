@@ -22,7 +22,7 @@ export class TradeInterceptor implements NestInterceptor {
                                     case: (find(good.parameters, ['name', 'case']) as ParameterDto)?.stringValue,
                                     remark: (find(good.parameters, ['name', 'remark']) as ParameterDto)?.stringValue,
                                     id: '',
-                                    sellerGoodId: good.id,
+                                    sellerGoodId: '',
                                     code: good.code,
                                     warehouseCode: warehouse.name,
                                     goodId: good.goodId,
