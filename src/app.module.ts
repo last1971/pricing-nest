@@ -15,31 +15,46 @@ import { GoodModule } from './good/good.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ApiRequestStatModule } from './api-request-stat/api-request-stat.module';
 
-const configService = new ConfigService();
+//const configService = new ConfigService();
 @Module({
     imports: [
         ConfigModule.forRoot({ isGlobal: true }),
         CacheModule.registerAsync({
+            imports: [ConfigModule],
             isGlobal: true,
-            useFactory: async () => ({
-                store: await redisStore({ ttl: configService.get<number>('CACHE_DEFAULT_EXP') }),
+            useFactory: async (configService: ConfigService) => ({
+                store: await redisStore({
+                    ttl: configService.get<number>('CACHE_DEFAULT_EXP'),
+                    socket: {
+                        host: configService.get('REDIS_HOST'),
+                        port: configService.get<number>('REDIS_PORT'),
+                    },
+                }),
             }),
+            inject: [ConfigService],
         }),
-        MongooseModule.forRoot(
-            'mongodb://' +
-                configService.get<string>('MONGODB_USER') +
-                ':' +
-                configService.get<string>('MONGODB_PASS') +
-                '@' +
-                configService.get<string>('MONGODB_URI') +
-                '/' +
-                configService.get<string>('MONGODB_DATABASE'),
-        ),
-        BullModule.forRoot({
-            redis: {
-                host: 'localhost',
-                port: 6379,
+        MongooseModule.forRootAsync({
+            imports: [ConfigModule],
+            useFactory: async (configService: ConfigService) => {
+                const user = configService.get<string>('MONGODB_USER');
+                const pass = configService.get<string>('MONGODB_PASS');
+                const uri = configService.get<string>('MONGODB_URI');
+                const base = configService.get<string>('MONGODB_DATABASE');
+                return {
+                    uri: `mongodb://${user}:${pass}@${uri}/${base}`,
+                };
             },
+            inject: [ConfigService],
+        }),
+        BullModule.forRootAsync({
+            imports: [ConfigModule],
+            useFactory: async (configService: ConfigService) => ({
+                redis: {
+                    host: configService.get('REDIS_HOST'),
+                    port: configService.get('REDIS_PORT'),
+                },
+            }),
+            inject: [ConfigService],
         }),
         ScheduleModule.forRoot(),
         PriceModule,

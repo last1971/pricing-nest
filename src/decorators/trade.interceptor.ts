@@ -5,6 +5,7 @@ import { TradePriceDto } from '../price/dtos/trade.price.dto';
 import { find } from 'lodash';
 import { ParameterDto } from '../good/dtos/parameter.dto';
 import { Source } from '../good/dtos/source.enum';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class TradeInterceptor implements NestInterceptor {
@@ -21,8 +22,8 @@ export class TradeInterceptor implements NestInterceptor {
                                         ?.stringValue,
                                     case: (find(good.parameters, ['name', 'case']) as ParameterDto)?.stringValue,
                                     remark: (find(good.parameters, ['name', 'remark']) as ParameterDto)?.stringValue,
-                                    id: '',
-                                    sellerGoodId: '',
+                                    id: uuidv4(),
+                                    sellerGoodId: good.supplier + ':' + good.code,
                                     code: good.code,
                                     warehouseCode: warehouse.name,
                                     goodId: good.goodId,
