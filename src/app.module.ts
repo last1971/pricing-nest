@@ -15,7 +15,6 @@ import { GoodModule } from './good/good.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ApiRequestStatModule } from './api-request-stat/api-request-stat.module';
 
-//const configService = new ConfigService();
 @Module({
     imports: [
         ConfigModule.forRoot({ isGlobal: true }),

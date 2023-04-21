@@ -8,7 +8,7 @@ export class TradePriceDto {
     code: string;
     warehouseCode: string;
     goodId: string;
-    sellerId: string;
+    sellerId: number;
     packageQuantity: number;
     multiplicity: number;
     quantity: number;

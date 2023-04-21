@@ -8,6 +8,6 @@ async function bootstrap() {
     app.useGlobalPipes(new ValidationPipe({ transform: true }));
     await app.get(SeedService).execute();
     // await app.startAllMicroservices();
-    await app.listen(3000);
+    await app.listen(4000);
 }
 bootstrap();

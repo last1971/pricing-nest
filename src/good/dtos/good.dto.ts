@@ -6,7 +6,7 @@ import { ISupplierable } from '../../interfaces/i.supplierable';
 export class GoodDto implements ISupplierable {
     supplier: string;
     code: string;
-    goodId?: string | any;
+    goodId?: string | any = null;
     alias: string;
     source?: Source = Source.Db;
     warehouses: WarehouseDto[];

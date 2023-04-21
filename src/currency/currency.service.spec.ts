@@ -3,10 +3,13 @@ import { CurrencyService } from './currency.service';
 import { getModelToken } from '@nestjs/mongoose';
 import { Currency } from './currency.schema';
 import { CurrencyDto } from './dto/currency.dto';
-
-const findOne = jest.fn().mockResolvedValue({ toObject: () => ({}) });
 class MockData {
-    constructor(public data?: any) {}
+    public alfa3;
+    public id;
+    constructor(public data?: any) {
+        this.alfa3 = data.alfa3;
+        this.id = data.id;
+    }
     toObject(): any {
         return this.data;
     }
@@ -14,10 +17,7 @@ class MockData {
 class MockCurrencyModel {
     constructor(public data?: any) {}
     static async find() {
-        return [new MockData({}), new MockData({})];
-    }
-    static async findOne(...args: any) {
-        return findOne(args);
+        return [new MockData({ alfa3: 'V01', id: '1' }), new MockData({ alfa3: 'V02', id: '2' })];
     }
 }
 describe('CurrencyService', () => {
@@ -35,6 +35,7 @@ describe('CurrencyService', () => {
         }).compile();
 
         service = module.get<CurrencyService>(CurrencyService);
+        await service.onModuleInit();
     });
 
     it('should be defined', () => {
@@ -47,7 +48,12 @@ describe('CurrencyService', () => {
     });
 
     it('test alfa3', async () => {
-        await service.alfa3('test');
-        expect(findOne.mock.calls[0]).toMatchObject([[{ alfa3: 'test' }]]);
+        const response = await service.alfa3('V01');
+        expect(response).toHaveProperty('alfa3', 'V01');
+    });
+
+    it('test id', () => {
+        const response = service.id('2');
+        expect(response).toHaveProperty('alfa3', 'V02');
     });
 });

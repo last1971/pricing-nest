@@ -3,6 +3,7 @@ import { PriceController } from './price.controller';
 import { PriceService } from './price.service';
 import { GoodDto } from '../good/dtos/good.dto';
 import { SupplierService } from '../supplier/supplier.service';
+import { CurrencyService } from '../currency/currency.service';
 
 describe('PriceController', () => {
     let controller: PriceController;
@@ -19,6 +20,10 @@ describe('PriceController', () => {
                 },
                 {
                     provide: SupplierService,
+                    useValue: {},
+                },
+                {
+                    provide: CurrencyService,
                     useValue: {},
                 },
             ],
