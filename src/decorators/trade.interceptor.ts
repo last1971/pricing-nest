@@ -1,6 +1,5 @@
 import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
 import { map, Observable } from 'rxjs';
-import { GoodDto } from '../good/dtos/good.dto';
 import { find } from 'lodash';
 import { ParameterDto } from '../good/dtos/parameter.dto';
 import { Source } from '../good/dtos/source.enum';
@@ -12,11 +11,12 @@ export class TradeInterceptor implements NestInterceptor {
     constructor(private currencyService: CurrencyService) {}
     intercept(context: ExecutionContext, next: CallHandler<any>): Observable<any> | Promise<Observable<any>> {
         return next.handle().pipe(
-            map((data: GoodDto[]): any => {
+            map(async (data): Promise<any> => {
+                const getData = await data;
                 return {
                     isApiError: false,
-                    cache: !!data.find((good) => good.source === Source.Cache),
-                    data: data
+                    cache: !!getData.find((good) => good.source === Source.Cache),
+                    data: getData
                         .map((good) => {
                             return good.warehouses.map((warehouse) => {
                                 return warehouse.prices.map((price) => {
@@ -28,7 +28,7 @@ export class TradeInterceptor implements NestInterceptor {
                                         remark: (find(good.parameters, ['name', 'remark']) as ParameterDto)
                                             ?.stringValue,
                                         id: uuidv4(),
-                                        sellerGoodId: good.supplier + ':' + good.code,
+                                        sellerGoodId: good.id,
                                         code: good.code,
                                         warehouseCode: warehouse.name,
                                         goodId: good.goodId,
@@ -47,7 +47,7 @@ export class TradeInterceptor implements NestInterceptor {
                                         deliveryTime: warehouse.deliveryTime,
                                         isSomeoneElsesWarehouse: false,
                                         isApi: good.source === Source.Api,
-                                        options: {},
+                                        options: null,
                                         updatedAt: good.updatedAt,
                                     };
                                 });

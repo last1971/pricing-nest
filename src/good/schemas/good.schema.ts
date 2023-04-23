@@ -7,8 +7,11 @@ import { Source } from '../dtos/source.enum';
 import mongoose from 'mongoose';
 
 export type GoodDocument = HydratedDocument<Good>;
-@Schema({ timestamps: true })
+@Schema({ timestamps: true, _id: false })
 export class Good {
+    @Prop({ required: true, unique: true })
+    id: string;
+
     @Prop({ type: Types.ObjectId, required: true, ref: 'Supplier' })
     supplier: Supplier;
 

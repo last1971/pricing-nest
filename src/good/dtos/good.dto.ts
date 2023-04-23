@@ -2,8 +2,10 @@ import { Source } from './source.enum';
 import { WarehouseDto } from './warehouse.dto';
 import { ParameterDto } from './parameter.dto';
 import { ISupplierable } from '../../interfaces/i.supplierable';
+import * as crypto from 'crypto';
 
 export class GoodDto implements ISupplierable {
+    id: string;
     supplier: string;
     code: string;
     goodId?: string | any = null;
@@ -14,6 +16,14 @@ export class GoodDto implements ISupplierable {
     updatedAt: Date;
 
     constructor(data?: Partial<GoodDto>) {
+        if (data?.supplier && data?.code) {
+            this.id =
+                data.id ??
+                crypto
+                    .createHash('md5')
+                    .update(data.supplier + data.code)
+                    .digest('hex');
+        }
         (Object as any).assign(this, data);
     }
     getGoodId(): any {

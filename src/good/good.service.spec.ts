@@ -13,6 +13,10 @@ describe('GoodService', () => {
         id: 'first',
         alias: 'dbSupplier',
         deliveryTime: 1,
+        supplierCodes: {
+            first: '1',
+            '1': 'first',
+        },
     };
 
     const apiSupplier = {
@@ -23,6 +27,10 @@ describe('GoodService', () => {
 
     const findOneAndUpdate = jest.fn();
     const find = jest.fn().mockReturnValue({ toObject: () => ({}) });
+    const save = jest.fn();
+    const findOne = jest.fn((params: any) => {
+        return params.id === '1' ? { save } : null;
+    });
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
@@ -30,13 +38,14 @@ describe('GoodService', () => {
                 GoodService,
                 {
                     provide: getModelToken(Good.name),
-                    useValue: { findOneAndUpdate, find },
+                    useValue: { findOneAndUpdate, find, findOne },
                 },
                 {
                     provide: SupplierService,
                     useValue: {
                         dbOnly: async (): Promise<SupplierDto[]> => [dbSupplier],
                         all: async (): Promise<SupplierDto[]> => [dbSupplier, apiSupplier],
+                        alias: async (alias: string) => (alias === 'first' ? dbSupplier : null),
                     },
                 },
             ],
@@ -107,6 +116,25 @@ describe('GoodService', () => {
         ].forEach((item, index) => {
             expect(find.mock.calls[index][0].supplier.$in).toEqual(item.supplier);
             expect(find.mock.calls[index][0].alias).toEqual(item.alias);
+        });
+    });
+
+    it('test setGood', async () => {
+        const responses: boolean[] = [];
+        for (const item of [
+            { supplierAlias: 'hz', supplierGoodId: '1', goodId: '1' },
+            { supplierAlias: 'first', supplierGoodId: '2', goodId: '1' },
+            { supplierAlias: 'first', supplierGoodId: '1', goodId: '1' },
+        ]) {
+            responses.push(await service.setGood(item));
+        }
+        [
+            { response: false, save: 1 },
+            { response: false, save: 1 },
+            { response: true, save: 1 },
+        ].forEach((item, index) => {
+            expect(responses[index]).toEqual(item.response);
+            expect(save.mock.calls).toHaveLength(item.save);
         });
     });
 });

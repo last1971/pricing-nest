@@ -164,7 +164,11 @@ describe('ParsersService', () => {
     it('Test cache search', async () => {
         const response = await service.search({ search: '123', withCache: true, dbOnly: false });
         expect(response).toHaveLength(3);
-        expect(response.map((d) => omit(d, 'id'))).toEqual([{ source: 'Cache' }, { source: 'Db' }, { source: 'Db' }]);
+        expect(response).toEqual([
+            { source: 'Cache', goodId: null },
+            { source: 'Db', goodId: null },
+            { source: 'Db', goodId: null },
+        ]);
         expect(CacheSet.mock.calls).toHaveLength(1);
         expect(QueueAdd.mock.calls).toHaveLength(1);
         expect(QueueAdd.mock.calls[0][1]).toHaveProperty('isSuccess', false);
@@ -176,8 +180,8 @@ describe('ParsersService', () => {
         expect(response.map((d) => omit(d, 'id'))).toEqual([
             { source: 'Api' },
             { source: 'Api' },
-            { source: 'Db' },
-            { source: 'Db' },
+            { source: 'Db', goodId: null },
+            { source: 'Db', goodId: null },
         ]);
         expect(CacheSet.mock.calls).toHaveLength(2);
         expect(CacheSet.mock.calls[0]).toEqual(['error : second', true, null]);

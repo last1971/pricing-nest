@@ -4,10 +4,12 @@ import { PriceService } from './price.service';
 import { GoodDto } from '../good/dtos/good.dto';
 import { SupplierService } from '../supplier/supplier.service';
 import { CurrencyService } from '../currency/currency.service';
+import { GoodService } from '../good/good.service';
+import { PriceSetGoodIdDto } from './dtos/price.set.good.id.dto';
 
 describe('PriceController', () => {
     let controller: PriceController;
-
+    const setGood = jest.fn();
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
             controllers: [PriceController],
@@ -26,6 +28,10 @@ describe('PriceController', () => {
                     provide: CurrencyService,
                     useValue: {},
                 },
+                {
+                    provide: GoodService,
+                    useValue: { setGood },
+                },
             ],
         }).compile();
 
@@ -42,5 +48,10 @@ describe('PriceController', () => {
         expect(response).toHaveProperty('data');
         expect(response['data']).toHaveLength(1);
         expect(response['data'][0]).toBeInstanceOf(GoodDto);
+    });
+
+    it('setGood ', async () => {
+        await controller.setGoodId(new PriceSetGoodIdDto());
+        expect(setGood.mock.calls).toHaveLength(1);
     });
 });

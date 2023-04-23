@@ -1,10 +1,10 @@
-import { PriceInterceptor } from './prices.interceptor';
+import { PriceSupplierInterceptor } from './price.supplier.interceptor';
 import { firstValueFrom, Observable, of } from 'rxjs';
 import { GoodDto } from '../good/dtos/good.dto';
 import { cloneDeep } from 'lodash';
 
 describe('Test PriceInterceptor', () => {
-    let priceInterceptor: PriceInterceptor;
+    let priceInterceptor: PriceSupplierInterceptor;
     const context = {
         switchToHttp: jest.fn().mockReturnThis(),
         getRequest: jest.fn().mockReturnThis(),
@@ -39,7 +39,7 @@ describe('Test PriceInterceptor', () => {
     ].map((data) => new GoodDto(data));
     let expectedData: GoodDto[];
     beforeEach(() => {
-        priceInterceptor = new PriceInterceptor();
+        priceInterceptor = new PriceSupplierInterceptor();
         expectedData = cloneDeep(data);
     });
     it('Without supplier', async () => {
