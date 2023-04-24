@@ -5,13 +5,14 @@ import { ParameterDto } from '../good/dtos/parameter.dto';
 import { Source } from '../good/dtos/source.enum';
 import { v4 as uuidv4 } from 'uuid';
 import { CurrencyService } from '../currency/currency.service';
+import { GoodDto } from '../good/dtos/good.dto';
 
 @Injectable()
 export class TradeInterceptor implements NestInterceptor {
     constructor(private currencyService: CurrencyService) {}
     intercept(context: ExecutionContext, next: CallHandler<any>): Observable<any> | Promise<Observable<any>> {
         return next.handle().pipe(
-            map(async (data): Promise<any> => {
+            map(async (data: GoodDto[] | Promise<GoodDto[]>): Promise<any> => {
                 const getData = await data;
                 return {
                     isApiError: false,
@@ -31,7 +32,7 @@ export class TradeInterceptor implements NestInterceptor {
                                         sellerGoodId: good.id,
                                         code: good.code,
                                         warehouseCode: warehouse.name,
-                                        goodId: good.goodId,
+                                        goodId: good.goodId ? parseInt(good.goodId) : null,
                                         sellerId: parseInt(good.supplier),
                                         packageQuantity:
                                             (find(good.parameters, ['name', 'packageQuantity']) as ParameterDto)

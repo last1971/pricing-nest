@@ -44,10 +44,8 @@ describe('PriceController', () => {
 
     it('get prices', async () => {
         const response = await controller.findAll({ search: '123', dbOnly: false, withCache: true });
-        expect(response).toHaveProperty('request', { dbOnly: false, search: '123', withCache: true });
-        expect(response).toHaveProperty('data');
-        expect(response['data']).toHaveLength(1);
-        expect(response['data'][0]).toBeInstanceOf(GoodDto);
+        expect(response).toHaveLength(1);
+        expect(response[0]).toBeInstanceOf(GoodDto);
     });
 
     it('setGood ', async () => {

@@ -11,7 +11,7 @@ export class PriceRequestDto {
     suppliers?: string[];
 
     @IsOptional()
-    supplier?: string | SupplierDto;
+    supplier?: SupplierDto;
 
     @IsOptional()
     supplierAlias?: string;

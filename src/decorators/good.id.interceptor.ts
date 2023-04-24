@@ -9,7 +9,7 @@ export class GoodIdInterceptor implements NestInterceptor {
     constructor(private service: GoodService) {}
     intercept(context: ExecutionContext, next: CallHandler<any>): Observable<any> | Promise<Observable<any>> {
         return next.handle().pipe(
-            map(async (data: Promise<GoodDto[]>) => {
+            map(async (data: GoodDto[] | Promise<GoodDto[]>) => {
                 const getData = await data;
                 const ids = uniq(getData.map((good) => good.id));
                 const goods = (await this.service.find({ id: { $in: ids } })).reduce(
