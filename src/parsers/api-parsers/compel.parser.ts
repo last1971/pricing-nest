@@ -54,7 +54,7 @@ export class CompelParser extends AbstractParser {
                     ],
                     warehouses: item.locations.map(
                         (location): WarehouseDto => ({
-                            name: location.item_id,
+                            name: location.location_id ?? 'CENTER',
                             deliveryTime: this.getSupplier().deliveryTime + location.prognosis_days,
                             quantity: location.vend_qty,
                             multiple: location.mpq,

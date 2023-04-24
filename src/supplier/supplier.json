@@ -6,5 +6,6 @@
   {"alias" : "mars", "deliveryTime": 11},
   {"alias" : "elcopro", "deliveryTime":  0},
   {"alias" : "electronica", "deliveryTime":  1},
-  {"alias" : "dan", "deliveryTime":  5}
+  {"alias" : "dan", "deliveryTime":  5},
+  {"alias" : "getchips", "deliveryTime":  9}
 ]

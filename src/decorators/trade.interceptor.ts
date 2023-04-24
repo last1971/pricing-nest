@@ -20,6 +20,12 @@ export class TradeInterceptor implements NestInterceptor {
                     data: getData
                         .map((good) => {
                             return good.warehouses.map((warehouse) => {
+                                const goodId =
+                                    good.supplier === '0'
+                                        ? parseInt(good.code)
+                                        : good.goodId
+                                        ? parseInt(good.goodId)
+                                        : null;
                                 return warehouse.prices.map((price) => {
                                     return {
                                         name: (find(good.parameters, ['name', 'name']) as ParameterDto).stringValue,
@@ -32,7 +38,7 @@ export class TradeInterceptor implements NestInterceptor {
                                         sellerGoodId: good.id,
                                         code: good.code,
                                         warehouseCode: warehouse.name,
-                                        goodId: good.goodId ? parseInt(good.goodId) : null,
+                                        goodId,
                                         sellerId: parseInt(good.supplier),
                                         packageQuantity:
                                             (find(good.parameters, ['name', 'packageQuantity']) as ParameterDto)

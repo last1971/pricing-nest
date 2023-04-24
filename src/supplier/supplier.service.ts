@@ -9,6 +9,7 @@ import { ModelToDto } from '../decorators/model.to.dto';
 import { PlatanParser } from '../parsers/api-parsers/platan.parser';
 import { ElcoParser } from '../parsers/api-parsers/elco.parser';
 import { ElectronicaParser } from '../parsers/api-parsers/electronica.parser';
+import { GetchipsParser } from '../parsers/api-parsers/getchips.parser';
 
 @Injectable()
 export class SupplierService {
@@ -20,6 +21,7 @@ export class SupplierService {
             platan: PlatanParser,
             elcopro: ElcoParser,
             electronica: ElectronicaParser,
+            getchips: GetchipsParser,
         };
     }
     //@ModelToDto(SupplierDto)
