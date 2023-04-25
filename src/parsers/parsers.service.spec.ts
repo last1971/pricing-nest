@@ -3,7 +3,6 @@ import { ParsersService } from './parsers.service';
 import { SupplierService } from '../supplier/supplier.service';
 import { CurrencyService } from '../currency/currency.service';
 import { ConfigService } from '@nestjs/config';
-import { CACHE_MANAGER } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { Observable, of } from 'rxjs';
 import { CurrencyMock } from '../currency/currency.mock';
@@ -18,6 +17,8 @@ import { AxiosError } from 'axios';
 import { GoodService } from '../good/good.service';
 import { GoodDto } from '../good/dtos/good.dto';
 import { omit } from 'lodash';
+import { MAIL_ERROR_MESSAGE } from '../mail/mail.constants';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 
 describe('ParsersService', () => {
     let service: ParsersService;
@@ -42,7 +43,9 @@ describe('ParsersService', () => {
                 },
                 {
                     provide: ConfigService,
-                    useValue: {},
+                    useValue: {
+                        get: () => 60,
+                    },
                 },
                 {
                     provide: UnitService,
@@ -141,7 +144,10 @@ describe('ParsersService', () => {
         expect(response.isSuccess).toEqual(false);
         expect(response.errorMessage).toEqual('test error');
         expect(CacheSet.mock.calls).toHaveLength(1);
-        expect(CacheSet.mock.calls[0]).toEqual(['error : first', true, null]);
+        expect(CacheSet.mock.calls[0]).toEqual(['error : first', true, 60]);
+        expect(QueueAdd.mock.calls).toHaveLength(1);
+        expect(QueueAdd.mock.calls[0][0]).toEqual(MAIL_ERROR_MESSAGE);
+        expect(QueueAdd.mock.calls[0][1]).toHaveProperty('module', 'FIRST parser');
     });
 
     it('Test abstract parser save stat', async () => {
@@ -170,8 +176,9 @@ describe('ParsersService', () => {
             { source: 'Db', goodId: null },
         ]);
         expect(CacheSet.mock.calls).toHaveLength(1);
-        expect(QueueAdd.mock.calls).toHaveLength(1);
-        expect(QueueAdd.mock.calls[0][1]).toHaveProperty('isSuccess', false);
+        expect(QueueAdd.mock.calls).toHaveLength(2);
+        expect(QueueAdd.mock.calls[0][0]).toEqual(MAIL_ERROR_MESSAGE);
+        expect(QueueAdd.mock.calls[1][1]).toHaveProperty('isSuccess', false);
     });
 
     it('Test no cache search', async () => {
@@ -184,12 +191,13 @@ describe('ParsersService', () => {
             { source: 'Db', goodId: null },
         ]);
         expect(CacheSet.mock.calls).toHaveLength(2);
-        expect(CacheSet.mock.calls[0]).toEqual(['error : second', true, null]);
+        expect(CacheSet.mock.calls[0]).toEqual(['error : second', true, 60]);
         expect(CacheSet.mock.calls[1]).toEqual(['first : 123', [{ source: 'Api' }, { source: 'Api' }]]);
-        expect(QueueAdd.mock.calls).toHaveLength(3);
-        expect(QueueAdd.mock.calls[0][1]).toHaveProperty('isSuccess', true);
-        expect(QueueAdd.mock.calls[2][1]).toHaveProperty('isSuccess', false);
-        expect(QueueAdd.mock.calls[1]).toEqual(['keys', 'first : 123']);
+        expect(QueueAdd.mock.calls).toHaveLength(4);
+        expect(QueueAdd.mock.calls[0][0]).toEqual(MAIL_ERROR_MESSAGE);
+        expect(QueueAdd.mock.calls[1][1]).toHaveProperty('isSuccess', true);
+        expect(QueueAdd.mock.calls[2]).toEqual(['keys', 'first : 123']);
+        expect(QueueAdd.mock.calls[3][1]).toHaveProperty('isSuccess', false);
     });
 
     it('Test http search', async () => {
@@ -198,7 +206,7 @@ describe('ParsersService', () => {
         expect(response[0]).toEqual({ source: 'Api' });
         expect(parseResponse.mock.results).toHaveLength(1);
         expect(CacheSet.mock.calls).toHaveLength(2);
-        expect(QueueAdd.mock.calls).toHaveLength(3);
+        expect(QueueAdd.mock.calls).toHaveLength(4);
     });
 
     it('Test http search first supplier', async () => {

@@ -13,13 +13,15 @@ import { RctParser } from './schedule-parsers/rct.parser';
 import { UnitService } from '../unit/unit.service';
 import { MarsParser } from './schedule-parsers/mars.parser';
 import { DanParser } from './schedule-parsers/dan.parser';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
 
 @Injectable()
 export class ParserSchedule implements IScheduleParsers {
     private readonly logger = new Logger(ParserSchedule.name);
     private parsers = {
         //'0 * * * * *': [TestParser],
-        '0 29 20 * * *': [RctParser],
+        '0 06 19 * * *': [RctParser],
         '0 30 20 * * *': [MarsParser],
         '0 31 20 * * *': [DanParser],
     };
@@ -31,6 +33,7 @@ export class ParserSchedule implements IScheduleParsers {
         @Inject(forwardRef(() => GoodService)) private goodService: GoodService,
         private currencyService: CurrencyService,
         private unitService: UnitService,
+        @InjectQueue('api') private readonly apiQueue: Queue,
     ) {
         Object.keys(this.parsers).forEach((key) => {
             this.parsers[key].forEach((parserClass) => {
@@ -68,5 +71,8 @@ export class ParserSchedule implements IScheduleParsers {
     }
     getUnitService(): UnitService {
         return this.unitService;
+    }
+    getQueue(): Queue {
+        return this.apiQueue;
     }
 }

@@ -5,6 +5,7 @@ import { SupplierService } from '../supplier/supplier.service';
 import { CurrencyService } from '../currency/currency.service';
 import { GoodService } from '../good/good.service';
 import { UnitService } from '../unit/unit.service';
+import { Queue } from 'bull';
 
 export interface IScheduleParsers {
     getConfigService(): ConfigService;
@@ -14,4 +15,5 @@ export interface IScheduleParsers {
     getCurrencies(): CurrencyService;
     getGoods(): GoodService;
     getUnitService(): UnitService;
+    getQueue(): Queue;
 }

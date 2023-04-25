@@ -12,7 +12,7 @@ export class MailService {
         await this.send({
             to: await this.configService.get<string>('MAIL_ADMIN'),
             // from: '"Support Team" <support@example.com>', // override default from
-            subject: 'Shit happened',
+            subject: 'Shit happened in ' + dto.module + ' module!',
             template: 'error_message', // `.hbs` extension is appended automatically
             context: dto,
         });

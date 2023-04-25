@@ -1,8 +1,9 @@
 import { IScheduleParsers } from '../../interfaces/IScheduleParsers';
-import { DateTime } from 'luxon';
+import { DateTime, Duration } from 'luxon';
 import { SupplierDto } from '../../supplier/supplier.dto';
 import { CurrencyDto } from '../../currency/dto/currency.dto';
 import { UnitDto } from '../../unit/dtos/unit.dto';
+import { MAIL_ERROR_MESSAGE } from '../../mail/mail.constants';
 
 export class ScheduleParser implements ICommand {
     protected supplierAlias: string;
@@ -35,8 +36,19 @@ export class ScheduleParser implements ICommand {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     protected async parse(): Promise<void> {}
     async execute(): Promise<void> {
-        await this.start();
-        await this.parse();
-        await this.finish();
+        try {
+            await this.start();
+            await this.parse();
+            await this.finish();
+        } catch (e) {
+            await this.schedule.getQueue().add(MAIL_ERROR_MESSAGE, {
+                error: e.message,
+                time: DateTime.now().toLocaleString(DateTime.DATETIME_FULL),
+                duration: DateTime.now()
+                    .plus(Duration.fromObject({ days: 1 }))
+                    .toLocaleString(DateTime.DATETIME_FULL),
+                module: this.supplierAlias.toUpperCase(),
+            });
+        }
     }
 }
