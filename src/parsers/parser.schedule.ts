@@ -21,9 +21,9 @@ export class ParserSchedule implements IScheduleParsers {
     private readonly logger = new Logger(ParserSchedule.name);
     private parsers = {
         //'0 * * * * *': [TestParser],
-        '0 06 19 * * *': [RctParser],
-        '0 30 20 * * *': [MarsParser],
-        '0 31 20 * * *': [DanParser],
+        '0 22 19 * * *': [RctParser],
+        '0 23 19 * * *': [MarsParser],
+        '0 24 19 * * *': [DanParser],
     };
     constructor(
         private schedulerRegistry: SchedulerRegistry,

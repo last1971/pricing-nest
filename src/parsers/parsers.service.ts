@@ -1,4 +1,4 @@
-import { CACHE_MANAGER, Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { IApiParsers } from '../interfaces/IApiParsers';
 import { ConfigService } from '@nestjs/config';
 import { SupplierService } from '../supplier/supplier.service';
@@ -16,6 +16,7 @@ import { CurrencyDto } from '../currency/dto/currency.dto';
 import { UnitService } from '../unit/unit.service';
 import { UnitDto } from '../unit/dtos/unit.dto';
 import { GoodService } from '../good/good.service';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 
 @Injectable()
 export class ParsersService implements IApiParsers {

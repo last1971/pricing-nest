@@ -7,6 +7,16 @@ import { PriceDto } from '../../good/dtos/price.dto';
 import { Observable } from 'rxjs';
 import { AxiosResponse } from 'axios';
 export class CompelParser extends AbstractParser {
+    /*
+    private supplierTypes = {
+        CD: 'Каталожный дистрибьютор',
+        M: 'Производитель',
+        OD: 'Официальный дистрибьютор',
+        MIX: 'Дистрибьютор со смешанной моделью',
+        ID: 'Независимый дистрибьютор',
+        MF: 'Франчайзинговый производитель',
+    };
+    */
     getAlias(): string {
         return 'compel';
     }
@@ -58,6 +68,7 @@ export class CompelParser extends AbstractParser {
                             deliveryTime: this.getSupplier().deliveryTime + location.prognosis_days,
                             quantity: location.vend_qty,
                             multiple: location.mpq,
+                            options: null,
                             prices: (location.price_qty ?? []).map(
                                 (price): PriceDto => ({
                                     value: price.price,

@@ -54,7 +54,7 @@ export class TradeInterceptor implements NestInterceptor {
                                         deliveryTime: warehouse.deliveryTime,
                                         isSomeoneElsesWarehouse: false,
                                         isApi: good.source === Source.Api,
-                                        options: null,
+                                        options: warehouse.options ?? null,
                                         updatedAt: good.updatedAt,
                                     };
                                 });

@@ -49,6 +49,9 @@ export class GetchipsParser extends AbstractParser {
                             deliveryTime: this.getSupplier().deliveryTime + item.orderdays,
                             quantity: parseInt(item.quantity),
                             multiple: parseInt(item.folddivision),
+                            options: {
+                                location_id: item.donor,
+                            },
                             prices: item.priceBreak
                                 .map(
                                     (price, index, prices): PriceDto => ({

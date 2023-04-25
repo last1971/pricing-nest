@@ -6,4 +6,5 @@ export class WarehouseDto {
     quantity: number;
     multiple: number;
     prices?: PriceDto[];
+    options?: any;
 }
