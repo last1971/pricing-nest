@@ -16,7 +16,7 @@ import { DanParser } from './schedule-parsers/dan.parser';
 
 @Injectable()
 export class ParserSchedule implements IScheduleParsers {
-    private readonly logger = new Logger('ScheduleParser');
+    private readonly logger = new Logger(ParserSchedule.name);
     private parsers = {
         //'0 * * * * *': [TestParser],
         '0 29 20 * * *': [RctParser],

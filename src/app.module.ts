@@ -14,6 +14,7 @@ import { BullModule } from '@nestjs/bull';
 import { GoodModule } from './good/good.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ApiRequestStatModule } from './api-request-stat/api-request-stat.module';
+import { MailModule } from './mail/mail.module';
 
 @Module({
     imports: [
@@ -64,6 +65,7 @@ import { ApiRequestStatModule } from './api-request-stat/api-request-stat.module
         ParsersModule,
         GoodModule,
         ApiRequestStatModule,
+        MailModule,
     ],
     controllers: [AppController],
     providers: [AppService],

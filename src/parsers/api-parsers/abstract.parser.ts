@@ -5,10 +5,11 @@ import { PriceRequestDto } from '../../price/dtos/price.request.dto';
 import { catchError, firstValueFrom, map, Observable } from 'rxjs';
 import { AxiosError, AxiosResponse } from 'axios';
 import { CurrencyDto } from '../../currency/dto/currency.dto';
-import { DateTime } from 'luxon';
+import { DateTime, Duration } from 'luxon';
 import { ApiRequestStatDto } from '../../api-request-stat/api.request.stat.dto';
 import { ApiResponseDto } from './api.response.dto';
 import { Source } from '../../good/dtos/source.enum';
+import { MAIL_ERROR_MESSAGE } from '../../mail/mail.constants';
 
 export abstract class AbstractParser {
     protected search: string;
@@ -58,9 +59,16 @@ export abstract class AbstractParser {
     async obtainError(error: AxiosError, response: ApiResponseDto) {
         response.errorMessage = error.message;
         response.isSuccess = false;
-        await this.parsers
-            .getCache()
-            .set('error : ' + this.getAlias(), true, await this.parsers.getCache().get<number>('CACHE_ERROR_EXP'));
+        const milliseconds = await this.parsers.getConfigService().get<number>('CACHE_ERROR_EXP');
+        const time = DateTime.now();
+        const exp = time.plus(Duration.fromObject({ milliseconds }));
+        await this.parsers.getCache().set('error : ' + this.getAlias(), true, milliseconds);
+        await this.parsers.getQueue().add(MAIL_ERROR_MESSAGE, {
+            time: time.toLocaleString(DateTime.DATETIME_FULL),
+            duration: exp.toLocaleString(DateTime.DATETIME_FULL),
+            error: error.message,
+            module: this.getAlias().toUpperCase() + ' parser',
+        });
     }
     async saveStat(response: ApiResponseDto): Promise<void> {
         const apiRequestStat: ApiRequestStatDto = {
