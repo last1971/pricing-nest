@@ -10,6 +10,7 @@ import { PlatanParser } from '../parsers/api-parsers/platan.parser';
 import { ElcoParser } from '../parsers/api-parsers/elco.parser';
 import { ElectronicaParser } from '../parsers/api-parsers/electronica.parser';
 import { GetchipsParser } from '../parsers/api-parsers/getchips.parser';
+import { CompelDmsParser } from '../parsers/api-parsers/compel.dms.parser';
 
 @Injectable()
 export class SupplierService {
@@ -17,6 +18,7 @@ export class SupplierService {
     constructor(@InjectModel(Supplier.name) private supplierModel: Model<SupplierDocument>) {
         this.parsers = {
             compel: CompelParser,
+            compeldms: CompelDmsParser,
             promelec: PromelecParser,
             platan: PlatanParser,
             elcopro: ElcoParser,

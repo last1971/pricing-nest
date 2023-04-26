@@ -7,7 +7,6 @@ import { PriceDto } from '../../good/dtos/price.dto';
 import { Observable } from 'rxjs';
 import { AxiosResponse } from 'axios';
 export class CompelParser extends AbstractParser {
-    /*
     private supplierTypes = {
         CD: 'Каталожный дистрибьютор',
         M: 'Производитель',
@@ -15,16 +14,13 @@ export class CompelParser extends AbstractParser {
         MIX: 'Дистрибьютор со смешанной моделью',
         ID: 'Независимый дистрибьютор',
         MF: 'Франчайзинговый производитель',
+        EOL: 'Лабаз',
     };
-    */
     getAlias(): string {
         return 'compel';
     }
     getCurrencyAlfa(): string {
         return 'USD';
-    }
-    useGetMethod(): boolean {
-        return false;
     }
     getResponse(): Observable<AxiosResponse<any, any>> {
         return this.parsers.getHttp().post(this.parsers.getConfigService().get<string>('API_COMPEL_URL'), {
@@ -62,13 +58,32 @@ export class CompelParser extends AbstractParser {
                               ]
                             : []),
                     ],
-                    warehouses: item.locations.map(
+                    warehouses: (this.getAlias() === 'compel'
+                        ? item.locations
+                        : item.proposals.filter((location) => !location.location_id.trim())
+                    ).map(
                         (location): WarehouseDto => ({
-                            name: location.location_id ?? 'CENTER',
+                            name: !!location.location_id.trim()
+                                ? location.location_id
+                                : location.prognosis_id +
+                                  ';' +
+                                  location.vend_type +
+                                  ';' +
+                                  location.vend_qty +
+                                  ';' +
+                                  location.cut_tape +
+                                  ';' +
+                                  location.vend_note,
                             deliveryTime: this.getSupplier().deliveryTime + location.prognosis_days,
-                            quantity: location.vend_qty,
+                            quantity:
+                                location.vend_qty ?? (location.price_qty?.length ? location.price_qty.slice(-1)[0] : 0),
                             multiple: location.mpq,
-                            options: null,
+                            options: {
+                                location_id: !!location.location_id.trim()
+                                    ? location.location_id
+                                    : (this.supplierTypes[location.vend_type] ?? 'U N K N O W N') +
+                                      (location.cut_tape ? ', обрезки' : ''),
+                            },
                             prices: (location.price_qty ?? []).map(
                                 (price): PriceDto => ({
                                     value: price.price,
