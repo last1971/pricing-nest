@@ -14,7 +14,7 @@ export class CompelParser extends AbstractParser {
         MIX: 'Дистрибьютор со смешанной моделью',
         ID: 'Независимый дистрибьютор',
         MF: 'Франчайзинговый производитель',
-        EOL: 'Лабаз',
+        EOL: 'Независимый дистрибьютор (EOL)',
     };
     getAlias(): string {
         return 'compel';
@@ -81,8 +81,12 @@ export class CompelParser extends AbstractParser {
                             options: {
                                 location_id: !!location.location_id.trim()
                                     ? location.location_id
-                                    : (this.supplierTypes[location.vend_type] ?? 'U N K N O W N') +
+                                    : (this.supplierTypes[location.vend_type] ?? location.vend_type) +
                                       (location.cut_tape ? ', обрезки' : ''),
+                                pos: item.pos,
+                                ...(!!location.vend_proposal_date
+                                    ? { updatedAt: new Date(location.vend_proposal_date) }
+                                    : null),
                             },
                             prices: (location.price_qty ?? []).map(
                                 (price): PriceDto => ({

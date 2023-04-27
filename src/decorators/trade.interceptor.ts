@@ -47,7 +47,7 @@ export class TradeInterceptor implements NestInterceptor {
                                         quantity: warehouse.quantity,
                                         minQuantity: price.min,
                                         maxQuantity: price.max,
-                                        pos: false,
+                                        pos: !!warehouse.options?.pos,
                                         price: price.value,
                                         CharCode: this.currencyService.id(price.currency).alfa3,
                                         isInput: !price.isOrdinary,
@@ -55,7 +55,7 @@ export class TradeInterceptor implements NestInterceptor {
                                         isSomeoneElsesWarehouse: false,
                                         isApi: good.source === Source.Api,
                                         options: warehouse.options ?? null,
-                                        updatedAt: good.updatedAt,
+                                        updatedAt: warehouse.options?.updatedAt ?? good.updatedAt,
                                     };
                                 });
                             });
