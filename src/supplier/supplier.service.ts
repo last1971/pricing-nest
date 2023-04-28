@@ -11,6 +11,7 @@ import { ElcoParser } from '../parsers/api-parsers/elco.parser';
 import { ElectronicaParser } from '../parsers/api-parsers/electronica.parser';
 import { GetchipsParser } from '../parsers/api-parsers/getchips.parser';
 import { CompelDmsParser } from '../parsers/api-parsers/compel.dms.parser';
+import { ChipDipParser } from '../parsers/api-parsers/chip.dip.parser';
 
 @Injectable()
 export class SupplierService {
@@ -24,6 +25,7 @@ export class SupplierService {
             elcopro: ElcoParser,
             electronica: ElectronicaParser,
             getchips: GetchipsParser,
+            chipdip: ChipDipParser,
         };
     }
     //@ModelToDto(SupplierDto)

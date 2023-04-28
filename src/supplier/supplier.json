@@ -8,5 +8,6 @@
   {"alias" : "elcopro", "deliveryTime":  0},
   {"alias" : "electronica", "deliveryTime":  1},
   {"alias" : "dan", "deliveryTime":  5},
-  {"alias" : "getchips", "deliveryTime":  9}
+  {"alias" : "getchips", "deliveryTime":  9},
+  {"alias" : "chipdip", "deliveryTime":  1}
 ]
