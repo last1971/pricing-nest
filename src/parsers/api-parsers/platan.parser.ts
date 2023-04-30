@@ -73,7 +73,7 @@ export class PlatanParser extends AbstractParser {
                     warehouses.push({
                         name: 'CENTER',
                         deliveryTime: this.getSupplier().deliveryTime,
-                        multiple: parseInt(item.KRATNOST),
+                        multiple: parseInt(item.KRATNOST) || 1,
                         quantity: parseInt(item.QUANTY),
                         prices,
                     });
@@ -85,7 +85,7 @@ export class PlatanParser extends AbstractParser {
                     warehouses.push({
                         name: 'TRANSIT',
                         deliveryTime: this.getSupplier().deliveryTime + days,
-                        multiple: parseInt(item.KRATNOST),
+                        multiple: parseInt(item.KRATNOST) || 1,
                         quantity: parseInt(item.PRIHOD),
                         prices,
                     });

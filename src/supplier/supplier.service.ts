@@ -12,11 +12,16 @@ import { ElectronicaParser } from '../parsers/api-parsers/electronica.parser';
 import { GetchipsParser } from '../parsers/api-parsers/getchips.parser';
 import { CompelDmsParser } from '../parsers/api-parsers/compel.dms.parser';
 import { RadiodetaliComParser } from '../parsers/api-parsers/radiodetali.com.parser';
+import { SupplierRateDto } from './supplier.trade.dto';
+import { ApiRequestStatService } from '../api-request-stat/api-request-stat.service';
 
 @Injectable()
 export class SupplierService {
     private parsers: any;
-    constructor(@InjectModel(Supplier.name) private supplierModel: Model<SupplierDocument>) {
+    constructor(
+        @InjectModel(Supplier.name) private supplierModel: Model<SupplierDocument>,
+        private agrServise: ApiRequestStatService,
+    ) {
         this.parsers = {
             compel: CompelParser,
             compeldms: CompelDmsParser,
@@ -54,5 +59,15 @@ export class SupplierService {
     @ModelToDto(SupplierDto)
     async id(id: string): Promise<SupplierDto> {
         return this.supplierModel.findById(id);
+    }
+    async rate(alias?: string): Promise<SupplierRateDto[]> {
+        const supplierAlias: SupplierDto = alias ? await this.alias(alias) : null;
+        const suppliers = await this.all();
+        const rates = await this.agrServise.duration();
+        return suppliers.map((supplier) => {
+            const id = supplierAlias ? supplierAlias.supplierCodes[supplier.id] : supplier.id;
+            const rate = rates.get(supplier.id) ?? 0;
+            return { id, rate };
+        });
     }
 }

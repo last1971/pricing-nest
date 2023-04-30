@@ -10,4 +10,16 @@ export class ApiRequestStatService {
     async create(dto: ApiRequestStatDto): Promise<void> {
         await this.model.create(dto);
     }
+    async duration(): Promise<Map<string, number>> {
+        const res = await this.model.aggregate([
+            { $match: { isSuccess: true } },
+            {
+                $group: {
+                    _id: '$supplier',
+                    duration: { $avg: '$duration' },
+                },
+            },
+        ]);
+        return res.reduce((map, value) => map.set(value._id, value.duration), new Map<string, number>());
+    }
 }

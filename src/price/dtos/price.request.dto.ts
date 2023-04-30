@@ -1,4 +1,4 @@
-import { IsBoolean, IsNotEmpty, IsOptional, MinLength } from 'class-validator';
+import { IsArray, IsBoolean, IsNotEmpty, IsOptional, MinLength } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { SupplierDto } from '../../supplier/supplier.dto';
 
@@ -8,6 +8,7 @@ export class PriceRequestDto {
     search: string;
 
     @IsOptional()
+    @IsArray()
     suppliers?: string[];
 
     @IsOptional()

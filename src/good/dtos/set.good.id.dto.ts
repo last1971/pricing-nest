@@ -1,6 +1,6 @@
 import { IsNotEmpty } from 'class-validator';
 
-export class PriceSetGoodIdDto {
+export class SetGoodIdDto {
     @IsNotEmpty()
     supplierAlias: string;
 

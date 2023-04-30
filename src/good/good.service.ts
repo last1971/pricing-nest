@@ -11,7 +11,7 @@ import { SupplierService } from '../supplier/supplier.service';
 import { alias } from '../helpers';
 import { ModelToDto } from '../decorators/model.to.dto';
 import { isString } from 'lodash';
-import { PriceSetGoodIdDto } from '../price/dtos/price.set.good.id.dto';
+import { SetGoodIdDto } from './dtos/set.good.id.dto';
 
 @Injectable()
 export class GoodService {
@@ -51,7 +51,7 @@ export class GoodService {
             alias: { $regex: new RegExp(alias(priceRequestDto.search), 'i') },
         });
     }
-    async setGood(setGoodDto: PriceSetGoodIdDto): Promise<boolean> {
+    async setGood(setGoodDto: SetGoodIdDto): Promise<boolean> {
         const supplier = await this.supplierService.alias(setGoodDto.supplierAlias);
         if (!supplier || !supplier.supplierCodes) return false;
         const good = await this.goodModel.findOne({

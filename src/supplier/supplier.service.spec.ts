@@ -2,9 +2,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { SupplierService } from './supplier.service';
 import { getModelToken } from '@nestjs/mongoose';
 import { Supplier } from './supplier.schema';
+import { ApiRequestStatService } from '../api-request-stat/api-request-stat.service';
 
-const find = jest.fn().mockResolvedValue({ toObject: () => ({}) });
-const findOne = jest.fn().mockResolvedValue({ toObject: () => ({}) });
+const find = jest.fn().mockResolvedValue([{ toObject: () => ({ id: '1' }) }, { toObject: () => ({ id: '3' }) }]);
+const findOne = jest.fn().mockResolvedValue({ toObject: () => ({ supplierCodes: { '1': 'A', '3': 'B' } }) });
 const findById = jest.fn().mockResolvedValue({ toObject: () => ({}) });
 
 describe('SupplierService', () => {
@@ -17,6 +18,10 @@ describe('SupplierService', () => {
                 {
                     provide: getModelToken(Supplier.name),
                     useValue: { find, findOne, findById },
+                },
+                {
+                    provide: ApiRequestStatService,
+                    useValue: { duration: () => new Map(Object.entries({ '1': 1, '2': 2 })) },
                 },
             ],
         }).compile();
@@ -63,5 +68,21 @@ describe('SupplierService', () => {
         await service.dbOnly();
         expect(find.mock.calls).toHaveLength(1);
         expect(find.mock.calls[0]).toMatchObject([{ alias: { $nin } }]);
+    });
+
+    it('test rate without alias', async () => {
+        const res = await service.rate();
+        expect(res).toEqual([
+            { id: '1', rate: 1 },
+            { id: '3', rate: 0 },
+        ]);
+    });
+
+    it('test rate with alias', async () => {
+        const res = await service.rate('test');
+        expect(res).toEqual([
+            { id: 'A', rate: 1 },
+            { id: 'B', rate: 0 },
+        ]);
     });
 });
