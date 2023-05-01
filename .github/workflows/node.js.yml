@@ -32,3 +32,22 @@ jobs:
         npm test
       env:
         CI: true
+
+  deploy:
+    needs: [test]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: SSH and deploy trade app
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cd ~/pricing-nest
+            git pull origin master
+            npm install 
+            npm run build
+            pm2 restart pricing
