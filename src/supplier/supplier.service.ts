@@ -14,6 +14,7 @@ import { CompelDmsParser } from '../parsers/api-parsers/compel.dms.parser';
 import { RadiodetaliComParser } from '../parsers/api-parsers/radiodetali.com.parser';
 import { SupplierRateDto } from './supplier.trade.dto';
 import { ApiRequestStatService } from '../api-request-stat/api-request-stat.service';
+import { ElitanParser } from '../parsers/api-parsers/elitan.parser';
 
 @Injectable()
 export class SupplierService {
@@ -31,6 +32,7 @@ export class SupplierService {
             electronica: ElectronicaParser,
             getchips: GetchipsParser,
             radiodetalicom: RadiodetaliComParser,
+            elitan: ElitanParser,
         };
     }
     //@ModelToDto(SupplierDto)
