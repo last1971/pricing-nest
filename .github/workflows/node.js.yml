@@ -46,9 +46,9 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
+            source ~/.bashrc
             cd ~/pricing-nest
-            git pull origin main
-            source ./.bashrc
+            git pull origin main        
             npm install 
             npm run build
             pm2 restart pricing
