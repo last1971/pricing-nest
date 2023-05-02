@@ -48,6 +48,7 @@ jobs:
           script: |
             cd ~/pricing-nest
             git pull origin main
+            export PATH="/home/trade/.local/share/fnm:$PATH"
             fnm env
             npm install 
             npm run build
