@@ -48,6 +48,6 @@ jobs:
           script: |
             cd ~/pricing-nest
             git pull origin main
-            ../.local/share/fnm/aliases/default/bin/npm install 
-            ../.local/share/fnm/aliases/default/bin/npm run build
-            ../.local/share/fnm/aliases/default/bin/pm2 restart pricing
+            npm install 
+            npm run build
+            pm2 restart pricing
