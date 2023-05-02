@@ -48,6 +48,7 @@ jobs:
           script: |
             cd ~/pricing-nest
             git pull origin main
+            source ./.bashrc
             npm install 
             npm run build
             pm2 restart pricing
