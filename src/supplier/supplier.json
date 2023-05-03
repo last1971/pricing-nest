@@ -10,5 +10,6 @@
   {"alias" : "dan", "deliveryTime":  5},
   {"alias" : "getchips", "deliveryTime":  9},
   {"alias" : "radiodetalicom", "deliveryTime":  7},
-  {"alias" :  "elitan", "deliveryTime": 7}
+  {"alias" : "elitan", "deliveryTime": 7},
+  {"alias" : "ruelectronics", "deliveryTime": 11}
 ]
