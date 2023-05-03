@@ -46,11 +46,10 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
+            export NVM_DIR=~/.nvm
+            source ~/.nvm/nvm.sh
             cd ~/pricing-nest
-            # git pull origin main
-            export PATH="/home/trade/.local/share/fnm:$PATH"
-            fnm env
-            fnm use 19
+            git pull origin main          
             npm install 
-            # npm run build
-            # pm2 restart pricing
+            npm run build
+            pm2 restart pricing
