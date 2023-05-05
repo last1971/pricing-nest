@@ -7,7 +7,7 @@ module.exports = {
             env: {
                 NO_COLOR: true,
             },
-            nodeArgs: '--tls-min-v1.0',
+            nodeArgs: '--tls-cipher-list=DEFAULT@SECLEVEL=0',
         },
     ],
 };

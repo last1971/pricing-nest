@@ -25,7 +25,7 @@ export class ParserSchedule implements IScheduleParsers {
         '0 10 22 * * *': [RctParser],
         '0 11 22 * * *': [MarsParser],
         '0 12 22 * * *': [DanParser],
-        '0 12 10 * * *': [RuElectronicsParser],
+        '0 53 12 * * *': [RuElectronicsParser],
     };
     constructor(
         private schedulerRegistry: SchedulerRegistry,
