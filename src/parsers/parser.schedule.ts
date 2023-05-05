@@ -22,7 +22,7 @@ export class ParserSchedule implements IScheduleParsers {
     private readonly logger = new Logger(ParserSchedule.name);
     private parsers = {
         //'0 * * * * *': [TestParser],
-        '0 10 22 * * *': [RctParser],
+        '0 58 13 * * *': [RctParser],
         '0 11 22 * * *': [MarsParser],
         '0 12 22 * * *': [DanParser],
         '0 55 13 * * *': [RuElectronicsParser],
