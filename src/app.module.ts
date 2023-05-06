@@ -1,4 +1,4 @@
-import { CacheModule, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PriceModule } from './price/price.module';
@@ -15,6 +15,7 @@ import { GoodModule } from './good/good.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ApiRequestStatModule } from './api-request-stat/api-request-stat.module';
 import { MailModule } from './mail/mail.module';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
     imports: [

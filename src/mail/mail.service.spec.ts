@@ -26,6 +26,8 @@ describe('MailService', () => {
             ],
         }).compile();
 
+        sendMail.mockClear();
+
         service = module.get<MailService>(MailService);
     });
 
@@ -43,5 +45,11 @@ describe('MailService', () => {
         await service.sendErrorMessage(testDto);
         expect(sendMail.mock.calls).toHaveLength(1);
         expect(sendMail.mock.calls[0][0]).toHaveProperty('context', testDto);
+    });
+
+    it('sendTestMessage', async () => {
+        await service.sendTestMessage();
+        expect(sendMail.mock.calls).toHaveLength(1);
+        expect(sendMail.mock.calls[0][0]).toHaveProperty('context', { test: 'Nothing important ' });
     });
 });
