@@ -46,7 +46,7 @@ export class PlatanParser extends AbstractParser {
             const retail = retails.get(item.NOM_N);
             const warehouses: WarehouseDto[] = [];
             if (item.QUANTY || item.PRIHOD) {
-                const minFromWarehouse = item.MINSOSKL ? item.MINSOSKL : 1;
+                const minFromWarehouse = item.MINSOSKL ? parseInt(item.MINSOSKL) : 1;
                 const prices: PriceDto[] = times(6)
                     .slice(1)
                     .map((i) => {
