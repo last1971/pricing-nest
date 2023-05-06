@@ -5,9 +5,13 @@ name: nestjs CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
   pull_request:
-    branches: [ "main" ]
+    types:
+      - closed
+    branches:
+      - main
 
 jobs:
   test:
