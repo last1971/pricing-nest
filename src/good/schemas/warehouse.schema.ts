@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Price, PriceSchema } from '../../price/schemas/price.schema';
+import mongoose from 'mongoose';
 
 @Schema()
 export class Warehouse {
@@ -17,6 +18,9 @@ export class Warehouse {
 
     @Prop({ type: [PriceSchema], required: false })
     prices?: Price[];
+
+    @Prop({ required: false, type: mongoose.Schema.Types.Mixed })
+    options: any;
 }
 
 export const WarehouseSchema = SchemaFactory.createForClass(Warehouse);

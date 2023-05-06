@@ -26,10 +26,9 @@ export class GoodService {
         this.allSuppliers = await this.supplierService.all();
     }
     async createOrUpdate(good: GoodDto): Promise<void> {
-        const newValues = good as any;
-        newValues.source = Source.Db;
-        newValues.alias = alias(good.alias);
-        await this.goodModel.findOneAndUpdate(pick(good, ['code', 'supplier']), omit(newValues, ['code', 'supplier']), {
+        good.source = Source.Db;
+        good.alias = alias(good.alias);
+        await this.goodModel.findOneAndUpdate(pick(good, ['code', 'supplier']), omit(good, ['code', 'supplier']), {
             upsert: true,
         });
     }

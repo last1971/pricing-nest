@@ -17,7 +17,7 @@ services:
     ports:
       - 27017:27017
     #    network_mode: host
-    #restart: unless-stopped
+    restart: unless-stopped
   redis:
     image: redis:latest
     container_name: price-redis
