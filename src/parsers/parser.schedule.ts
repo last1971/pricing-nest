@@ -27,7 +27,7 @@ export class ParserSchedule implements IScheduleParsers {
         '0 40 17 * * *': [MarsParser],
         '0 41 17 * * *': [DanParser],
         '0 42 17 * * *': [RuElectronicsParser],
-        '0 11 07 * * *': [CompelDbfParser],
+        '0 27 17 * * *': [CompelDbfParser],
     };
     constructor(
         private schedulerRegistry: SchedulerRegistry,
