@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Good, GoodDocument } from './schemas/good.schema';
 import { Model } from 'mongoose';
 import { GoodDto } from './dtos/good.dto';
-import { omit, pick } from 'lodash';
+import { omit, pick, find, isEqual } from 'lodash';
 import { Source } from './dtos/source.enum';
 import { PriceRequestDto } from '../price/dtos/price.request.dto';
 import { SupplierDto } from '../supplier/supplier.dto';
@@ -12,6 +12,8 @@ import { alias } from '../helpers';
 import { ModelToDto } from '../decorators/model.to.dto';
 import { isString } from 'lodash';
 import { SetGoodIdDto } from './dtos/set.good.id.dto';
+import { ParameterDto } from './dtos/parameter.dto';
+import { ParameterDocument } from './schemas/parameter.schema';
 
 @Injectable()
 export class GoodService {
@@ -28,9 +30,38 @@ export class GoodService {
     async createOrUpdate(good: GoodDto): Promise<void> {
         good.source = Source.Db;
         good.alias = alias(good.alias);
-        await this.goodModel.findOneAndUpdate(pick(good, ['code', 'supplier']), omit(good, ['code', 'supplier']), {
-            upsert: true,
+        const newGood = await this.goodModel.findOneAndUpdate(
+            pick(good, ['code', 'supplier']),
+            omit(good, ['code', 'supplier', 'parameters']),
+            {
+                upsert: true,
+            },
+        );
+        if (good.parameters) {
+            await this.setParameters(newGood, good.parameters);
+        }
+    }
+    async setParameters(newGood: GoodDocument, setParameters: ParameterDto[]): Promise<void> {
+        const parameters: ParameterDto[] = newGood.parameters
+            ? newGood.parameters.map((parameter: ParameterDocument) => parameter.toObject())
+            : [];
+        let modified = false;
+        setParameters.forEach((parameter) => {
+            const { name } = parameter;
+            const newParameter: ParameterDto = find(parameters, { name });
+            if (!newParameter) {
+                parameters.push(parameter);
+                modified = true;
+            } else if (!isEqual(newParameter, parameter)) {
+                Object.assign(newParameter, parameter);
+                modified = true;
+            }
         });
+        if (modified) {
+            await this.goodModel.findOneAndUpdate(pick(newGood.toObject(), ['code', 'supplier']), {
+                $set: { parameters },
+            });
+        }
     }
     @ModelToDto(GoodDto)
     async find(filter: any): Promise<GoodDto[]> {

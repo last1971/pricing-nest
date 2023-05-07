@@ -1,8 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Types } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 import { Unit } from '../../unit/unit.schema';
 
-@Schema()
+export type ParameterDocument = HydratedDocument<Parameter>;
+@Schema({ _id: false })
 export class Parameter {
     @Prop({ required: true })
     name: string;

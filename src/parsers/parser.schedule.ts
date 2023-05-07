@@ -16,6 +16,7 @@ import { DanParser } from './schedule-parsers/dan.parser';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import { RuElectronicsParser } from './schedule-parsers/ru.electronics.parser';
+import { CompelDbfParser } from './schedule-parsers/compel.dbf.parser';
 
 @Injectable()
 export class ParserSchedule implements IScheduleParsers {
@@ -26,6 +27,7 @@ export class ParserSchedule implements IScheduleParsers {
         '0 40 17 * * *': [MarsParser],
         '0 41 17 * * *': [DanParser],
         '0 42 17 * * *': [RuElectronicsParser],
+        '0 11 07 * * *': [CompelDbfParser],
     };
     constructor(
         private schedulerRegistry: SchedulerRegistry,
