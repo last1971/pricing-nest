@@ -1,10 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { GoodService } from './good.service';
 import { getModelToken } from '@nestjs/mongoose';
-import { Good } from './schemas/good.schema';
+import { Good, GoodDocument } from './schemas/good.schema';
 import { SupplierService } from '../supplier/supplier.service';
 import { SupplierDto } from '../supplier/supplier.dto';
 import { GoodDto } from './dtos/good.dto';
+import { ParameterDocument } from './schemas/parameter.schema';
 
 describe('GoodService', () => {
     let service: GoodService;
@@ -54,6 +55,7 @@ describe('GoodService', () => {
         service = module.get<GoodService>(GoodService);
 
         find.mockClear();
+        findOneAndUpdate.mockClear();
     });
 
     it('should be defined', async () => {
@@ -136,5 +138,60 @@ describe('GoodService', () => {
             expect(responses[index]).toEqual(item.response);
             expect(save.mock.calls).toHaveLength(item.save);
         });
+    });
+    it('test setParameters [], [1]', async () => {
+        const good = { toObject: () => ({ code: '1', supplier: '1' }) } as GoodDocument;
+        await service.setParameters(good, [{ name: 'test', stringValue: 'test' }]);
+        expect(findOneAndUpdate.mock.calls).toEqual([
+            [{ code: '1', supplier: '1' }, { $set: { parameters: [{ name: 'test', stringValue: 'test' }] } }],
+        ]);
+    });
+    it('test setParameters [1], [2]', async () => {
+        const parameter = { toObject: () => ({ name: 'test1', stringValue: 'test1' }) } as ParameterDocument;
+        const good = {
+            toObject: () => ({ code: '1', supplier: '1' }),
+        } as GoodDocument;
+        good.parameters = [parameter];
+        await service.setParameters(good, [{ name: 'test', stringValue: 'test' }]);
+        expect(findOneAndUpdate.mock.calls).toEqual([
+            [
+                { code: '1', supplier: '1' },
+                {
+                    $set: {
+                        parameters: [
+                            { name: 'test1', stringValue: 'test1' },
+                            { name: 'test', stringValue: 'test' },
+                        ],
+                    },
+                },
+            ],
+        ]);
+    });
+    it('test setParameters [1], [1_]', async () => {
+        const parameter = { toObject: () => ({ name: 'test', stringValue: 'test1' }) } as ParameterDocument;
+        const good = {
+            toObject: () => ({ code: '1', supplier: '1' }),
+        } as GoodDocument;
+        good.parameters = [parameter];
+        await service.setParameters(good, [{ name: 'test', stringValue: 'test' }]);
+        expect(findOneAndUpdate.mock.calls).toEqual([
+            [
+                { code: '1', supplier: '1' },
+                {
+                    $set: {
+                        parameters: [{ name: 'test', stringValue: 'test' }],
+                    },
+                },
+            ],
+        ]);
+    });
+    it('test setParameters [1], [1]', async () => {
+        const parameter = { toObject: () => ({ name: 'test', stringValue: 'test' }) } as ParameterDocument;
+        const good = {
+            toObject: () => ({ code: '1', supplier: '1' }),
+        } as GoodDocument;
+        good.parameters = [parameter];
+        await service.setParameters(good, [{ name: 'test', stringValue: 'test' }]);
+        expect(findOneAndUpdate.mock.calls).toHaveLength(0);
     });
 });
