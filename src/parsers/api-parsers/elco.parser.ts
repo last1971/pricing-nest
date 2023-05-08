@@ -36,45 +36,41 @@ export class ElcoParser extends AbstractParser {
 
     async parseResponse(response: any): Promise<GoodDto[]> {
         const result: Map<string, GoodDto> = new Map<string, GoodDto>();
-        try {
-            response.data.forEach((item: any) => {
-                let good: GoodDto = result.get(item.code);
-                if (!good) {
-                    good = new GoodDto({
-                        alias: item.name,
-                        supplier: this.getSupplier().id,
-                        code: item.code,
-                        source: Source.Api,
-                        updatedAt: new Date(),
-                        parameters: [
-                            { name: 'name', stringValue: item.name },
-                            { name: 'producer', stringValue: item.producer },
-                            { name: 'case', stringValue: item.case },
-                        ],
-                        warehouses: [
-                            {
-                                name: 'CENTER',
-                                quantity: item.quantity,
-                                deliveryTime: this.getSupplier().deliveryTime,
-                                multiple: 1,
-                                prices: [],
-                            },
-                        ],
-                    });
-                    result.set(item.code, good);
-                }
-                good.warehouses[0].prices.push({
-                    value: item.price,
-                    currency: this.getCurrency().id,
-                    min: item.minQuantity,
-                    max: item.maxQuantity,
-                    isOrdinary: !item.isInput,
+
+        response.data.forEach((item: any) => {
+            let good: GoodDto = result.get(item.code);
+            if (!good) {
+                good = new GoodDto({
+                    alias: item.name,
+                    supplier: this.getSupplier().id,
+                    code: item.code,
+                    source: Source.Api,
+                    updatedAt: new Date(),
+                    parameters: [
+                        { name: 'name', stringValue: item.name },
+                        { name: 'producer', stringValue: item.producer },
+                        { name: 'case', stringValue: item.case },
+                    ],
+                    warehouses: [
+                        {
+                            name: 'CENTER',
+                            quantity: item.quantity,
+                            deliveryTime: this.getSupplier().deliveryTime,
+                            multiple: 1,
+                            prices: [],
+                        },
+                    ],
                 });
+                result.set(item.code, good);
+            }
+            good.warehouses[0].prices.push({
+                value: item.price,
+                currency: this.getCurrency().id,
+                min: item.minQuantity,
+                max: item.maxQuantity,
+                isOrdinary: !item.isInput,
             });
-        } catch (e) {
-            this.parsers.getLogger().debug(response);
-            this.parsers.getLogger().error(e);
-        }
+        });
         return [...result].map(([, value]) => value);
     }
 }

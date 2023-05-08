@@ -93,7 +93,17 @@ export abstract class AbstractParser {
             response.data = await firstValueFrom(
                 this.getResponse()
                     .pipe(map((res) => res.data))
-                    .pipe(map(async (res) => await this.parseResponse(res)))
+                    .pipe(
+                        map(async (res) => {
+                            try {
+                                return await this.parseResponse(res);
+                            } catch (e) {
+                                this.parsers.getLogger().debug(res);
+                                this.parsers.getLogger().error(e);
+                                return await this.getFromDb();
+                            }
+                        }),
+                    )
                     .pipe(
                         catchError(async (error: AxiosError) => {
                             await this.obtainError(error, response);
