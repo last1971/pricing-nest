@@ -32,7 +32,7 @@ export class GoodService {
         good.alias = alias(good.alias);
         const newGood = await this.goodModel.findOneAndUpdate(
             pick(good, ['code', 'supplier']),
-            omit(good, ['code', 'supplier', 'parameters']),
+            omit(good, ['code', 'supplier', 'parameters', 'goodId']),
             {
                 upsert: true,
             },

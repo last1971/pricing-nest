@@ -12,15 +12,16 @@ import { MAIL_QUEUE } from './mail.constants';
     imports: [
         MailerModule.forRootAsync({
             useFactory: async (config: ConfigService) => ({
-                // transport: config.get("MAIL_TRANSPORT"),
-                // or
                 transport: {
                     host: config.get('MAIL_HOST'),
                     secure: true,
+                    port: config.get('MAIL_PORT', 465),
                     auth: {
                         user: config.get('MAIL_USER'),
                         pass: config.get('MAIL_PASSWORD'),
                     },
+                    logger: config.get('MAIL_LOG', 'false') === 'true',
+                    debug: config.get('MAIL_DEBUG', 'false') === 'true',
                 },
                 defaults: {
                     from: `"No Reply" <${config.get('MAIL_FROM')}>`,
