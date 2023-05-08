@@ -89,4 +89,7 @@ export class ParsersService implements IApiParsers {
     getQueue(): Queue {
         return this.apiQueue;
     }
+    getLogger(): Logger {
+        return this.logger;
+    }
 }

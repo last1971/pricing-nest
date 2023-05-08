@@ -69,6 +69,7 @@ export abstract class AbstractParser {
             error: error.message,
             module: this.getAlias().toUpperCase() + ' parser',
         });
+        this.parsers.getLogger().error(`Api request to ${this.getAlias()} response error: ${error.message}`);
     }
     async saveStat(response: ApiResponseDto): Promise<void> {
         const apiRequestStat: ApiRequestStatDto = {
