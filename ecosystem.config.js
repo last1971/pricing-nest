@@ -3,7 +3,7 @@ module.exports = {
         {
             name: 'pricing',
             script: 'dist/main.js',
-            watch: true,
+            watch: false,
             env: {
                 NO_COLOR: true,
             },
