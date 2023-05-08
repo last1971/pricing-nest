@@ -61,7 +61,12 @@ export class PromelecParser extends AbstractParser {
                             quantity: vendor.quant,
                             multiple: vendor.mpq ?? 1,
                             options: {
-                                location_id: vendor.delivery === 2 ? 'М А Г А З И Н' : vendor.comment ?? 'Л А Б А З',
+                                location_id:
+                                    vendor.delivery === 0
+                                        ? 'Элкит'
+                                        : vendor.delivery === 2
+                                        ? 'М А Г А З И Н'
+                                        : vendor.comment ?? 'Л А Б А З',
                             },
                             prices: this.parsePrices(vendor.pricebreaks, vendor),
                         })),

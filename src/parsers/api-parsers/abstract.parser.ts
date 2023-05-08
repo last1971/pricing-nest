@@ -56,7 +56,7 @@ export abstract class AbstractParser {
         }
         return response;
     }
-    async obtainError(error: AxiosError, response: ApiResponseDto) {
+    async obtainError(error: Error, response: ApiResponseDto) {
         response.errorMessage = error.message;
         response.isSuccess = false;
         const milliseconds = await this.parsers.getConfigService().get<number>('CACHE_ERROR_EXP');
@@ -97,9 +97,9 @@ export abstract class AbstractParser {
                         map(async (res) => {
                             try {
                                 return await this.parseResponse(res);
-                            } catch (e) {
+                            } catch (error) {
                                 this.parsers.getLogger().debug(res);
-                                this.parsers.getLogger().error(e);
+                                await this.obtainError(error, response);
                                 return await this.getFromDb();
                             }
                         }),

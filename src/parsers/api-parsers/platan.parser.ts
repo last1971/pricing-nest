@@ -75,6 +75,9 @@ export class PlatanParser extends AbstractParser {
                         deliveryTime: this.getSupplier().deliveryTime,
                         multiple: parseInt(item.KRATNOST) || 1,
                         quantity: parseInt(item.QUANTY),
+                        options: {
+                            location_id: 'Одинцово',
+                        },
                         prices,
                     });
                 }
@@ -87,6 +90,9 @@ export class PlatanParser extends AbstractParser {
                         deliveryTime: this.getSupplier().deliveryTime + days,
                         multiple: parseInt(item.KRATNOST) || 1,
                         quantity: parseInt(item.PRIHOD),
+                        options: {
+                            location_id: 'Транзит',
+                        },
                         prices,
                     });
                 }
