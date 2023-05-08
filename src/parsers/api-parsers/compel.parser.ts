@@ -90,7 +90,7 @@ export class CompelParser extends AbstractParser {
                             },
                             prices: (location.price_qty ?? []).map(
                                 (price): PriceDto => ({
-                                    value: price.price,
+                                    value: price.price * this.parsers.getConfigService().get<number>('API_COMPEL_COEF'),
                                     min: price.min_qty,
                                     max: price.max_qty,
                                     currency: this.getCurrency().id,
