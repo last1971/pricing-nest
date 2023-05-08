@@ -36,6 +36,7 @@ export class ElcoParser extends AbstractParser {
 
     async parseResponse(response: any): Promise<GoodDto[]> {
         const result: Map<string, GoodDto> = new Map<string, GoodDto>();
+        this.parsers.getLogger().debug(response);
         response.data.forEach((item: any) => {
             let good: GoodDto = result.get(item.code);
             if (!good) {
