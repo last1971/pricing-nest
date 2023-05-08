@@ -14,7 +14,7 @@ import { MAIL_QUEUE } from './mail.constants';
             useFactory: async (config: ConfigService) => ({
                 transport: {
                     host: config.get('MAIL_HOST'),
-                    secure: true,
+                    secure: config.get('MAIL_USE_TLS', 'true') === 'true',
                     port: config.get('MAIL_PORT', 465),
                     auth: {
                         user: config.get('MAIL_USER'),
