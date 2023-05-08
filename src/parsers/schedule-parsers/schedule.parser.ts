@@ -41,6 +41,7 @@ export class ScheduleParser implements ICommand {
             await this.parse();
             await this.finish();
         } catch (e) {
+            this.schedule.getLog().error(`Break ${this.supplierAlias} parse with error ${e.message}`);
             await this.schedule.getQueue().add(MAIL_ERROR_MESSAGE, {
                 error: e.message,
                 time: DateTime.now().toLocaleString(DateTime.DATETIME_FULL),
