@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Good, GoodDocument } from './schemas/good.schema';
 import { Model } from 'mongoose';
@@ -19,6 +19,7 @@ import { ParameterDocument } from './schemas/parameter.schema';
 export class GoodService {
     private dbSuppliers: SupplierDto[];
     private allSuppliers: SupplierDto[];
+    private logger = new Logger(GoodService.name);
     constructor(
         @InjectModel(Good.name) private goodModel: Model<GoodDocument>,
         private supplierService: SupplierService,
@@ -35,9 +36,12 @@ export class GoodService {
             omit(good, ['code', 'supplier', 'parameters', 'goodId']),
             {
                 upsert: true,
+                new: true,
             },
         );
-        if (good.parameters) {
+        if (!newGood) {
+            this.logger.debug(`Not good with code: ${good.code} & supplier: ${good.supplier}`);
+        } else if (good.parameters) {
             await this.setParameters(newGood, good.parameters);
         }
     }
