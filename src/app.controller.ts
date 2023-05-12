@@ -16,7 +16,7 @@ export class AppController {
                 },
             },
         },
-        description: '200. Success. Returns a user',
+        description: 'Success. Test link',
     })
     @Get()
     getHello(): any {
