@@ -7,10 +7,12 @@ import { CurrencyDto } from '../currency/dto/currency.dto';
 import { UnitDto } from '../unit/dtos/unit.dto';
 import { GoodService } from '../good/good.service';
 import { Logger } from '@nestjs/common';
+import { ApiRequestStatService } from '../api-request-stat/api-request-stat.service';
 export interface IApiParsers {
     getSuppliers(): Map<string, SupplierDto>;
     getCurrencies(): Map<string, CurrencyDto>;
     getGoodService(): GoodService;
+    getStatService(): ApiRequestStatService;
     getPiece(): UnitDto;
     getConfigService(): ConfigService;
     getCache(): Cache;

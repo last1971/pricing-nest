@@ -17,6 +17,7 @@ import { UnitService } from '../unit/unit.service';
 import { UnitDto } from '../unit/dtos/unit.dto';
 import { GoodService } from '../good/good.service';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { ApiRequestStatService } from '../api-request-stat/api-request-stat.service';
 
 @Injectable()
 export class ParsersService implements IApiParsers {
@@ -30,6 +31,7 @@ export class ParsersService implements IApiParsers {
         private currencyService: CurrencyService,
         private unitService: UnitService,
         private goodService: GoodService,
+        private statService: ApiRequestStatService,
         @Inject(CACHE_MANAGER) private cache: Cache,
         private http: HttpService,
         @InjectQueue('api') private readonly apiQueue: Queue,
@@ -58,6 +60,9 @@ export class ParsersService implements IApiParsers {
     }
     getGoodService(): GoodService {
         return this.goodService;
+    }
+    getStatService(): ApiRequestStatService {
+        return this.statService;
     }
     getConfigService(): ConfigService {
         return this.configService;

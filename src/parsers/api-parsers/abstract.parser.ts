@@ -57,9 +57,10 @@ export abstract class AbstractParser {
         return response;
     }
     async obtainError(error: Error, response: ApiResponseDto) {
+        const coeff = await this.parsers.getStatService().todayErrorCount(this.getSupplier());
         response.errorMessage = error.message;
         response.isSuccess = false;
-        const milliseconds = await this.parsers.getConfigService().get<number>('CACHE_ERROR_EXP');
+        const milliseconds = (await this.parsers.getConfigService().get<number>('CACHE_ERROR_EXP')) * coeff;
         const time = DateTime.now();
         const exp = time.plus(Duration.fromObject({ milliseconds }));
         await this.parsers.getCache().set('error : ' + this.getAlias(), true, milliseconds);

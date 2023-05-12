@@ -12,7 +12,7 @@ export class ApiRequestStat {
     isSuccess: boolean;
     @Prop({ required: false })
     errorMessage?: string;
-    @Prop({ type: DateTime, required: true })
+    @Prop({ type: Date, required: true })
     dateTime: DateTime;
     @Prop({ required: true })
     duration: number;

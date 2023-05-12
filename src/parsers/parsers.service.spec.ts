@@ -19,6 +19,7 @@ import { GoodDto } from '../good/dtos/good.dto';
 import { omit } from 'lodash';
 import { MAIL_ERROR_MESSAGE } from '../mail/mail.constants';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { ApiRequestStatService } from '../api-request-stat/api-request-stat.service';
 
 describe('ParsersService', () => {
     let service: ParsersService;
@@ -40,6 +41,10 @@ describe('ParsersService', () => {
                 {
                     provide: GoodService,
                     useValue: { find },
+                },
+                {
+                    provide: ApiRequestStatService,
+                    useValue: { todayErrorCount: () => 1 },
                 },
                 {
                     provide: ConfigService,
@@ -194,8 +199,9 @@ describe('ParsersService', () => {
         expect(CacheSet.mock.calls[0]).toEqual(['error : second', true, 60]);
         expect(CacheSet.mock.calls[1]).toEqual(['first : 123', [{ source: 'Api' }, { source: 'Api' }]]);
         expect(QueueAdd.mock.calls).toHaveLength(4);
-        expect(QueueAdd.mock.calls[0][0]).toEqual(MAIL_ERROR_MESSAGE);
-        expect(QueueAdd.mock.calls[1][1]).toHaveProperty('isSuccess', true);
+        expect(QueueAdd.mock.calls[1][0]).toEqual(MAIL_ERROR_MESSAGE);
+        expect(QueueAdd.mock.calls[0][0]).toEqual('apiRequestStats');
+        expect(QueueAdd.mock.calls[0][1]).toHaveProperty('isSuccess', true);
         expect(QueueAdd.mock.calls[2]).toEqual(['keys', 'first : 123']);
         expect(QueueAdd.mock.calls[3][1]).toHaveProperty('isSuccess', false);
     });
