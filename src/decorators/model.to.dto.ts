@@ -10,7 +10,9 @@ export function ModelToDto<T>(dto: ClassConstructor<T>) {
                 ? result.map((item: any) => {
                       return plainToInstance(dto, item.toObject({ virtuals: true }));
                   })
-                : plainToInstance(dto, result.toObject({ virtuals: true }));
+                : result
+                ? plainToInstance(dto, result.toObject({ virtuals: true }))
+                : null;
         };
         return descriptor;
     };

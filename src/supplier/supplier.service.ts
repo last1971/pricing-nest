@@ -63,7 +63,7 @@ export class SupplierService {
         return this.supplierModel.findById(id);
     }
     async rate(alias?: string): Promise<SupplierRateDto[]> {
-        const supplierAlias: SupplierDto = alias ? await this.alias(alias) : null;
+        const supplierAlias: SupplierDto = !!alias ? await this.alias(alias) : null;
         const suppliers = await this.all();
         const rates = await this.agrServise.duration();
         return suppliers.map((supplier) => {

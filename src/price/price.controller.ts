@@ -5,10 +5,16 @@ import { PriceSupplierInterceptor } from '../decorators/price.supplier.intercept
 import { TradeInterceptor } from '../decorators/trade.interceptor';
 import { GoodIdInterceptor } from '../decorators/good.id.interceptor';
 import { GoodDto } from '../good/dtos/good.dto';
-
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+@ApiTags('price')
 @Controller('price')
 export class PriceController {
     constructor(private service: PriceService) {}
+    @ApiOkResponse({
+        isArray: true,
+        type: GoodDto,
+        description: 'Search goods in api and db by substring and response goods json',
+    })
     @Get()
     @UseInterceptors(PriceSupplierInterceptor)
     async findAll(@Query() request: PriceRequestDto): Promise<GoodDto[]> {
