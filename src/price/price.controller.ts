@@ -6,6 +6,7 @@ import { TradeInterceptor } from '../decorators/trade.interceptor';
 import { GoodIdInterceptor } from '../decorators/good.id.interceptor';
 import { GoodDto } from '../good/dtos/good.dto';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { TradePriceDto } from './dtos/trade.price.dto';
 @ApiTags('price')
 @Controller('price')
 export class PriceController {
@@ -20,7 +21,11 @@ export class PriceController {
     async findAll(@Query() request: PriceRequestDto): Promise<GoodDto[]> {
         return this.service.getPrices(request);
     }
-
+    @ApiOkResponse({
+        isArray: true,
+        type: TradePriceDto,
+        description: 'Search goods in api and db by substring and response in elcopro trade format',
+    })
     @Get('trade')
     @UseInterceptors(TradeInterceptor, PriceSupplierInterceptor, GoodIdInterceptor)
     async findForTrade(@Query() request: PriceRequestDto): Promise<any> {

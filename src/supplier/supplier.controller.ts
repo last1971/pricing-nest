@@ -1,7 +1,7 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { SupplierService } from './supplier.service';
 import { ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
-import { SupplierRateDto } from './supplier.trade.dto';
+import { SupplierRateDto } from './supplier.rate.dto';
 @ApiTags('supplier')
 @Controller('supplier')
 export class SupplierController {

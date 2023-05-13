@@ -6,6 +6,7 @@ import { Source } from '../good/dtos/source.enum';
 import { v4 as uuidv4 } from 'uuid';
 import { CurrencyService } from '../currency/currency.service';
 import { GoodDto } from '../good/dtos/good.dto';
+import { TradePriceDto } from '../price/dtos/trade.price.dto';
 
 @Injectable()
 export class TradeInterceptor implements NestInterceptor {
@@ -26,7 +27,7 @@ export class TradeInterceptor implements NestInterceptor {
                                         : good.goodId
                                         ? parseInt(good.goodId)
                                         : null;
-                                return warehouse.prices.map((price) => {
+                                return warehouse.prices.map((price): TradePriceDto => {
                                     return {
                                         name: (find(good.parameters, ['name', 'name']) as ParameterDto).stringValue,
                                         producer: (find(good.parameters, ['name', 'producer']) as ParameterDto)

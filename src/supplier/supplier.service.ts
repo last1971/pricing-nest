@@ -12,7 +12,7 @@ import { ElectronicaParser } from '../parsers/api-parsers/electronica.parser';
 import { GetchipsParser } from '../parsers/api-parsers/getchips.parser';
 import { CompelDmsParser } from '../parsers/api-parsers/compel.dms.parser';
 import { RadiodetaliComParser } from '../parsers/api-parsers/radiodetali.com.parser';
-import { SupplierRateDto } from './supplier.trade.dto';
+import { SupplierRateDto } from './supplier.rate.dto';
 import { ApiRequestStatService } from '../api-request-stat/api-request-stat.service';
 import { ElitanParser } from '../parsers/api-parsers/elitan.parser';
 
