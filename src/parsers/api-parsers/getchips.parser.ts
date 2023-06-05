@@ -14,10 +14,11 @@ export class GetchipsParser extends AbstractParser {
         return 'USD';
     }
 
-    getResponse(): Observable<AxiosResponse<any, any>> {
-        return this.parsers.getHttp().get(this.parsers.getConfigService().get<string>('API_GETCHIPS_URL'), {
+    async getResponse(): Promise<Observable<AxiosResponse<any, any>>> {
+        const getchips = await this.parsers.getVault().get('getchips');
+        return this.parsers.getHttp().get(getchips.URL_API as string, {
             params: {
-                token: this.parsers.getConfigService().get<string>('API_GETCHIPS_TOKEN'),
+                token: getchips.TOKEN,
                 input_field: this.search,
                 count_field: 1,
                 currency_code: 1, // USD

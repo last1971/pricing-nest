@@ -6,6 +6,7 @@ import { CurrencyService } from '../currency/currency.service';
 import { GoodService } from '../good/good.service';
 import { UnitService } from '../unit/unit.service';
 import { Queue } from 'bull';
+import { VaultService } from 'vault-module/lib/vault.service';
 
 export interface IScheduleParsers {
     getConfigService(): ConfigService;
@@ -16,4 +17,5 @@ export interface IScheduleParsers {
     getGoods(): GoodService;
     getUnitService(): UnitService;
     getQueue(): Queue;
+    getVault(): VaultService;
 }

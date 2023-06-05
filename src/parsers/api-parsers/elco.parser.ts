@@ -13,18 +13,12 @@ export class ElcoParser extends AbstractParser {
         return 'RUB';
     }
 
-    protected getUrl(): string {
-        return this.parsers.getConfigService().get<string>('API_ELCO_URL');
-    }
-
-    protected getToken(): string {
-        return this.parsers.getConfigService().get<string>('API_ELCO_TOKEN');
-    }
-
-    getResponse(): Observable<AxiosResponse<any, any>> {
-        return this.parsers.getHttp().get(this.getUrl(), {
+    async getResponse(): Promise<Observable<AxiosResponse<any, any>>> {
+        const data = await this.parsers.getVault().get(this.getAlias());
+        const url = data.URL + (this.getAlias() === 'elcopro' ? '/api/seller-price/own' : '/api/seller-price');
+        return this.parsers.getHttp().get(url, {
             headers: {
-                Authorization: 'Bearer ' + this.getToken(),
+                Authorization: 'Bearer ' + data.TOKEN,
                 Accept: 'application/json',
             },
             params: {

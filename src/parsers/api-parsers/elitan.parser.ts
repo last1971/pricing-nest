@@ -15,10 +15,11 @@ export class ElitanParser extends AbstractParser {
         return 'RUB';
     }
 
-    getResponse(): Observable<AxiosResponse<any, any>> {
-        const url = this.parsers.getConfigService().get<string>('API_ELITAN_URL');
-        const email_aut = this.parsers.getConfigService().get<string>('API_ELITAN_EMAIL');
-        const mail_hash = this.parsers.getConfigService().get<string>('API_ELITAN_MAIL_HASH');
+    async getResponse(): Promise<Observable<AxiosResponse<any, any>>> {
+        const elitan = await this.parsers.getVault().get('elitan');
+        const url = elitan.URL as string;
+        const email_aut = elitan.EMAIL as string;
+        const mail_hash = elitan.MAIL_HASH as string;
         const Cookie = 'email_aut=' + email_aut + '; mail_hash=' + mail_hash + ';';
         return this.parsers.getHttp().get(url, {
             headers: {

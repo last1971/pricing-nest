@@ -14,11 +14,12 @@ export class RadiodetaliComParser extends AbstractParser {
         return 'USD';
     }
 
-    getResponse(): Observable<AxiosResponse<any, any>> {
-        return this.parsers.getHttp().get(this.parsers.getConfigService().get<string>('API_RADIODETALICOM_URL'), {
+    async getResponse(): Promise<Observable<AxiosResponse<any, any>>> {
+        const rd = await this.parsers.getVault().get('radiodetali.com');
+        return this.parsers.getHttp().get(rd.URL as string, {
             params: {
-                id: this.parsers.getConfigService().get<string>('API_RADIODETALICOM_TOKEN'),
-                offs: this.parsers.getConfigService().get<string>('API_RADIODETALICOM_IGNORE'),
+                id: rd.TOKEN,
+                offs: rd.IGNORE,
                 opt: 'by_part_n',
                 seek: this.search,
             },

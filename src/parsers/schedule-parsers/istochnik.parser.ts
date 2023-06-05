@@ -7,8 +7,9 @@ export class IstochnikParser extends ScheduleParser {
     protected supplierAlias = 'istochnik';
     protected currencyAlfa3 = 'RUB';
     async parse(): Promise<void> {
-        const url = this.schedule.getConfigService().get<string>('API_ISTOCHNIK_URL');
-        const api_key = this.schedule.getConfigService().get<string>('API_ISTOCHNIK_KEY');
+        const ist = await this.schedule.getVault().get('istochnik');
+        const url = ist.API_URL as string;
+        const api_key = ist.API_KEY as string;
         const res = await this.schedule.getHttp().get(url, { params: { api_key } });
         const { data } = await firstValueFrom(res);
         const promises = data.PriceList.Items.Item.map((item: any) => {

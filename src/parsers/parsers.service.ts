@@ -18,6 +18,7 @@ import { UnitDto } from '../unit/dtos/unit.dto';
 import { GoodService } from '../good/good.service';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { ApiRequestStatService } from '../api-request-stat/api-request-stat.service';
+import { VaultService } from 'vault-module/lib/vault.service';
 
 @Injectable()
 export class ParsersService implements IApiParsers {
@@ -35,6 +36,7 @@ export class ParsersService implements IApiParsers {
         @Inject(CACHE_MANAGER) private cache: Cache,
         private http: HttpService,
         @InjectQueue('api') private readonly apiQueue: Queue,
+        private vaultService: VaultService,
     ) {}
     async onModuleInit() {
         this.suppliers = new Map<string, SupplierDto>();
@@ -96,5 +98,8 @@ export class ParsersService implements IApiParsers {
     }
     getLogger(): Logger {
         return this.logger;
+    }
+    getVault(): VaultService {
+        return this.vaultService;
     }
 }

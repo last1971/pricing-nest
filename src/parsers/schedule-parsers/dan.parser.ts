@@ -9,12 +9,11 @@ export class DanParser extends ScheduleParser {
     protected supplierAlias = 'dan';
     protected currencyAlfa3 = 'RUB';
     async parse(): Promise<void> {
-        const res = await this.schedule
-            .getHttp()
-            .get(this.schedule.getConfigService().get<string>('API_DAN_URL'), { responseType: 'arraybuffer' });
+        const dan = await this.schedule.getVault().get('dan');
+        const res = await this.schedule.getHttp().get(dan.URL as string, { responseType: 'arraybuffer' });
         const response = await firstValueFrom(res);
         const directory = await Open.buffer(response.data);
-        const file = await directory.files[0].buffer(this.schedule.getConfigService().get<string>('API_DAN_PASS'));
+        const file = await directory.files[0].buffer(dan.PASS);
         const workbook = XLSX.read(file, { type: 'array' });
         const worksheet = workbook.Sheets[workbook.SheetNames[0]];
         const promises: Promise<any>[] = [];

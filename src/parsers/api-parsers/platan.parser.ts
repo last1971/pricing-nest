@@ -18,8 +18,9 @@ export class PlatanParser extends AbstractParser {
         return 'RUB';
     }
 
-    getResponse(): Observable<AxiosResponse<any, any>> {
-        return this.parsers.getHttp().get(this.parsers.getConfigService().get<string>('API_PLATAN_URL'), {
+    async getResponse(): Promise<Observable<AxiosResponse<any, any>>> {
+        const platan = await this.parsers.getVault().get('platan');
+        return this.parsers.getHttp().get(platan.URL as string, {
             params: { search: this.search },
         });
     }
@@ -30,15 +31,14 @@ export class PlatanParser extends AbstractParser {
             retails.set(code, item);
             return code;
         });
-        const login = this.parsers.getConfigService().get<string>('API_PLATAN_LOGIN');
-        const pass = this.parsers.getConfigService().get<string>('API_PLATAN_PASS');
+        const platan = await this.parsers.getVault().get('platan');
         const sha1 = crypto
             .createHash('sha1')
-            .update(login + ';' + codes.join(';') + ';' + pass)
+            .update(platan.LOGIN + ';' + codes.join(';') + ';' + platan.PASS)
             .digest('hex')
             .toUpperCase();
-        const url = new URL(this.parsers.getConfigService().get<string>('API_PLATAN_URL'));
-        url.searchParams.append('login', login);
+        const url = new URL(platan.URL as string);
+        url.searchParams.append('login', platan.LOGIN as string);
         codes.forEach((id) => url.searchParams.append('id', id));
         url.searchParams.append('sha1', sha1);
         const wholesales = await firstValueFrom(this.parsers.getHttp().get(url.toString()));

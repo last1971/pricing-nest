@@ -10,9 +10,8 @@ export class CompelDbfParser extends ScheduleParser {
     protected supplierAlias = 'compel';
     protected currencyAlfa3 = 'USD';
     async parse(): Promise<void> {
-        const res = await this.schedule
-            .getHttp()
-            .get(this.schedule.getConfigService().get<string>('API_COMPEL_DBF_URL'), { responseType: 'arraybuffer' });
+        const compel = await this.schedule.getVault().get('compel');
+        const res = await this.schedule.getHttp().get(compel.DBF_URL as string, { responseType: 'arraybuffer' });
         const response = await firstValueFrom(res);
         const directory = await Open.buffer(response.data);
         const file = await directory.files[0].buffer();
@@ -25,7 +24,7 @@ export class CompelDbfParser extends ScheduleParser {
                 .filter((i) => i === 1 || good['QTY_' + i] !== 0 || good['PRICE_' + i] > good['PRICE_' + (i - 1)])
                 .map(
                     (i, j, ij): PriceDto => ({
-                        value: good['PRICE_' + i] * this.schedule.getConfigService().get<number>('API_COMPEL_COEF'),
+                        value: good['PRICE_' + i] * (compel.COEFF as number),
                         min: good['QTY_' + i],
                         max: i === ij.length ? 0 : good['QTY_' + (i + 1)] - multiple || multiple,
                         currency: this.currency.id,

@@ -11,7 +11,8 @@ export class MarsParser extends ScheduleParser {
     protected supplierAlias = 'mars';
     protected currencyAlfa3 = 'RUB';
     async parse(): Promise<void> {
-        const url = this.schedule.getConfigService().get<string>('API_MARS_URL');
+        const mars = await this.schedule.getVault().get('mars');
+        const url = mars.URL as string;
         const res = await this.schedule.getHttp().get(url, { responseType: 'arraybuffer' });
         const response = await firstValueFrom(res);
         const workbook = XLSX.read(response.data, { type: 'array' });

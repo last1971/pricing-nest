@@ -11,8 +11,8 @@ export class RctParser extends ScheduleParser {
     protected supplierAlias = 'rct';
     protected currencyAlfa3 = 'USD';
     async parse(): Promise<void> {
-        const url = this.schedule.getConfigService().get<string>('API_RCT_URL');
-        const res = await this.schedule.getHttp().get(url, { responseType: 'stream' });
+        const rct = await this.schedule.getVault().get('rct');
+        const res = await this.schedule.getHttp().get(rct.URL as string, { responseType: 'stream' });
         const response = await firstValueFrom(res);
         const workbook = new Excel.Workbook();
         await workbook.xlsx.read(response.data);

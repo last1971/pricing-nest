@@ -22,12 +22,13 @@ export class CompelParser extends AbstractParser {
     getCurrencyAlfa(): string {
         return 'USD';
     }
-    getResponse(): Observable<AxiosResponse<any, any>> {
-        return this.parsers.getHttp().post(this.parsers.getConfigService().get<string>('API_COMPEL_URL'), {
+    async getResponse(): Promise<Observable<AxiosResponse<any, any>>> {
+        const compel = await this.parsers.getVault().get('compel');
+        return this.parsers.getHttp().post(compel.API_URL as string, {
             id: v4(),
             method: 'search_item_name_h',
             params: {
-                user_hash: this.parsers.getConfigService().get<string>('API_COMPEL_HASH'),
+                user_hash: compel.HASH,
                 query_string: this.search + '*',
                 calc_price: true,
                 calc_qty: true,
@@ -36,6 +37,7 @@ export class CompelParser extends AbstractParser {
     }
     async parseResponse(response: any): Promise<GoodDto[]> {
         if (response.error) throw response.error;
+        const compel = await this.parsers.getVault().get('compel');
         return response.result.items.map(
             (item): GoodDto =>
                 new GoodDto({
@@ -90,7 +92,7 @@ export class CompelParser extends AbstractParser {
                             },
                             prices: (location.price_qty ?? []).map(
                                 (price): PriceDto => ({
-                                    value: price.price * this.parsers.getConfigService().get<number>('API_COMPEL_COEF'),
+                                    value: price.price * (compel.COEFF as number),
                                     min: price.min_qty,
                                     max: price.max_qty,
                                     currency: this.getCurrency().id,

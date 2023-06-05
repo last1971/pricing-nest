@@ -10,8 +10,8 @@ export class RuElectronicsParser extends ScheduleParser {
     protected supplierAlias = 'ruelectronics';
     protected currencyAlfa3 = 'RUB';
     async parse(): Promise<void> {
-        const url = this.schedule.getConfigService().get<string>('API_RUELECTRONICS_URL');
-        const res = await this.schedule.getHttp().get(url);
+        const ruel = await this.schedule.getVault().get('ruelectronics');
+        const res = await this.schedule.getHttp().get(ruel.URL_XML as string);
         const { data } = await firstValueFrom(res);
         const { product } = await parseStringPromise(data, {
             explicitRoot: false,

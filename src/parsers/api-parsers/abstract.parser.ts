@@ -19,7 +19,7 @@ export abstract class AbstractParser {
     }
     abstract getAlias(): string;
     abstract getCurrencyAlfa(): string;
-    abstract getResponse(): Observable<AxiosResponse<any, any>>;
+    abstract getResponse(): Observable<AxiosResponse<any, any>> | Promise<Observable<AxiosResponse<any, any>>>;
     getSupplier(): SupplierDto {
         return this.parsers.getSuppliers().get(this.getAlias());
     }
@@ -92,7 +92,9 @@ export abstract class AbstractParser {
     async getFromHttp(response): Promise<ApiResponseDto> {
         if (!response.isFinished) {
             response.data = await firstValueFrom(
-                this.getResponse()
+                (
+                    await this.getResponse()
+                )
                     .pipe(map((res) => res.data))
                     .pipe(
                         map(async (res) => {

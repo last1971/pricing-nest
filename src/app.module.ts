@@ -16,6 +16,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { ApiRequestStatModule } from './api-request-stat/api-request-stat.module';
 import { MailModule } from './mail/mail.module';
 import { CacheModule } from '@nestjs/cache-manager';
+import { VaultModule } from 'vault-module/lib/vault.module';
 
 @Module({
     imports: [
@@ -53,6 +54,23 @@ import { CacheModule } from '@nestjs/cache-manager';
                 redis: {
                     host: configService.get('REDIS_HOST'),
                     port: configService.get('REDIS_PORT'),
+                },
+            }),
+            inject: [ConfigService],
+        }),
+        VaultModule.forRootAsync({
+            imports: [ConfigModule],
+            useFactory: async (configService: ConfigService) => ({
+                credentials: {
+                    user: configService.get('VAULT_USER'),
+                    password: configService.get('VAULT_PASS'),
+                },
+                config: {
+                    https: true,
+                    baseUrl: configService.get('VAULT_URL'),
+                    rootPath: configService.get('VAULT_ROOT'),
+                    timeout: 2000,
+                    proxy: false,
                 },
             }),
             inject: [ConfigService],

@@ -12,12 +12,13 @@ export class PromelecParser extends AbstractParser {
     getCurrencyAlfa(): string {
         return 'RUB';
     }
-    getResponse(): Observable<AxiosResponse<any, any>> {
-        return this.parsers.getHttp().post(this.parsers.getConfigService().get<string>('API_PROM_URL'), {
+    async getResponse(): Promise<Observable<AxiosResponse<any, any>>> {
+        const promelec = await this.parsers.getVault().get('promelec');
+        return this.parsers.getHttp().post(promelec.URL_API as string, {
             method: 'items_data_find',
-            login: this.parsers.getConfigService().get<string>('API_PROM_LOGIN'),
-            password: this.parsers.getConfigService().get<string>('API_PROM_PASS'),
-            customer_id: this.parsers.getConfigService().get<string>('API_PROM_ID'),
+            login: promelec.LOGIN,
+            password: promelec.PASSWORD,
+            customer_id: promelec.CUSTOMER_ID,
             name: this.search,
             extended: 1,
         });

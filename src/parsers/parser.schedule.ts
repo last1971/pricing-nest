@@ -18,6 +18,7 @@ import { Queue } from 'bull';
 import { RuElectronicsParser } from './schedule-parsers/ru.electronics.parser';
 import { CompelDbfParser } from './schedule-parsers/compel.dbf.parser';
 import { IstochnikParser } from './schedule-parsers/istochnik.parser';
+import { VaultService } from 'vault-module/lib/vault.service';
 
 @Injectable()
 export class ParserSchedule implements IScheduleParsers {
@@ -34,6 +35,7 @@ export class ParserSchedule implements IScheduleParsers {
     constructor(
         private schedulerRegistry: SchedulerRegistry,
         protected configService: ConfigService,
+        private vaultService: VaultService,
         private http: HttpService,
         private supplierService: SupplierService,
         @Inject(forwardRef(() => GoodService)) private goodService: GoodService,
@@ -80,5 +82,8 @@ export class ParserSchedule implements IScheduleParsers {
     }
     getQueue(): Queue {
         return this.apiQueue;
+    }
+    getVault(): VaultService {
+        return this.vaultService;
     }
 }

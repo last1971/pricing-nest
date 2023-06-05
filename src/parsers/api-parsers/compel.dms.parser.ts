@@ -7,12 +7,13 @@ export class CompelDmsParser extends CompelParser {
     getAlias(): string {
         return 'compeldms';
     }
-    getResponse(): Observable<AxiosResponse<any, any>> {
-        return this.parsers.getHttp().post(this.parsers.getConfigService().get<string>('API_COMPEL_URL'), {
+    async getResponse(): Promise<Observable<AxiosResponse<any, any>>> {
+        const compel = await this.parsers.getVault().get('compel');
+        return this.parsers.getHttp().post(compel.API_URL as string, {
             id: v4(),
             method: 'search_item_ext',
             params: {
-                user_hash: this.parsers.getConfigService().get<string>('API_COMPEL_HASH'),
+                user_hash: compel.HASH,
                 query_string: this.search + '*',
             },
         });
