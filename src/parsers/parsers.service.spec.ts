@@ -20,6 +20,7 @@ import { omit } from 'lodash';
 import { MAIL_ERROR_MESSAGE } from '../mail/mail.constants';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { ApiRequestStatService } from '../api-request-stat/api-request-stat.service';
+import { VaultService } from 'vault-module/lib/vault.service';
 
 describe('ParsersService', () => {
     let service: ParsersService;
@@ -77,6 +78,10 @@ describe('ParsersService', () => {
                 {
                     provide: 'BullQueue_api',
                     useValue: QueueMock,
+                },
+                {
+                    provide: VaultService,
+                    useValue: {},
                 },
             ],
         }).compile();

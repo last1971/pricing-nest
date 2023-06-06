@@ -1,8 +1,6 @@
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { SchedulerRegistry } from '@nestjs/schedule';
-// import { TestParser } from './schedule-parsers/test.parser';
 import { CronJob } from 'cron';
-import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
 import { IScheduleParsers } from '../interfaces/IScheduleParsers';
 import { ScheduleParser } from './schedule-parsers/schedule.parser';
@@ -24,7 +22,6 @@ import { VaultService } from 'vault-module/lib/vault.service';
 export class ParserSchedule implements IScheduleParsers {
     private readonly logger = new Logger(ParserSchedule.name);
     private parsers = {
-        //'0 * * * * *': [TestParser],
         '0 32 23 * * *': [RctParser],
         '0 34 23 * * *': [MarsParser],
         '0 36 23 * * *': [DanParser],
@@ -34,7 +31,6 @@ export class ParserSchedule implements IScheduleParsers {
     };
     constructor(
         private schedulerRegistry: SchedulerRegistry,
-        protected configService: ConfigService,
         private vaultService: VaultService,
         private http: HttpService,
         private supplierService: SupplierService,
@@ -55,11 +51,6 @@ export class ParserSchedule implements IScheduleParsers {
         });
         this.logger.log('Start');
     }
-
-    getConfigService(): ConfigService {
-        return this.configService;
-    }
-
     getHttp(): HttpService {
         return this.http;
     }

@@ -1,4 +1,3 @@
-import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
 import { Logger } from '@nestjs/common';
 import { SupplierService } from '../supplier/supplier.service';
@@ -9,7 +8,6 @@ import { Queue } from 'bull';
 import { VaultService } from 'vault-module/lib/vault.service';
 
 export interface IScheduleParsers {
-    getConfigService(): ConfigService;
     getHttp(): HttpService;
     getLog(): Logger;
     getSuppliers(): SupplierService;
