@@ -25,11 +25,11 @@ export class ParserSchedule implements IScheduleParsers {
     private parsers = {
         '0 32 23 * * *': [RctParser],
         '0 34 23 * * *': [MarsParser],
-        '0 36 23 * * *': [DanParser],
+        '0 48 0 * * *': [DanParser],
         '0 38 23 * * *': [RuElectronicsParser],
-        '0 40 23 * * *': [CompelDbfParser],
+        '0 46 0 * * *': [CompelDbfParser],
         '0 42 23 * * *': [IstochnikParser],
-        '0 02 16 * * *': [EskParser],
+        '0 50 0 * * *': [EskParser],
     };
     constructor(
         private schedulerRegistry: SchedulerRegistry,
