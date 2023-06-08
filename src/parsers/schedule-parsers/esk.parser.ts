@@ -28,6 +28,8 @@ export class EskParser extends ScheduleParser {
         worksheet['M1'] = { v: 'name', t: 's', w: 'price4' };
         worksheet['N1'] = { v: 'name', t: 's', w: 'min5' };
         worksheet['O1'] = { v: 'name', t: 's', w: 'price5' };
+        worksheet['P1'] = { v: 'name', t: 's', w: 'body' };
+        worksheet['Q1'] = { v: 'name', t: 's', w: 'producer' };
         const promises: Promise<any>[] = XLSX.utils.sheet_to_json(worksheet).map((row: any) =>
             this.schedule.getGoods().createOrUpdate(
                 new GoodDto({
@@ -35,7 +37,11 @@ export class EskParser extends ScheduleParser {
                     code: row.code,
                     supplier: this.supplier.id,
                     updatedAt: new Date(),
-                    parameters: [{ name: 'name', stringValue: (row.prefix || '') + row.name }],
+                    parameters: [
+                        { name: 'name', stringValue: (row.prefix || '') + row.name },
+                        ...(row.producer ? [{ name: 'producer', stringValue: row.producer }] : []),
+                        ...(row.body ? [{ name: 'case', stringValue: row.body }] : []),
+                    ],
                     warehouses: [
                         {
                             name: 'CENTER',
