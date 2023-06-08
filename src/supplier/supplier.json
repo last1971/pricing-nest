@@ -12,5 +12,6 @@
   {"alias" : "radiodetalicom", "deliveryTime":  7},
   {"alias" : "elitan", "deliveryTime": 7},
   {"alias" : "ruelectronics", "deliveryTime": 11},
-  {"alias" : "istochnik", "deliveryTime": 14}
+  {"alias" : "istochnik", "deliveryTime": 14},
+  {"alias" : "esk", "deliveryTime": 12}
 ]

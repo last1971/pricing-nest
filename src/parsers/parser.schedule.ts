@@ -17,6 +17,7 @@ import { RuElectronicsParser } from './schedule-parsers/ru.electronics.parser';
 import { CompelDbfParser } from './schedule-parsers/compel.dbf.parser';
 import { IstochnikParser } from './schedule-parsers/istochnik.parser';
 import { VaultService } from 'vault-module/lib/vault.service';
+import { EskParser } from './schedule-parsers/esk.parser';
 
 @Injectable()
 export class ParserSchedule implements IScheduleParsers {
@@ -28,6 +29,7 @@ export class ParserSchedule implements IScheduleParsers {
         '0 38 23 * * *': [RuElectronicsParser],
         '0 40 23 * * *': [CompelDbfParser],
         '0 42 23 * * *': [IstochnikParser],
+        '0 44 23 * * *': [EskParser],
     };
     constructor(
         private schedulerRegistry: SchedulerRegistry,
