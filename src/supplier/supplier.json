@@ -13,5 +13,6 @@
   {"alias" : "elitan", "deliveryTime": 7},
   {"alias" : "ruelectronics", "deliveryTime": 11},
   {"alias" : "istochnik", "deliveryTime": 14},
-  {"alias" : "esk", "deliveryTime": 12}
+  {"alias" : "esk", "deliveryTime": 12},
+  {"alias" : "triatron", "deliveryTime": 12}
 ]

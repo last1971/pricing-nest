@@ -1,5 +1,5 @@
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
-import { SchedulerRegistry } from '@nestjs/schedule';
+import { Cron, SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
 import { HttpService } from '@nestjs/axios';
 import { IScheduleParsers } from '../interfaces/IScheduleParsers';
@@ -18,6 +18,13 @@ import { CompelDbfParser } from './schedule-parsers/compel.dbf.parser';
 import { IstochnikParser } from './schedule-parsers/istochnik.parser';
 import { VaultService } from 'vault-module/lib/vault.service';
 import { EskParser } from './schedule-parsers/esk.parser';
+import fs from 'fs/promises';
+import { ConfigService } from '@nestjs/config';
+import { MAIL_ERROR_MESSAGE } from '../mail/mail.constants';
+import { DateTime, Duration } from 'luxon';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
+import { TriatronParser } from './schedule-parsers/triatron.parser';
 
 @Injectable()
 export class ParserSchedule implements IScheduleParsers {
@@ -40,6 +47,8 @@ export class ParserSchedule implements IScheduleParsers {
         private currencyService: CurrencyService,
         private unitService: UnitService,
         @InjectQueue('api') private readonly apiQueue: Queue,
+        private configService: ConfigService,
+        @Inject(CACHE_MANAGER) private cache: Cache,
     ) {
         Object.keys(this.parsers).forEach((key) => {
             this.parsers[key].forEach((parserClass) => {
@@ -78,5 +87,40 @@ export class ParserSchedule implements IScheduleParsers {
     }
     getVault(): VaultService {
         return this.vaultService;
+    }
+    @Cron('0 */5 * * * *')
+    async checkUpload(): Promise<void> {
+        const upload = this.configService.get('UPLOAD', 'price');
+        const uploadError = await this.cache.get(ParserSchedule.name + ':check-upload');
+        if (uploadError) return;
+        try {
+            await fs.access(upload);
+        } catch (e) {
+            this.cache.set(ParserSchedule.name + ':check-upload', true, 3600000);
+            this.apiQueue.add(MAIL_ERROR_MESSAGE, {
+                error: e.message,
+                time: DateTime.now().toLocaleString(DateTime.DATETIME_FULL),
+                duration: DateTime.now()
+                    .plus(Duration.fromObject({ hours: 1 }))
+                    .toLocaleString(DateTime.DATETIME_FULL),
+                module: ParserSchedule.name,
+            });
+            this.logger.error(e.message);
+        }
+        const files = await fs.readdir(upload);
+        for (const file of files) {
+            const ruleObject = [{ reg: /.*xlsx.zip/gm, parserClass: TriatronParser }].find((rule) => {
+                const res = file.match(rule.reg);
+                return !!res;
+            });
+            if (ruleObject) {
+                const { parserClass } = ruleObject;
+                const parser = new parserClass(this, upload + '/' + file);
+                await parser.execute();
+            } else {
+                this.logger.warn(file + ' was removed');
+            }
+            await fs.rm(upload + '/' + file);
+        }
     }
 }
