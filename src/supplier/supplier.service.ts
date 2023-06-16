@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Supplier, SupplierDocument } from './supplier.schema';
 import { Model } from 'mongoose';
@@ -15,6 +15,8 @@ import { RadiodetaliComParser } from '../parsers/api-parsers/radiodetali.com.par
 import { SupplierRateDto } from './supplier.rate.dto';
 import { ApiRequestStatService } from '../api-request-stat/api-request-stat.service';
 import { ElitanParser } from '../parsers/api-parsers/elitan.parser';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class SupplierService {
@@ -22,6 +24,7 @@ export class SupplierService {
     constructor(
         @InjectModel(Supplier.name) private supplierModel: Model<SupplierDocument>,
         private agrServise: ApiRequestStatService,
+        @Inject(CACHE_MANAGER) private cache: Cache,
     ) {
         this.parsers = {
             compel: CompelParser,
@@ -71,5 +74,8 @@ export class SupplierService {
             const rate = rates.get(supplier.id) ?? 0;
             return { id, rate };
         });
+    }
+    async errorClear(alias: string): Promise<void> {
+        await this.cache.del('error : ' + alias);
     }
 }

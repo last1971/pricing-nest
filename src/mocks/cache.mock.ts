@@ -1,6 +1,7 @@
 import { GoodDto } from '../good/dtos/good.dto';
 
 export const CacheSet = jest.fn();
+export const CacheDel = jest.fn();
 export const CacheMock = {
     get: (key: string) => {
         switch (key) {
@@ -14,5 +15,6 @@ export const CacheMock = {
                 return null;
         }
     },
+    del: CacheDel,
     set: CacheSet,
 };

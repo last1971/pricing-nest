@@ -3,6 +3,8 @@ import { SupplierService } from './supplier.service';
 import { getModelToken } from '@nestjs/mongoose';
 import { Supplier } from './supplier.schema';
 import { ApiRequestStatService } from '../api-request-stat/api-request-stat.service';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { CacheDel, CacheMock } from '../mocks/cache.mock';
 
 const find = jest.fn().mockResolvedValue([{ toObject: () => ({ id: '1' }) }, { toObject: () => ({ id: '3' }) }]);
 const findOne = jest.fn().mockResolvedValue({ toObject: () => ({ supplierCodes: { '1': 'A', '3': 'B' } }) });
@@ -15,6 +17,10 @@ describe('SupplierService', () => {
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 SupplierService,
+                {
+                    provide: CACHE_MANAGER,
+                    useValue: CacheMock,
+                },
                 {
                     provide: getModelToken(Supplier.name),
                     useValue: { find, findOne, findById },
@@ -84,5 +90,10 @@ describe('SupplierService', () => {
             { id: 'A', rate: 1 },
             { id: 'B', rate: 0 },
         ]);
+    });
+
+    it('test del error in cache', async () => {
+        await service.errorClear('test');
+        expect(CacheDel.mock.calls[0]).toEqual(['error : test']);
     });
 });
