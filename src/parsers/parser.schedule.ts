@@ -25,6 +25,7 @@ import { DateTime, Duration } from 'luxon';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { TriatronParser } from './schedule-parsers/triatron.parser';
+import { MicroemParser } from './schedule-parsers/microem.parser';
 
 @Injectable()
 export class ParserSchedule implements IScheduleParsers {
@@ -32,11 +33,11 @@ export class ParserSchedule implements IScheduleParsers {
     private parsers = {
         '0 32 23 * * *': [RctParser],
         '0 34 23 * * *': [MarsParser],
-        '0 48 0 * * *': [DanParser],
+        '0 36 23 * * *': [DanParser],
         '0 38 23 * * *': [RuElectronicsParser],
-        '0 46 0 * * *': [CompelDbfParser],
+        '0 40 23 * * *': [CompelDbfParser],
         '0 42 23 * * *': [IstochnikParser],
-        '0 50 0 * * *': [EskParser],
+        '0 44 23 * * *': [EskParser],
     };
     constructor(
         private schedulerRegistry: SchedulerRegistry,
@@ -88,7 +89,7 @@ export class ParserSchedule implements IScheduleParsers {
     getVault(): VaultService {
         return this.vaultService;
     }
-    @Cron('0 */5 * * * *')
+    @Cron('0 * * * * *')
     async checkUpload(): Promise<void> {
         const upload = this.configService.get('UPLOAD', 'price');
         const uploadError = await this.cache.get(ParserSchedule.name + ':check-upload');
@@ -109,7 +110,10 @@ export class ParserSchedule implements IScheduleParsers {
         }
         const files = await fs.readdir(upload);
         for (const file of files) {
-            const ruleObject = [{ reg: /.*xlsx.zip/gm, parserClass: TriatronParser }].find((rule) => {
+            const ruleObject = [
+                { reg: /.*xlsx.zip/gm, parserClass: TriatronParser },
+                { reg: /ExpEmail.csv/gm, parserClass: MicroemParser },
+            ].find((rule) => {
                 const res = file.match(rule.reg);
                 return !!res;
             });

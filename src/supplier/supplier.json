@@ -14,5 +14,6 @@
   {"alias" : "ruelectronics", "deliveryTime": 11},
   {"alias" : "istochnik", "deliveryTime": 14},
   {"alias" : "esk", "deliveryTime": 12},
-  {"alias" : "triatron", "deliveryTime": 12}
+  {"alias" : "triatron", "deliveryTime": 12},
+  {"alias" :  "microem", "deliveryTime": 12}
 ]
