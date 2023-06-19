@@ -10,6 +10,7 @@ import { ApiRequestStatDto } from '../api-request-stat/api.request.stat.dto';
 import { MAIL_ERROR_MESSAGE } from '../mail/mail.constants';
 import { MailErrorDto } from '../mail/mail.error.dto';
 import { MailService } from '../mail/mail.service';
+import { ParserSchedule } from './parser.schedule';
 
 @Processor('api')
 export class ParserProcessor {
@@ -17,6 +18,7 @@ export class ParserProcessor {
         private goodService: GoodService,
         private apiRequestStatService: ApiRequestStatService,
         private mailService: MailService,
+        private parseSchedule: ParserSchedule,
         @Inject(CACHE_MANAGER) private cache: Cache,
     ) {}
     @Process('keys')
@@ -31,7 +33,12 @@ export class ParserProcessor {
     }
 
     @Process(MAIL_ERROR_MESSAGE)
-    async processErrorMessage(job: Job<MailErrorDto>) {
+    async processErrorMessage(job: Job<MailErrorDto>): Promise<void> {
         await this.mailService.sendErrorMessage(job.data);
+    }
+
+    @Process('parseForDb')
+    async processParseForDb(job: Job<string>): Promise<void> {
+        await this.parseSchedule.updateParse(job.data);
     }
 }

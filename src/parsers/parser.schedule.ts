@@ -89,7 +89,7 @@ export class ParserSchedule implements IScheduleParsers {
     getVault(): VaultService {
         return this.vaultService;
     }
-    @Cron('0 * * * * *')
+    @Cron('0 */2 * * * *')
     async checkUpload(): Promise<void> {
         const upload = this.configService.get('UPLOAD', 'price');
         const uploadError = await this.cache.get(ParserSchedule.name + ':check-upload');
@@ -125,6 +125,21 @@ export class ParserSchedule implements IScheduleParsers {
                 this.logger.warn(file + ' was removed');
             }
             await fs.rm(upload + '/' + file);
+        }
+    }
+    async updateParse(alias: string): Promise<void> {
+        let parser: ScheduleParser = null;
+        for (const parserClass of Object.values(this.parsers).flat()) {
+            const parserInstance = new parserClass(this);
+            if (parserInstance.getSupplierAlias() === alias) {
+                parser = parserInstance;
+                break;
+            }
+        }
+        if (parser) {
+            await parser.execute();
+        } else {
+            this.logger.error(alias + ' is not Supplier');
         }
     }
 }

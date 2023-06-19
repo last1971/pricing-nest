@@ -52,4 +52,7 @@ export class ScheduleParser implements ICommand {
             });
         }
     }
+    public getSupplierAlias(): string {
+        return this.supplierAlias;
+    }
 }
