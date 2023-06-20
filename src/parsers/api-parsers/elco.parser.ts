@@ -15,7 +15,7 @@ export class ElcoParser extends AbstractParser {
 
     async getResponse(): Promise<Observable<AxiosResponse<any, any>>> {
         const data = await this.parsers.getVault().get(this.getAlias());
-        const url = data.URL + (this.getAlias() === 'elcopro' ? '/api/seller-price/own' : '/api/seller-price');
+        const url = data.URL + '/api/seller-price/own';
         return this.parsers.getHttp().get(url, {
             headers: {
                 Authorization: 'Bearer ' + data.TOKEN,
