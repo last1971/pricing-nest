@@ -26,6 +26,7 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { TriatronParser } from './schedule-parsers/triatron.parser';
 import { MicroemParser } from './schedule-parsers/microem.parser';
+import { UnisvsParser } from './schedule-parsers/unisvs.parser';
 
 @Injectable()
 export class ParserSchedule implements IScheduleParsers {
@@ -113,6 +114,7 @@ export class ParserSchedule implements IScheduleParsers {
             const ruleObject = [
                 { reg: /.*xlsx.zip/gm, parserClass: TriatronParser },
                 { reg: /ExpEmail.csv/gm, parserClass: MicroemParser },
+                { reg: /Unisvs R.zip/gm, parserClass: UnisvsParser },
             ].find((rule) => {
                 const res = file.match(rule.reg);
                 return !!res;

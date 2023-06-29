@@ -15,5 +15,6 @@
   {"alias" : "istochnik", "deliveryTime": 14},
   {"alias" : "esk", "deliveryTime": 12},
   {"alias" : "triatron", "deliveryTime": 12},
-  {"alias" :  "microem", "deliveryTime": 12}
+  {"alias" :  "microem", "deliveryTime": 12},
+  {"alias" :  "unisvs", "deliveryTime": 10}
 ]
