@@ -11,6 +11,10 @@ export class JobMock implements Bull.Job {
     stacktrace: string[];
     timestamp: number;
 
+    extendLock(): Promise<number> {
+        return Promise.resolve(undefined);
+    }
+
     discard(): Promise<void> {
         return Promise.resolve(undefined);
     }
