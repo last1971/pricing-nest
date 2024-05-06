@@ -14,7 +14,10 @@ import { MAIL_ERROR_MESSAGE } from '../../mail/mail.constants';
 export abstract class AbstractParser {
     protected search: string;
     protected withCache: boolean;
-    public constructor(priceRequest: PriceRequestDto, protected parsers: IApiParsers) {
+    public constructor(
+        priceRequest: PriceRequestDto,
+        protected parsers: IApiParsers,
+    ) {
         ({ search: this.search, withCache: this.withCache } = priceRequest);
     }
     abstract getAlias(): string;
@@ -92,10 +95,12 @@ export abstract class AbstractParser {
     async getFromHttp(response): Promise<ApiResponseDto> {
         if (!response.isFinished) {
             response.data = await firstValueFrom(
-                (
-                    await this.getResponse()
-                )
-                    .pipe(map((res) => res.data))
+                (await this.getResponse())
+                    .pipe(
+                        map((res) => {
+                            return res.data;
+                        }),
+                    )
                     .pipe(
                         map(async (res) => {
                             try {

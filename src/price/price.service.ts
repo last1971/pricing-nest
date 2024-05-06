@@ -6,7 +6,10 @@ import { GoodService } from '../good/good.service';
 
 @Injectable()
 export class PriceService {
-    constructor(private parsers: ParsersService, private goodService: GoodService) {}
+    constructor(
+        private parsers: ParsersService,
+        private goodService: GoodService,
+    ) {}
     async getPrices(request: PriceRequestDto): Promise<GoodDto[]> {
         const searchers: Promise<GoodDto[]>[] = [this.goodService.search(request)];
         if (!request.dbOnly) {

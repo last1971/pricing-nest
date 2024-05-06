@@ -19,20 +19,20 @@ export class GetchipsParser extends AbstractParser {
         return this.parsers.getHttp().get(getchips.URL_API as string, {
             params: {
                 token: getchips.TOKEN,
-                input_field: this.search,
-                count_field: 1,
-                currency_code: 1, // USD
+                input: this.search,
+                qty: 1,
+                //currency_code: 1, // USD
             },
         });
     }
 
     parseResponse(response: any): Promise<GoodDto[]> {
-        return response.map(
+        return response.data.map(
             (item): GoodDto =>
                 new GoodDto({
                     updatedAt: new Date(),
                     supplier: this.getSupplier().id,
-                    code: item.donorID.toString() + item.title,
+                    code: item.donor + ':' + item.title,
                     alias: item.title.toString(),
                     source: Source.Api,
                     parameters: [
