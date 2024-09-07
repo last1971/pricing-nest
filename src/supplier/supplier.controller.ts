@@ -29,6 +29,15 @@ export class SupplierController {
         await this.service.errorClear(alias);
         return { message: 'Error was cleared in cache' };
     }
+    @Post('vault/clear')
+    @ApiOkResponse({
+        description: 'Clear vault cache',
+        type: 'object',
+    })
+    async clearVaultCache(): Promise<any> {
+        await this.service.vaultClear();
+        return { message: 'Vault cache was cleared' };
+    }
     @ApiParam({ name: 'alias', required: false, description: 'Supplier Alias', example: 'elcopro' })
     @Post('update/:alias?')
     @ApiOkResponse({

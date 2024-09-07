@@ -17,6 +17,7 @@ import { ApiRequestStatService } from '../api-request-stat/api-request-stat.serv
 import { ElitanParser } from '../parsers/api-parsers/elitan.parser';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
+import { VaultService } from 'vault-module/lib/vault.service';
 
 @Injectable()
 export class SupplierService {
@@ -25,6 +26,7 @@ export class SupplierService {
         @InjectModel(Supplier.name) private supplierModel: Model<SupplierDocument>,
         private agrServise: ApiRequestStatService,
         @Inject(CACHE_MANAGER) private cache: Cache,
+        private vaultService: VaultService,
     ) {
         this.parsers = {
             compel: CompelParser,
@@ -77,5 +79,9 @@ export class SupplierService {
     }
     async errorClear(alias: string): Promise<void> {
         await this.cache.del('error : ' + alias);
+    }
+
+    async vaultClear(): Promise<void> {
+       this.vaultService.clearCache();
     }
 }

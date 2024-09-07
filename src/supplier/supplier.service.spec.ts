@@ -5,6 +5,7 @@ import { Supplier } from './supplier.schema';
 import { ApiRequestStatService } from '../api-request-stat/api-request-stat.service';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { CacheDel, CacheMock } from '../mocks/cache.mock';
+import { VaultService } from 'vault-module/lib/vault.service';
 
 const find = jest.fn().mockResolvedValue([{ toObject: () => ({ id: '1' }) }, { toObject: () => ({ id: '3' }) }]);
 const findOne = jest.fn().mockResolvedValue({ toObject: () => ({ supplierCodes: { '1': 'A', '3': 'B' } }) });
@@ -29,6 +30,10 @@ describe('SupplierService', () => {
                     provide: ApiRequestStatService,
                     useValue: { duration: () => new Map(Object.entries({ '1': 1, '2': 2 })) },
                 },
+                {
+                    provide: VaultService,
+                    useValue: {},
+                }
             ],
         }).compile();
 
