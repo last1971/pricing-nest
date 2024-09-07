@@ -6,6 +6,7 @@ import { SupplierService } from '../supplier/supplier.service';
 import { SupplierDto } from '../supplier/supplier.dto';
 import { GoodDto } from './dtos/good.dto';
 import { ParameterDocument } from './schemas/parameter.schema';
+import { ConfigService } from '@nestjs/config';
 
 describe('GoodService', () => {
     let service: GoodService;
@@ -29,6 +30,7 @@ describe('GoodService', () => {
     const findOneAndUpdate = jest.fn();
     const find = jest.fn().mockReturnValue({ toObject: () => ({}) });
     const save = jest.fn();
+    const updateMany = jest.fn().mockReturnValue({ toObject: () => ({ matchedCount: 1 }) });
     const findOne = jest.fn((params: any) => {
         return params.id === '1' ? { save } : null;
     });
@@ -39,7 +41,7 @@ describe('GoodService', () => {
                 GoodService,
                 {
                     provide: getModelToken(Good.name),
-                    useValue: { findOneAndUpdate, find, findOne },
+                    useValue: { findOneAndUpdate, find, findOne, updateMany },
                 },
                 {
                     provide: SupplierService,
@@ -49,6 +51,10 @@ describe('GoodService', () => {
                         alias: async (alias: string) => (alias === 'first' ? dbSupplier : null),
                     },
                 },
+                {
+                    provide: ConfigService,
+                    useValue: { get: () => 7 },
+                },
             ],
         }).compile();
 
@@ -56,6 +62,11 @@ describe('GoodService', () => {
 
         find.mockClear();
         findOneAndUpdate.mockClear();
+    });
+
+    afterAll(() => {
+        // Восстанавливаем оригинальную реализацию Date после всех тестов
+        jest.restoreAllMocks();
     });
 
     it('should be defined', async () => {
@@ -193,5 +204,18 @@ describe('GoodService', () => {
         good.parameters = [parameter];
         await service.setParameters(good, [{ name: 'test', stringValue: 'test' }]);
         expect(findOneAndUpdate.mock.calls).toHaveLength(0);
+    });
+    it('test clearWarehousesForOldGoods', async () => {
+        const mockDate = new Date('2023-09-01T00:00:00Z'); // Установите желаемую дату
+        jest.spyOn(global, 'Date').mockImplementation(() => mockDate);
+        await service.clearWarehousesForOldGoods();
+        expect(updateMany.mock.calls[0]).toEqual([
+            {
+                updatedAt: { $lt: new Date('2023-08-25T00:00:00.000Z') },
+            },
+            {
+                $set: { warehouses: [] },
+            },
+        ]);
     });
 });

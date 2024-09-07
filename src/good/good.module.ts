@@ -4,9 +4,10 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Good, GoodSchema } from './schemas/good.schema';
 import { SupplierModule } from '../supplier/supplier.module';
 import { GoodController } from './good.controller';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-    imports: [MongooseModule.forFeature([{ name: Good.name, schema: GoodSchema }]), SupplierModule],
+    imports: [MongooseModule.forFeature([{ name: Good.name, schema: GoodSchema }]), SupplierModule, ConfigModule],
     providers: [GoodService],
     exports: [GoodService],
     controllers: [GoodController],

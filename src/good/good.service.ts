@@ -14,6 +14,8 @@ import { isString } from 'lodash';
 import { SetGoodIdDto } from './dtos/set.good.id.dto';
 import { ParameterDto } from './dtos/parameter.dto';
 import { ParameterDocument } from './schemas/parameter.schema';
+import { Cron, CronExpression } from '@nestjs/schedule';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class GoodService {
@@ -23,6 +25,7 @@ export class GoodService {
     constructor(
         @InjectModel(Good.name) private goodModel: Model<GoodDocument>,
         private supplierService: SupplierService,
+        private configService: ConfigService,
     ) {}
     async onModuleInit() {
         this.dbSuppliers = await this.supplierService.dbOnly();
@@ -96,5 +99,24 @@ export class GoodService {
         Object.assign(good.goodId, { [supplier.id]: setGoodDto.goodId });
         await good.save();
         return true;
+    }
+
+    @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+    async clearWarehousesForOldGoods(): Promise<void> {
+        const cleanupDays = this.configService.get<number>('CLEANUP_DAYS');
+        const targetDate = new Date();
+        targetDate.setDate(targetDate.getDate() - cleanupDays);
+        try {
+            // Выполняем массовое обновление записей, у которых updatedAt старше чем cleanupDays дней назад
+            const result = await this.goodModel.updateMany(
+                { updatedAt: { $lt: targetDate } }, // Условие: updatedAt старше чем cleanupDays дней назад
+                { $set: { warehouses: [] } }, // Обновляем поле warehouses на пустой массив
+            );
+
+            this.logger.log(`Updated ${result.matchedCount} goods with empty warehouses.`);
+        } catch (error) {
+            this.logger.error('Failed to update goods:', error);
+            throw error;
+        }
     }
 }

@@ -7,7 +7,10 @@ import { ISendMailOptions } from '@nestjs-modules/mailer/dist/interfaces/send-ma
 @Injectable()
 export class MailService {
     private readonly logger = new Logger(MailService.name);
-    constructor(private readonly mailerService: MailerService, private configService: ConfigService) {}
+    constructor(
+        private readonly mailerService: MailerService,
+        private configService: ConfigService,
+    ) {}
     async sendErrorMessage(dto: MailErrorDto): Promise<boolean> {
         return this.send({
             to: await this.configService.get<string>('MAIL_ADMIN'),
