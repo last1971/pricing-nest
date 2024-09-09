@@ -39,7 +39,7 @@ export class RadiodetaliComParser extends AbstractParser {
                         source: Source.Api,
                         parameters: [
                             { name: 'name', stringValue: good.partnum },
-                            ...(good.manuf ? [{ name: 'producer', stringValue: good.manuf }] : []),
+                            ...(good.manf ? [{ name: 'producer', stringValue: good.manuf }] : []),
                             ...(good.note ? [{ name: 'remark', stringValue: good.note }] : []),
                         ],
                         warehouses: [
