@@ -5,7 +5,7 @@ import { AxiosResponse } from 'axios';
 import * as crypto from 'crypto';
 import { Source } from '../../good/dtos/source.enum';
 import { PriceDto } from '../../good/dtos/price.dto';
-import { times } from 'lodash';
+import { times, isString } from 'lodash';
 import { WarehouseDto } from '../../good/dtos/warehouse.dto';
 import { DateTime } from 'luxon';
 
@@ -26,7 +26,8 @@ export class PlatanParser extends AbstractParser {
     }
     async parseResponse(response: any): Promise<GoodDto[]> {
         const retails: Map<string, any> = new Map<string, any>();
-        const codes = response.items.map((item) => {
+        const responseWithoutErrors = isString(response) ? JSON.parse(response.replace(/\/"/g, '\\"')) : response;
+        const codes = responseWithoutErrors.items.map((item) => {
             const code: string = item.NOM_N.toString();
             retails.set(code, item);
             return code;
