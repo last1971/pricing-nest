@@ -43,7 +43,8 @@ export class PlatanParser extends AbstractParser {
         codes.forEach((id) => url.searchParams.append('id', id));
         url.searchParams.append('sha1', sha1);
         const wholesales = await firstValueFrom(this.parsers.getHttp().get(url.toString()));
-        return wholesales.data.items.map((item): GoodDto => {
+        const data = isString(wholesales.data) ? JSON.parse(wholesales.data.replace(/\/"/g, '\\"')) : wholesales.data;
+        return data.items.map((item): GoodDto => {
             const retail = retails.get(item.NOM_N);
             const warehouses: WarehouseDto[] = [];
             if (item.QUANTY || item.PRIHOD) {
