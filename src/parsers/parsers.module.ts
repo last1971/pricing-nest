@@ -27,6 +27,6 @@ import { MailModule } from '../mail/mail.module';
         }),
     ],
     providers: [ParsersService, ParserProcessor, ParserSchedule],
-    exports: [ParsersService],
+    exports: [ParsersService, ParserSchedule],
 })
 export class ParsersModule {}

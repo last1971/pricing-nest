@@ -4,6 +4,7 @@ import { ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
 import { SupplierRateDto } from './supplier.rate.dto';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
+import { SupplierDto } from './supplier.dto';
 @ApiTags('supplier')
 @Controller('supplier')
 export class SupplierController {
@@ -47,5 +48,15 @@ export class SupplierController {
     async update(@Param('alias') alias: string): Promise<any> {
         await this.apiQueue.add('parseForDb', alias);
         return { message: 'Try to parse' };
+    }
+    @Get('dealers')
+    @ApiOkResponse({
+        description: 'Get list of dealer suppliers with their details (delivery time, codes, etc)',
+        isArray: true,
+        type: SupplierDto
+    })
+    async dealers(): Promise<SupplierDto[]> {
+        const aliases = await this.service.dealerList();
+        return this.service.getSuppliersByAliases(aliases);
     }
 }
