@@ -1,0 +1,109 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node-terminal",
+      "name": "Сборка (build)",
+      "command": "npm run build"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Запуск (start)",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run-script", "start"],
+      "console": "integratedTerminal"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Dev (start:dev)",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run-script", "start:dev"],
+      "console": "integratedTerminal"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug (start:debug)",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run-script", "start:debug"],
+      "console": "integratedTerminal",
+      "port": 9229
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Production (start:prod)",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run-script", "start:prod"],
+      "console": "integratedTerminal"
+    },
+    {
+      "type": "node-terminal",
+      "name": "Линтинг (lint)",
+      "command": "npm run lint"
+    },
+    {
+      "type": "node-terminal",
+      "name": "Форматирование (format)",
+      "command": "npm run format"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Тесты (test)",
+      "program": "${workspaceFolder}/node_modules/.bin/jest",
+      "args": ["--runInBand"],
+      "console": "integratedTerminal",
+      "windows": {
+        "program": "${workspaceFolder}/node_modules/jest/bin/jest"
+      }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Тесты Watch (test:watch)",
+      "program": "${workspaceFolder}/node_modules/.bin/jest",
+      "args": ["--watch"],
+      "console": "integratedTerminal",
+      "windows": {
+        "program": "${workspaceFolder}/node_modules/jest/bin/jest"
+      }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Тесты Debug (test:debug)",
+      "program": "${workspaceFolder}/node_modules/.bin/jest",
+      "args": ["--runInBand", "--watchAll"],
+      "console": "integratedTerminal",
+      "windows": {
+        "program": "${workspaceFolder}/node_modules/jest/bin/jest"
+      },
+      "port": 9229
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Покрытие тестов (test:cov)",
+      "program": "${workspaceFolder}/node_modules/.bin/jest",
+      "args": ["--coverage"],
+      "console": "integratedTerminal",
+      "windows": {
+        "program": "${workspaceFolder}/node_modules/jest/bin/jest"
+      }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "E2E тесты (test:e2e)",
+      "program": "${workspaceFolder}/node_modules/.bin/jest",
+      "args": ["--config", "./test/jest-e2e.json"],
+      "console": "integratedTerminal",
+      "windows": {
+        "program": "${workspaceFolder}/node_modules/jest/bin/jest"
+      }
+    }
+  ]
+} 
