@@ -18,6 +18,7 @@ import { ElitanParser } from '../parsers/api-parsers/elitan.parser';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { VaultService } from 'vault-module/lib/vault.service';
+import { PriceRequestDto } from '../price/dtos/price.request.dto';
 
 @Injectable()
 export class SupplierService {
@@ -83,5 +84,26 @@ export class SupplierService {
 
     async vaultClear(): Promise<void> {
        this.vaultService.clearCache();
+    }
+
+    async dealerList(): Promise<string[]> {
+        const dealers = await this.vaultService.get('dealers');
+        return (dealers['ALIAS-LIST'] as string).split(',');
+    }
+
+    @ModelToDto(SupplierDto)
+    async getSuppliersByAliases(aliases: string[]): Promise<SupplierDto[]> {
+        return this.supplierModel.find({ alias: { $in: aliases } });
+    }
+
+    async createDealerPriceRequest(search: string): Promise<PriceRequestDto> {
+        const aliases = await this.dealerList();
+        const suppliers = await this.getSuppliersByAliases(aliases);
+        return {
+            search,
+            suppliers: suppliers.map(s => s.id),
+            withCache: true,
+            dbOnly: false,
+        };
     }
 }
