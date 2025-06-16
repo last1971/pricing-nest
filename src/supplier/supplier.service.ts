@@ -103,7 +103,7 @@ export class SupplierService {
             search,
             suppliers: suppliers.map(s => s.id),
             withCache: true,
-            dbOnly: true
+            dbOnly: false,
         };
     }
 }
