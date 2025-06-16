@@ -135,7 +135,7 @@ describe('SupplierService', () => {
             search: 'test search',
             suppliers: ['supplier1', 'supplier2', 'supplier3'],
             withCache: true,
-            dbOnly: true
+            dbOnly: false
         });
     });
 });

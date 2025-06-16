@@ -5,6 +5,11 @@ import { GoodDto } from '../good/dtos/good.dto';
 import { SupplierService } from '../supplier/supplier.service';
 import { CurrencyService } from '../currency/currency.service';
 import { GoodService } from '../good/good.service';
+import { ParserSchedule } from '../parsers/parser.schedule';
+import { HttpService } from '@nestjs/axios';
+import { Logger } from '@nestjs/common';
+import { Queue } from 'bull';
+import { VaultService } from 'vault-module/lib/vault.service';
 
 describe('PriceController', () => {
     let controller: PriceController;
@@ -29,6 +34,19 @@ describe('PriceController', () => {
                 {
                     provide: GoodService,
                     useValue: {},
+                },
+                {
+                    provide: ParserSchedule,
+                    useValue: {
+                        getHttp: () => ({} as HttpService),
+                        getLog: () => new Logger(ParserSchedule.name),
+                        getSuppliers: () => ({} as SupplierService),
+                        getCurrencies: () => ({} as CurrencyService),
+                        getGoods: () => ({} as GoodService),
+                        getQueue: () => ({} as Queue),
+                        getVault: () => ({} as VaultService),
+                        updateParse: async () => {},
+                    },
                 },
             ],
         }).compile();
