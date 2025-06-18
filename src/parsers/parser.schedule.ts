@@ -27,6 +27,7 @@ import { Cache } from 'cache-manager';
 import { TriatronParser } from './schedule-parsers/triatron.parser';
 import { MicroemParser } from './schedule-parsers/microem.parser';
 import { UnisvsParser } from './schedule-parsers/unisvs.parser';
+import { KulibinParser } from './schedule-parsers/kulibin.parser';
 
 @Injectable()
 export class ParserSchedule implements IScheduleParsers {
@@ -39,6 +40,7 @@ export class ParserSchedule implements IScheduleParsers {
         '0 40 23 * * *': [CompelDbfParser],
         '0 42 23 * * *': [IstochnikParser],
         '0 44 23 * * *': [EskParser],
+        '0 46 23 * * *': [KulibinParser],
     };
     constructor(
         private schedulerRegistry: SchedulerRegistry,
