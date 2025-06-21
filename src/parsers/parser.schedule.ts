@@ -28,6 +28,7 @@ import { TriatronParser } from './schedule-parsers/triatron.parser';
 import { MicroemParser } from './schedule-parsers/microem.parser';
 import { UnisvsParser } from './schedule-parsers/unisvs.parser';
 import { KulibinParser } from './schedule-parsers/kulibin.parser';
+import { DiamantParser } from './schedule-parsers/diamant.parser';
 
 @Injectable()
 export class ParserSchedule implements IScheduleParsers {
@@ -41,6 +42,7 @@ export class ParserSchedule implements IScheduleParsers {
         '0 42 23 * * *': [IstochnikParser],
         '0 44 23 * * *': [EskParser],
         '0 46 23 * * *': [KulibinParser],
+        '0 48 23 * * *': [DiamantParser],
     };
     constructor(
         private schedulerRegistry: SchedulerRegistry,
