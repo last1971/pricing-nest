@@ -24,10 +24,10 @@ export class MarsParser extends ScheduleParser {
         XLSX.utils.sheet_add_aoa(worksheet, [['packageQuantity']], { origin: 'D1' });
         XLSX.utils.sheet_add_aoa(worksheet, [['quantity']], { origin: 'E1' });
         XLSX.utils.sheet_add_aoa(worksheet, [['transit']], { origin: 'F1' });
-        XLSX.utils.sheet_add_aoa(worksheet, [['ordinaryPrice']], { origin: 'G1' });
-        XLSX.utils.sheet_add_aoa(worksheet, [['price']], { origin: 'H1' });
-        XLSX.utils.sheet_add_aoa(worksheet, [['producerName']], { origin: 'I1' });
-        XLSX.utils.sheet_add_aoa(worksheet, [['producer']], { origin: 'J1' });
+        // XLSX.utils.sheet_add_aoa(worksheet, [['ordinaryPrice']], { origin: 'G1' });
+        XLSX.utils.sheet_add_aoa(worksheet, [['price']], { origin: 'G1' });
+        XLSX.utils.sheet_add_aoa(worksheet, [['producerName']], { origin: 'H1' });
+        XLSX.utils.sheet_add_aoa(worksheet, [['producer']], { origin: 'I1' });
         XLSX.utils.sheet_to_json(worksheet).forEach((row: any) => {
             if (row.code && row.price) {
                 const piece = row.piece === 'шт' ? 1 : 1000;
@@ -53,21 +53,27 @@ export class MarsParser extends ScheduleParser {
                         packageQuantity = 1;
                     }
                 }
+                
+                // Проверяем, что цены являются валидными числами
+                const priceValue = parseFloat(row.price);
+                
                 const prices: PriceDto[] = [
                     {
-                        value: row.price / piece,
+                        value: priceValue / piece,
                         currency: this.currency.id,
                         min: multiple,
                         max: 0,
                         isOrdinary: false,
                     },
+                    /*
                     {
-                        value: row.ordinaryPrice / piece,
+                        value: ordinaryPriceValue / piece,
                         currency: this.currency.id,
                         min: multiple,
                         max: 0,
                         isOrdinary: true,
                     },
+                    */
                 ];
                 const warehouses: WarehouseDto[] = [];
                 if (row.quantity > 0) {
