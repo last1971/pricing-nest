@@ -24,4 +24,11 @@ export class SupplierDto {
         example: { '857': 'A', '860': 'B' }
     })
     supplierCodes?: { [key: string]: string };
+
+    @ApiProperty({
+        description: 'Telegram username',
+        example: '@nikol2171',
+        required: false
+    })
+    telegram?: string;
 }

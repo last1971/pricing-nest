@@ -11,6 +11,8 @@ export class Supplier {
     deliveryTime: number;
     @Prop({ required: false, type: mongoose.Schema.Types.Mixed })
     supplierCodes?: any;
+    @Prop({ required: false })
+    telegram?: string;
 }
 
 export const SupplierSchema = SchemaFactory.createForClass(Supplier);
