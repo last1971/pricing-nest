@@ -65,15 +65,6 @@ export class MarsParser extends ScheduleParser {
                         max: 0,
                         isOrdinary: false,
                     },
-                    /*
-                    {
-                        value: ordinaryPriceValue / piece,
-                        currency: this.currency.id,
-                        min: multiple,
-                        max: 0,
-                        isOrdinary: true,
-                    },
-                    */
                 ];
                 const warehouses: WarehouseDto[] = [];
                 if (row.quantity > 0) {
