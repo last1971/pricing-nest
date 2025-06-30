@@ -31,4 +31,11 @@ export class SupplierDto {
         required: false
     })
     telegram?: string;
+
+    @ApiProperty({
+        description: 'Supplier website URL',
+        example: 'https://www.danomsk.ru/',
+        required: false
+    })
+    www?: string;
 }

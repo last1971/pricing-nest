@@ -18,7 +18,14 @@ export class SupplierSeed implements ICommand {
     async seed(dtos: SupplierCreateDto[]): Promise<void> {
         await Promise.all(
             dtos.map((dto: SupplierCreateDto) =>
-                this.supplierModel.findOneAndUpdate(pick(dto, ['alias']), omit(dto, ['alias']), { upsert: true }),
+                this.supplierModel.findOneAndUpdate(
+                    pick(dto, ['alias']), 
+                    omit(dto, ['alias']), 
+                    { 
+                        upsert: true,
+                        overwrite: true,
+                    }
+                ),
             ),
         );
     }

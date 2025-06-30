@@ -13,6 +13,8 @@ export class Supplier {
     supplierCodes?: any;
     @Prop({ required: false })
     telegram?: string;
+    @Prop({ required: false })
+    www?: string;
 }
 
 export const SupplierSchema = SchemaFactory.createForClass(Supplier);
