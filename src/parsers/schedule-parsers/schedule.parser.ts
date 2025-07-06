@@ -49,6 +49,7 @@ export class ScheduleParser implements ICommand {
                     .plus(Duration.fromObject({ days: 1 }))
                     .toLocaleString(DateTime.DATETIME_FULL),
                 module: this.supplierAlias.toUpperCase(),
+                server: require('os').hostname(), 
             });
         }
     }
