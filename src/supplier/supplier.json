@@ -20,5 +20,6 @@
   {"alias" :  "kulibin", "deliveryTime": 5, "telegram":  "@ozolin1971"},
   {"alias" :  "diamant", "deliveryTime": 12, "telegram": "@nikol2171"},
   {"alias" :  "elsin", "deliveryTime": 10, "telegram": "@golovach_photo"},
-  {"alias" :  "trigger", "deliveryTime": 2, "www": "https://trigger.ru/"}
+  {"alias" :  "trigger", "deliveryTime": 2, "www": "https://trigger.ru/"},
+  {"alias" :  "beltrix", "deliveryTime": 15, "www": "https://beltrix.ru/"}
 ]

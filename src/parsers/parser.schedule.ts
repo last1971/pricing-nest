@@ -31,6 +31,7 @@ import { KulibinParser } from './schedule-parsers/kulibin.parser';
 import { DiamantParser } from './schedule-parsers/diamant.parser';
 import { ElsinParser } from './schedule-parsers/elsin.parser';
 import { TriggerParser } from './schedule-parsers/trigger.parser';
+import { BeltrixParser } from './schedule-parsers/beltrix.parser';
 
 @Injectable()
 export class ParserSchedule implements IScheduleParsers {
@@ -47,6 +48,7 @@ export class ParserSchedule implements IScheduleParsers {
         '0 48 23 * * *': [DiamantParser],
         '0 50 23 * * *': [ElsinParser],
         '0 52 23 * * *': [TriggerParser],
+        '0 54 23 * * *': [BeltrixParser],
     };
     constructor(
         private schedulerRegistry: SchedulerRegistry,
