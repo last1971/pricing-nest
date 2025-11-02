@@ -10,18 +10,38 @@ import { SupplierDto } from './supplier.dto';
 export class SupplierController {
     constructor(private service: SupplierService, @InjectQueue('api') private readonly apiQueue: Queue) {}
 
-    @ApiParam({ name: 'alias', required: false, description: 'Supplier Alias', example: 'elcopro' })
     @ApiOkResponse({
         description: 'Average response time per supplier',
         isArray: true,
         type: SupplierRateDto,
     })
-    @Get('rate/:alias?')
+    @Get('rate')
+    async rateAll(): Promise<SupplierRateDto[]> {
+        return this.service.rate(undefined);
+    }
+
+    @ApiParam({ name: 'alias', required: true, description: 'Supplier Alias', example: 'elcopro' })
+    @ApiOkResponse({
+        description: 'Average response time per supplier',
+        isArray: true,
+        type: SupplierRateDto,
+    })
+    @Get('rate/:alias')
     async rate(@Param('alias') alias: string): Promise<SupplierRateDto[]> {
         return this.service.rate(alias);
     }
-    @ApiParam({ name: 'alias', required: false, description: 'Supplier Alias', example: 'elcopro' })
-    @Post('error/clear/:alias?')
+    @Post('error/clear')
+    @ApiOkResponse({
+        description: 'Clear supplier api error',
+        type: 'object',
+    })
+    async errorClearAll(): Promise<any> {
+        await this.service.errorClear(undefined);
+        return { message: 'Error was cleared in cache' };
+    }
+
+    @ApiParam({ name: 'alias', required: true, description: 'Supplier Alias', example: 'elcopro' })
+    @Post('error/clear/:alias')
     @ApiOkResponse({
         description: 'Clear supplier api error',
         type: 'object',
@@ -39,8 +59,8 @@ export class SupplierController {
         await this.service.vaultClear();
         return { message: 'Vault cache was cleared' };
     }
-    @ApiParam({ name: 'alias', required: false, description: 'Supplier Alias', example: 'elcopro' })
-    @Post('update/:alias?')
+    @ApiParam({ name: 'alias', required: true, description: 'Supplier Alias', example: 'elcopro' })
+    @Post('update/:alias')
     @ApiOkResponse({
         description: 'Update supplier price from file or url',
         type: 'object',

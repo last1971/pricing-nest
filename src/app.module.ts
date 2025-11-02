@@ -74,7 +74,7 @@ import { VaultModule } from 'vault-module/lib/vault.module';
                 },
             }),
             inject: [ConfigService],
-        }),
+        }) as any,
         ScheduleModule.forRoot(),
         PriceModule,
         SupplierModule,

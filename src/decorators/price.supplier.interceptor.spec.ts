@@ -89,7 +89,7 @@ describe('Test PriceInterceptor', () => {
         expectedData = cloneDeep(data);
     });
     it('Without supplier', async () => {
-        const testContext = cloneDeep(context);
+        const testContext: any = cloneDeep(context);
         testContext.switchToHttp = () => ({
             getRequest: () => ({ query: { search: '123', dbOnly: false, withCache: false } }),
         });
@@ -104,7 +104,7 @@ describe('Test PriceInterceptor', () => {
         expect(response).toEqual(expectedData);
     });
     it('With supplier', async () => {
-        const testContext = cloneDeep(context);
+        const testContext: any = cloneDeep(context);
         testContext.switchToHttp = () => ({
             getRequest: () => ({
                 query: {
