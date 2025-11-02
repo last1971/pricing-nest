@@ -33,7 +33,7 @@ export class TradePriceDto {
     maxQuantity: number;
     @ApiProperty({ description: 'Pos', type: 'boolean', example: true })
     pos: boolean;
-    @ApiProperty({ description: 'Price', type: 'float', example: 3.33 })
+    @ApiProperty({ description: 'Price', type: 'number', example: 3.33 })
     price: number;
     @ApiProperty({ description: 'Currency char code', type: 'string', example: 'USD' })
     CharCode: string;
@@ -47,7 +47,6 @@ export class TradePriceDto {
     isApi: boolean;
     @ApiProperty({
         description: 'Some values from api request',
-        type: 'object',
         example: { location_id: 'CENTER', pos: false, updatedAt: new Date() },
     })
     options: any;

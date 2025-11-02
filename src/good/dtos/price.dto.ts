@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class PriceDto {
     @ApiProperty({
-        type: 'float',
+        type: 'number',
         description: 'Price value',
         example: 3.33,
     })

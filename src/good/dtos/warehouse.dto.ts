@@ -36,7 +36,6 @@ export class WarehouseDto {
     @ApiProperty({
         required: false,
         description: 'Some values from api request',
-        type: 'object',
         example: { location_id: 'CENTER', pos: false, updatedAt: new Date() },
     })
     options?: any;

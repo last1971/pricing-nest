@@ -20,7 +20,7 @@ export class ParameterDto {
     stringValue?: string;
     @ApiProperty({
         description: 'Parameter string value',
-        type: 'numeric',
+        type: 'number',
         example: 100.1,
         required: false,
     })
