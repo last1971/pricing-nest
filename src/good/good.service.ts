@@ -50,7 +50,13 @@ export class GoodService {
     }
     async setParameters(newGood: GoodDocument, setParameters: ParameterDto[]): Promise<void> {
         const parameters: ParameterDto[] = newGood.parameters
-            ? newGood.parameters.map((parameter: ParameterDocument) => parameter.toObject())
+            ? (newGood.parameters.map((parameter: ParameterDocument) => {
+                const { _id, __v, unit, ...rest } = parameter.toObject();
+                return {
+                    ...rest,
+                    ...(unit ? { unit: String(unit) } : {}),
+                } as ParameterDto;
+            }) as ParameterDto[])
             : [];
         let modified = false;
         setParameters.forEach((parameter) => {
