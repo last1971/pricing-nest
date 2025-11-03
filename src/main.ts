@@ -5,9 +5,11 @@ import { SeedService } from './seed/seed.service';
 import { ConfigService } from '@nestjs/config';
 import cookieParser from 'cookie-parser';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as qs from 'qs';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
+    app.getHttpAdapter().getInstance().set('query parser', (str) => qs.parse(str, { allowPrototypes: false }));
     app.useGlobalPipes(new ValidationPipe({ transform: true }));
     app.use(cookieParser());
     await app.get(SeedService).execute();
