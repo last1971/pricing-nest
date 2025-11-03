@@ -9,6 +9,7 @@ import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { TradePriceDto } from './dtos/trade.price.dto';
 import { SupplierService } from '../supplier/supplier.service';
 import { ParserSchedule } from '../parsers/parser.schedule';
+import { SupplierCodesPipe } from '../pipes/supplier.codes.pipe';
 
 @ApiTags('price')
 @Controller('price')
@@ -26,7 +27,7 @@ export class PriceController {
     })
     @Get()
     @UseInterceptors(PriceSupplierInterceptor)
-    async findAll(@Query() request: PriceRequestDto): Promise<GoodDto[]> {
+    async findAll(@Query(SupplierCodesPipe) request: PriceRequestDto): Promise<GoodDto[]> {
         return this.service.getPrices(request);
     }
 
@@ -37,7 +38,7 @@ export class PriceController {
     })
     @Get('trade')
     @UseInterceptors(TradeInterceptor, PriceSupplierInterceptor, GoodIdInterceptor)
-    async findForTrade(@Query() request: PriceRequestDto): Promise<any> {
+    async findForTrade(@Query(SupplierCodesPipe) request: PriceRequestDto): Promise<any> {
         return this.service.getPrices(request);
     }
 
@@ -47,7 +48,6 @@ export class PriceController {
         description: 'Search goods for dealers in db by substring and response goods json',
     })
     @Get('dealers')
-    @UseInterceptors(PriceSupplierInterceptor)
     async findForDealers(@Query('search') search: string): Promise<GoodDto[]> {
         const request = await this.supplierService.createDealerPriceRequest(search);
         return this.service.getPrices(request);
