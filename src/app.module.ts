@@ -69,7 +69,7 @@ import { VaultModule } from 'vault-module/lib/vault.module';
                     https: true,
                     baseUrl: configService.get('VAULT_URL'),
                     rootPath: configService.get('VAULT_ROOT'),
-                    timeout: 2000,
+                    timeout: parseInt(configService.get('VAULT_TIMEOUT')) || 10000,
                     proxy: false,
                 },
             }),
