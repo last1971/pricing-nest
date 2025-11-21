@@ -85,7 +85,7 @@ describe('CompelDmsParser', () => {
         expect(parser.getAlias()).toBe('compeldms');
     });
 
-    it('should add rawResponse to goods when parsing response', async () => {
+    it('should parse response correctly', async () => {
         const response = {
             result: {
                 items: [
@@ -113,13 +113,11 @@ describe('CompelDmsParser', () => {
         const goods = await parser.parseResponse(response);
 
         expect(goods).toHaveLength(1);
-        expect(goods[0].rawResponse).toBeDefined();
-        expect(goods[0].rawResponse.item_id).toBe('7641486');
-        expect(goods[0].rawResponse.item_name).toBe('LRS-350-24');
         expect(goods[0].code).toBe('7641486');
+        expect(goods[0].warehouses[0].options.prognosis_id).toBe('3 дня');
     });
 
-    it('should map rawResponse by code when items order differs', async () => {
+    it('should parse multiple items correctly', async () => {
         const response = {
             result: {
                 items: [
@@ -164,8 +162,8 @@ describe('CompelDmsParser', () => {
         const goods = await parser.parseResponse(response);
 
         expect(goods).toHaveLength(2);
-        expect(goods.find((g) => g.code === '7641486')?.rawResponse.item_id).toBe('7641486');
-        expect(goods.find((g) => g.code === '7641484')?.rawResponse.item_id).toBe('7641484');
+        expect(goods.find((g) => g.code === '7641486')?.warehouses[0].options.prognosis_id).toBe('3 дня');
+        expect(goods.find((g) => g.code === '7641484')?.warehouses[0].options.prognosis_id).toBe('5 недель');
     });
 });
 

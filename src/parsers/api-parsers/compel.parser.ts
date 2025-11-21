@@ -37,7 +37,6 @@ export class CompelParser extends AbstractParser {
     }
     async parseResponse(response: any): Promise<GoodDto[]> {
         if (response.error) throw response.error;
-        const compel = await this.parsers.getVault().get('compel');
         return response.result.items.map(
             (item): GoodDto =>
                 new GoodDto({
@@ -86,13 +85,14 @@ export class CompelParser extends AbstractParser {
                                     : (this.supplierTypes[location.vend_type] ?? location.vend_type) +
                                       (location.cut_tape ? ', обрезки' : ''),
                                 pos: item.pos,
+                                prognosis_id: location.prognosis_id,
                                 ...(!!location.vend_proposal_date
                                     ? { updatedAt: new Date(location.vend_proposal_date) }
                                     : null),
                             },
                             prices: (location.price_qty ?? []).map(
                                 (price): PriceDto => ({
-                                    value: price.price * (compel.COEFF as number),
+                                    value: price.price,
                                     min: price.min_qty,
                                     max: price.max_qty,
                                     currency: this.getCurrency().id,
