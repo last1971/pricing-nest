@@ -2,6 +2,8 @@ import { CompelParser } from './compel.parser';
 import { Observable } from 'rxjs';
 import { AxiosResponse } from 'axios';
 import { v4 } from 'uuid';
+import { GoodDto } from '../../good/dtos/good.dto';
+import { Source } from '../../good/dtos/source.enum';
 
 export class CompelDmsParser extends CompelParser {
     getAlias(): string {
@@ -17,5 +19,22 @@ export class CompelDmsParser extends CompelParser {
                 query_string: this.search + '*',
             },
         });
+    }
+
+    async parseResponse(response: any): Promise<GoodDto[]> {
+        // Вызываем родительский метод для получения базовых данных
+        const goods = await super.parseResponse(response);
+        
+        // Добавляем rawResponse для каждого товара
+        if (response.result?.items) {
+            goods.forEach((good, index) => {
+                const item = response.result.items[index];
+                if (item) {
+                    good.rawResponse = item;
+                }
+            });
+        }
+        
+        return goods;
     }
 }

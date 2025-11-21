@@ -83,6 +83,11 @@ export class GoodService {
         }
         return this.goodModel.find(filter);
     }
+
+    @ModelToDto(GoodDto)
+    async findByIds(ids: string[]): Promise<GoodDto[]> {
+        return this.goodModel.find({ id: { $in: ids } });
+    }
     @ModelToDto(GoodDto)
     async search(priceRequestDto: PriceRequestDto): Promise<GoodDto[]> {
         const searchSuppliers = priceRequestDto.dbOnly ? this.allSuppliers : this.dbSuppliers;

@@ -64,6 +64,8 @@ export class GoodDto implements ISupplierable {
     })
     updatedAt: Date;
 
+    rawResponse?: any;
+
     constructor(data?: Partial<GoodDto>) {
         if (data?.supplier && data?.code) {
             this.id =

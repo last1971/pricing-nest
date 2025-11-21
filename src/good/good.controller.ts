@@ -1,7 +1,9 @@
-import { Controller, Post, Query } from '@nestjs/common';
+import { Controller, Post, Query, Body } from '@nestjs/common';
 import { SetGoodIdDto } from './dtos/set.good.id.dto';
+import { GetRawResponseDto } from './dtos/get-raw-response.dto';
 import { GoodService } from './good.service';
-import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { GoodDto } from './dtos/good.dto';
 @ApiTags('good')
 @Controller('good')
 export class GoodController {
@@ -24,5 +26,15 @@ export class GoodController {
     async setGoodId(@Query() setGoodDto: SetGoodIdDto): Promise<any> {
         const result = await this.goodService.setGood(setGoodDto);
         return { result };
+    }
+
+    @ApiOkResponse({
+        isArray: true,
+        type: GoodDto,
+        description: 'Get raw response data for goods by IDs',
+    })
+    @Post('raw-response')
+    async getRawResponse(@Body() dto: GetRawResponseDto): Promise<GoodDto[]> {
+        return this.goodService.findByIds(dto.ids);
     }
 }

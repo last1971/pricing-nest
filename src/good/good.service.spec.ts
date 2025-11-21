@@ -218,4 +218,17 @@ describe('GoodService', () => {
             },
         ]);
     });
+
+    it('test findByIds', async () => {
+        const ids = ['id1', 'id2', 'id3'];
+        await service.findByIds(ids);
+        expect(find.mock.calls.length).toEqual(1);
+        expect(find.mock.calls[0][0]).toEqual({ id: { $in: ids } });
+    });
+
+    it('test findByIds with empty array', async () => {
+        await service.findByIds([]);
+        expect(find.mock.calls.length).toEqual(1);
+        expect(find.mock.calls[0][0]).toEqual({ id: { $in: [] } });
+    });
 });

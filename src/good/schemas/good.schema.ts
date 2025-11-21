@@ -27,6 +27,9 @@ export class Good {
     @Prop({ required: false, type: mongoose.Schema.Types.Mixed })
     goodId?: any;
 
+    @Prop({ required: false, type: mongoose.Schema.Types.Mixed })
+    rawResponse?: any;
+
     @Prop({ type: [WarehouseSchema], required: true })
     warehouses: Warehouse[];
 
