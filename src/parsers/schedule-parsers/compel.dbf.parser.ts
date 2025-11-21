@@ -24,7 +24,7 @@ export class CompelDbfParser extends ScheduleParser {
                 .filter((i) => i === 1 || good['QTY_' + i] !== 0 || good['PRICE_' + i] > good['PRICE_' + (i - 1)])
                 .map(
                     (i, j, ij): PriceDto => ({
-                        value: good['PRICE_' + i] * (compel.COEFF as number),
+                        value: good['PRICE_' + i],
                         min: good['QTY_' + i],
                         max: i === ij.length ? 0 : good['QTY_' + (i + 1)] - multiple || multiple,
                         currency: this.currency.id,
