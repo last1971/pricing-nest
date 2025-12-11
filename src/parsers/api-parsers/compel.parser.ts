@@ -42,7 +42,7 @@ export class CompelParser extends AbstractParser {
                 new GoodDto({
                     updatedAt: new Date(),
                     supplier: this.getSupplier().id,
-                    code: item.item_id.toString(),
+                    code: item.item_id ? item.item_id.toString() : `${item.item_name}_${item.item_brend}`,
                     alias: item.item_name.toString(),
                     source: Source.Api,
                     parameters: [
