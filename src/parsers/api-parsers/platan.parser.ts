@@ -22,11 +22,19 @@ export class PlatanParser extends AbstractParser {
         const platan = await this.parsers.getVault().get('platan');
         return this.parsers.getHttp().get(platan.URL as string, {
             params: { search: this.search },
+            transformResponse: (data) => data,
         });
     }
     async parseResponse(response: any): Promise<GoodDto[]> {
         const retails: Map<string, any> = new Map<string, any>();
-        const responseWithoutErrors = isString(response) ? JSON.parse(response.replace(/\/"/g, '\\"')) : response;
+        const fixJson = (str: string) => str.replace(/\/"(?![,}\]])/g, '\\"');
+        let responseWithoutErrors;
+        try {
+            responseWithoutErrors = isString(response) ? JSON.parse(fixJson(response)) : response;
+        } catch (e) {
+            const pos = parseInt(e.message.match(/position (\d+)/)?.[1] || '0');
+            throw new Error(`retail JSON error at pos ${pos}: ${response.substring(pos - 30, pos + 30)}`);
+        }
         const codes = responseWithoutErrors.items.map((item) => {
             const code: string = item.NOM_N.toString();
             retails.set(code, item);
@@ -42,8 +50,14 @@ export class PlatanParser extends AbstractParser {
         url.searchParams.append('login', platan.LOGIN as string);
         codes.forEach((id) => url.searchParams.append('id', id));
         url.searchParams.append('sha1', sha1);
-        const wholesales = await firstValueFrom(this.parsers.getHttp().get(url.toString()));
-        const data = isString(wholesales.data) ? JSON.parse(wholesales.data.replace(/\/"/g, '\\"')) : wholesales.data;
+        const wholesales = await firstValueFrom(this.parsers.getHttp().get(url.toString(), { transformResponse: (data) => data }));
+        let data;
+        try {
+            data = JSON.parse(fixJson(wholesales.data));
+        } catch (e) {
+            const pos = parseInt(e.message.match(/position (\d+)/)?.[1] || '0');
+            throw new Error(`wholesale JSON error at pos ${pos}: ${wholesales.data.substring(pos - 30, pos + 30)}`);
+        }
         return data.items.map((item): GoodDto => {
             const retail = retails.get(item.NOM_N);
             const warehouses: WarehouseDto[] = [];

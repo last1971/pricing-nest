@@ -106,7 +106,6 @@ export abstract class AbstractParser {
                             try {
                                 return await this.parseResponse(res);
                             } catch (error) {
-                                this.parsers.getLogger().debug(res);
                                 await this.obtainError(error, response);
                                 return await this.getFromDb();
                             }
