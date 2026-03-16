@@ -154,7 +154,10 @@ describe('ParsersService', () => {
         expect(response.isSuccess).toEqual(false);
         expect(response.errorMessage).toEqual('test error');
         expect(CacheSet.mock.calls).toHaveLength(1);
-        expect(CacheSet.mock.calls[0]).toEqual(['error : first', true, 60]);
+        expect(CacheSet.mock.calls[0][0]).toEqual('error : first');
+        expect(CacheSet.mock.calls[0][1]).toEqual(expect.objectContaining({ error: 'test error' }));
+        expect(CacheSet.mock.calls[0][1]).toHaveProperty('blockedUntil');
+        expect(CacheSet.mock.calls[0][2]).toEqual(60);
         expect(QueueAdd.mock.calls).toHaveLength(1);
         expect(QueueAdd.mock.calls[0][0]).toEqual(MAIL_ERROR_MESSAGE);
         expect(QueueAdd.mock.calls[0][1]).toHaveProperty('module', 'FIRST parser');
@@ -201,7 +204,10 @@ describe('ParsersService', () => {
             { source: 'Db', goodId: null },
         ]);
         expect(CacheSet.mock.calls).toHaveLength(2);
-        expect(CacheSet.mock.calls[0]).toEqual(['error : second', true, 60]);
+        expect(CacheSet.mock.calls[0][0]).toEqual('error : second');
+        expect(CacheSet.mock.calls[0][1]).toEqual(expect.objectContaining({ error: 'test error' }));
+        expect(CacheSet.mock.calls[0][1]).toHaveProperty('blockedUntil');
+        expect(CacheSet.mock.calls[0][2]).toEqual(60);
         expect(CacheSet.mock.calls[1]).toEqual(['first : 123', [{ source: 'Api' }, { source: 'Api' }]]);
         expect(QueueAdd.mock.calls).toHaveLength(4);
         expect(QueueAdd.mock.calls[1][0]).toEqual(MAIL_ERROR_MESSAGE);
