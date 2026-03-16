@@ -24,6 +24,14 @@ export class ApiRequestStatService {
         ]);
         return res.reduce((map, value) => map.set(value._id, value.duration), new Map<string, number>());
     }
+    async lastError(supplierId: string): Promise<string> {
+        const res = await this.model.findOne(
+            { supplier: supplierId, isSuccess: false },
+            { errorMessage: 1 },
+            { sort: { dateTime: -1 } },
+        );
+        return res?.errorMessage || 'unknown';
+    }
     async todayErrorCount(supplier: SupplierDto): Promise<number> {
         const res = await this.model.countDocuments({
             supplier: supplier.id,

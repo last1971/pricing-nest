@@ -116,6 +116,47 @@ describe('SupplierService', () => {
         expect(find).toHaveBeenCalledWith({ alias: { $in: aliases } });
     });
 
+    it('test blocked without alias (new cache format)', async () => {
+        find.mockResolvedValueOnce([
+            { toObject: () => ({ id: '1', alias: 'compel' }) },
+        ]);
+        const res = await service.blocked();
+        expect(res).toEqual([
+            {
+                id: '1',
+                alias: 'compel',
+                blockedUntil: '2026-03-16T14:30:00.000+03:00',
+                lastError: 'Request timeout',
+            },
+        ]);
+    });
+
+    it('test blocked with alias (maps supplier codes)', async () => {
+        find.mockResolvedValueOnce([
+            { toObject: () => ({ id: '1', alias: 'compel' }) },
+        ]);
+        findOne.mockResolvedValueOnce({
+            toObject: () => ({ supplierCodes: { '1': 'COMP' } }),
+        });
+        const res = await service.blocked('elcopro');
+        expect(res).toEqual([
+            {
+                id: 'COMP',
+                alias: 'compel',
+                blockedUntil: '2026-03-16T14:30:00.000+03:00',
+                lastError: 'Request timeout',
+            },
+        ]);
+    });
+
+    it('test blocked returns empty array when no suppliers blocked', async () => {
+        find.mockResolvedValueOnce([
+            { toObject: () => ({ id: '99', alias: 'promelec' }) },
+        ]);
+        const res = await service.blocked();
+        expect(res).toEqual([]);
+    });
+
     it('should create dealer price request', async () => {
         const mockDealers = { 'ALIAS-LIST': 'dealer1,dealer2,dealer3' };
         const mockSuppliers = [

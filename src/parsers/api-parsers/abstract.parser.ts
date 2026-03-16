@@ -53,7 +53,7 @@ export abstract class AbstractParser {
         return response;
     }
     async checkError(response: ApiResponseDto): Promise<ApiResponseDto> {
-        if (await this.parsers.getCache().get<string>('error : ' + this.getAlias())) {
+        if (await this.parsers.getCache().get<any>('error : ' + this.getAlias())) {
             response.data = await this.getFromDb();
             response.isFinished = true;
         }
@@ -66,7 +66,7 @@ export abstract class AbstractParser {
         const milliseconds = (await this.parsers.getConfigService().get<number>('CACHE_ERROR_EXP')) * coeff;
         const time = DateTime.now();
         const exp = time.plus(Duration.fromObject({ milliseconds }));
-        await this.parsers.getCache().set('error : ' + this.getAlias(), true, milliseconds);
+        await this.parsers.getCache().set('error : ' + this.getAlias(), { blockedUntil: exp.toISO(), error: error.message }, milliseconds);
         await this.parsers.getQueue().add(MAIL_ERROR_MESSAGE, {
             time: time.toLocaleString(DateTime.DATETIME_FULL),
             duration: exp.toLocaleString(DateTime.DATETIME_FULL),

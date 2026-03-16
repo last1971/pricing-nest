@@ -12,6 +12,7 @@ describe('ApiRequestStatService', () => {
         { _id: '1', duration: 1 },
         { _id: '2', duration: 2 },
     ]);
+    const findOne = jest.fn().mockReturnValue({ errorMessage: 'Connection refused' });
     const countDocuments = jest.fn().mockReturnValue(0);
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
@@ -19,7 +20,7 @@ describe('ApiRequestStatService', () => {
                 ApiRequestStatService,
                 {
                     provide: getModelToken(ApiRequestStat.name),
-                    useValue: { create, aggregate, countDocuments },
+                    useValue: { create, aggregate, countDocuments, findOne },
                 },
             ],
         }).compile();
@@ -52,6 +53,20 @@ describe('ApiRequestStatService', () => {
             ],
         ]);
         expect(res).toEqual(new Map(Object.entries({ '1': 1, '2': 2 })));
+    });
+    it('test lastError', async () => {
+        const res = await service.lastError('supplier1');
+        expect(res).toEqual('Connection refused');
+        expect(findOne).toHaveBeenCalledWith(
+            { supplier: 'supplier1', isSuccess: false },
+            { errorMessage: 1 },
+            { sort: { dateTime: -1 } },
+        );
+    });
+    it('test lastError returns unknown when no error found', async () => {
+        findOne.mockReturnValueOnce(null);
+        const res = await service.lastError('supplier2');
+        expect(res).toEqual('unknown');
     });
     it('test countError', async () => {
         const supplier = new SupplierDto();

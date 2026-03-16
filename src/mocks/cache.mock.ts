@@ -11,6 +11,8 @@ export const CacheMock = {
                 return [new GoodDto()];
             case 'error : third':
                 return true;
+            case 'error : compel':
+                return { blockedUntil: '2026-03-16T14:30:00.000+03:00', error: 'Request timeout' };
             default:
                 return null;
         }

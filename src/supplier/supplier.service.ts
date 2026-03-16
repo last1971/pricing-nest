@@ -19,6 +19,7 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { VaultService } from 'vault-module/lib/vault.service';
 import { PriceRequestDto } from '../price/dtos/price.request.dto';
+import { SupplierBlockedDto } from './supplier.blocked.dto';
 
 @Injectable()
 export class SupplierService {
@@ -94,6 +95,32 @@ export class SupplierService {
     @ModelToDto(SupplierDto)
     async getSuppliersByAliases(aliases: string[]): Promise<SupplierDto[]> {
         return this.supplierModel.find({ alias: { $in: aliases } });
+    }
+
+    async blocked(alias?: string): Promise<SupplierBlockedDto[]> {
+        const parserAliases = Object.keys(this.parsers);
+        const suppliers = await this.apiOnly();
+        const supplierMap = new Map(suppliers.map((s) => [s.alias, s]));
+        const callerSupplier = alias ? await this.alias(alias) : null;
+        const result: SupplierBlockedDto[] = [];
+        for (const parserAlias of parserAliases) {
+            const cached = await this.cache.get<any>('error : ' + parserAlias);
+            if (!cached) continue;
+            const supplier = supplierMap.get(parserAlias);
+            if (!supplier) continue;
+            let blockedUntil: string;
+            let lastError: string;
+            if (typeof cached === 'object' && cached.blockedUntil) {
+                blockedUntil = cached.blockedUntil;
+                lastError = cached.error;
+            } else {
+                blockedUntil = 'unknown';
+                lastError = await this.agrServise.lastError(supplier.id);
+            }
+            const id = callerSupplier?.supplierCodes?.[supplier.id] ?? supplier.id;
+            result.push({ id, alias: parserAlias, blockedUntil, lastError });
+        }
+        return result;
     }
 
     async createDealerPriceRequest(search: string): Promise<PriceRequestDto> {

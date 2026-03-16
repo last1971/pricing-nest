@@ -5,10 +5,32 @@ import { SupplierRateDto } from './supplier.rate.dto';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import { SupplierDto } from './supplier.dto';
+import { SupplierBlockedDto } from './supplier.blocked.dto';
 @ApiTags('supplier')
 @Controller('supplier')
 export class SupplierController {
     constructor(private service: SupplierService, @InjectQueue('api') private readonly apiQueue: Queue) {}
+
+    @ApiOkResponse({
+        description: 'List of blocked suppliers',
+        isArray: true,
+        type: SupplierBlockedDto,
+    })
+    @Get('blocked')
+    async blockedAll(): Promise<SupplierBlockedDto[]> {
+        return this.service.blocked();
+    }
+
+    @ApiParam({ name: 'alias', required: true, description: 'Caller supplier alias', example: 'elcopro' })
+    @ApiOkResponse({
+        description: 'List of blocked suppliers with codes for the given alias',
+        isArray: true,
+        type: SupplierBlockedDto,
+    })
+    @Get('blocked/:alias')
+    async blocked(@Param('alias') alias: string): Promise<SupplierBlockedDto[]> {
+        return this.service.blocked(alias);
+    }
 
     @ApiOkResponse({
         description: 'Average response time per supplier',
