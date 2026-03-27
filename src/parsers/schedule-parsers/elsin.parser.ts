@@ -18,23 +18,32 @@ export class ElsinParser extends ScheduleParser {
         const csvLines = decodedData.split('\n');
         const promises: Promise<any>[] = [];
 
+        // Парсим заголовки для определения индексов колонок
+        const headers = csvLines[0].split(';').map(col => col.trim().replace(/^"|"$/g, '').replace(/\r/g, ''));
+        const colIndex = (name: string) => headers.indexOf(name);
+
+        const iCode = colIndex('Код');
+        const iName = colIndex('Наименование');
+        const iCase = colIndex('Корпус');
+        const iProducer = colIndex('Производитель');
+        const iQuantity = colIndex('На складе');
+        const iMinQty = colIndex('Мин.кол-во');
+        const iMaxQty = colIndex('Макс.кол-во');
+        const iPrice = colIndex('Цена');
+
         csvLines.forEach((line: string, index: number) => {
-            // Пропускаем первую строку (заголовки)
             if (index === 0) return;
-            
-            // Парсим CSV строку с разделителем точка с запятой
+
             const columns = line.split(';').map(col => col.trim().replace(/^"|"$/g, ''));
-            if (columns.length < 10) return; // Минимальное количество колонок (учитываем пустой первый столбец)
-            
-            const code = columns[1];           // Код (второй столбец, так как первый пустой)
-            const name = columns[2];           // Наименование
-            const caseType = columns[3];       // Корпус
-            const producer = columns[4];       // Производитель
-            const quantity = columns[5];       // На складе
-            const minQty = columns[6];         // Мин.кол-во
-            const maxQty = columns[7];         // Макс.кол-во
-            // const quantity = columns[8];       // Количество
-            const price = columns[9];          // Цена
+
+            const code = iCode >= 0 ? columns[iCode] : '';
+            const name = iName >= 0 ? columns[iName] : '';
+            const caseType = iCase >= 0 ? columns[iCase] : '';
+            const producer = iProducer >= 0 ? columns[iProducer] : '';
+            const quantity = iQuantity >= 0 ? columns[iQuantity] : '';
+            const minQty = iMinQty >= 0 ? columns[iMinQty] : '';
+            const maxQty = iMaxQty >= 0 ? columns[iMaxQty] : '';
+            const price = iPrice >= 0 ? columns[iPrice] : '';
             
             if (!code || code === '') return;
             
@@ -81,25 +90,4 @@ export class ElsinParser extends ScheduleParser {
         await Promise.all(promises);
     }
 
-    private parseCSVLine(line: string): string[] {
-        const result: string[] = [];
-        let current = '';
-        let inQuotes = false;
-        
-        for (let i = 0; i < line.length; i++) {
-            const char = line[i];
-            
-            if (char === '"') {
-                inQuotes = !inQuotes;
-            } else if (char === ',' && !inQuotes) {
-                result.push(current.trim());
-                current = '';
-            } else {
-                current += char;
-            }
-        }
-        
-        result.push(current.trim());
-        return result;
-    }
 } 
