@@ -72,7 +72,9 @@ describe('ParsersService', () => {
                             }),
                         ),
                         get: () =>
-                            new Observable((s) => s.error({ response: 'resp', status: '4xx', message: 'test error' })),
+                            new Observable((s) =>
+                                s.error({ response: { status: 422, data: { message: 'resp' } }, message: 'test error' }),
+                            ),
                     },
                 },
                 {
@@ -205,7 +207,7 @@ describe('ParsersService', () => {
         ]);
         expect(CacheSet.mock.calls).toHaveLength(2);
         expect(CacheSet.mock.calls[0][0]).toEqual('error : second');
-        expect(CacheSet.mock.calls[0][1]).toEqual(expect.objectContaining({ error: 'test error' }));
+        expect(CacheSet.mock.calls[0][1]).toEqual(expect.objectContaining({ error: 'test error [422] {"message":"resp"}' }));
         expect(CacheSet.mock.calls[0][1]).toHaveProperty('blockedUntil');
         expect(CacheSet.mock.calls[0][2]).toEqual(60);
         expect(CacheSet.mock.calls[1]).toEqual(['first : 123', [{ source: 'Api' }, { source: 'Api' }]]);

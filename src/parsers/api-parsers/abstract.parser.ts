@@ -59,21 +59,31 @@ export abstract class AbstractParser {
         }
         return response;
     }
+    buildErrorMessage(error: Error): string {
+        const axiosError = error as AxiosError;
+        if (!axiosError.response) {
+            return error.message;
+        }
+        const body = JSON.stringify(axiosError.response.data) ?? '';
+        return `${error.message} [${axiosError.response.status}] ${body.slice(0, 1000)}`;
+    }
     async obtainError(error: Error, response: ApiResponseDto) {
         const coeff = await this.parsers.getStatService().todayErrorCount(this.getSupplier());
-        response.errorMessage = error.message;
+        const message = this.buildErrorMessage(error);
+        response.errorMessage = message;
         response.isSuccess = false;
         const milliseconds = (await this.parsers.getConfigService().get<number>('CACHE_ERROR_EXP')) * coeff;
         const time = DateTime.now();
         const exp = time.plus(Duration.fromObject({ milliseconds }));
-        await this.parsers.getCache().set('error : ' + this.getAlias(), { blockedUntil: exp.toISO(), error: error.message }, milliseconds);
+        await this.parsers.getCache().set('error : ' + this.getAlias(), { blockedUntil: exp.toISO(), error: message }, milliseconds);
         await this.parsers.getQueue().add(MAIL_ERROR_MESSAGE, {
             time: time.toLocaleString(DateTime.DATETIME_FULL),
             duration: exp.toLocaleString(DateTime.DATETIME_FULL),
-            error: error.message,
+            error: message,
             module: this.getAlias().toUpperCase() + ' parser',
+            search: this.search,
         });
-        this.parsers.getLogger().error(`Api request to ${this.getAlias()} response error: ${error.message}`);
+        this.parsers.getLogger().error(`Api request to ${this.getAlias()} response error: ${message}`);
     }
     async saveStat(response: ApiResponseDto): Promise<void> {
         const apiRequestStat: ApiRequestStatDto = {

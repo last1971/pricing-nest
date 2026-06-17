@@ -3,4 +3,5 @@ export class MailErrorDto {
     module: string;
     error: string;
     duration: string;
+    search?: string;
 }
