@@ -4,6 +4,7 @@ import { AxiosResponse } from 'axios';
 import { GoodDto } from '../../good/dtos/good.dto';
 import { Source } from '../../good/dtos/source.enum';
 import { PriceDto } from '../../good/dtos/price.dto';
+import { dropCyrillicIfMixed } from '../../helpers';
 
 export class GetchipsParser extends AbstractParser {
     getAlias(): string {
@@ -19,7 +20,7 @@ export class GetchipsParser extends AbstractParser {
         return this.parsers.getHttp().get(getchips.URL_API as string, {
             params: {
                 token: getchips.TOKEN,
-                input: this.search,
+                input: dropCyrillicIfMixed(this.search),
                 qty: 1,
                 //currency_code: 1, // USD
             },

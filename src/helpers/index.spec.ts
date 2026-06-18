@@ -1,5 +1,5 @@
 import { ISupplierable } from '../interfaces/i.supplierable';
-import { ApplySupplier } from './index';
+import { ApplySupplier, dropCyrillicIfMixed } from './index';
 
 describe('Test helpers', () => {
     it('ApplySupplier without supplier', () => {
@@ -56,5 +56,23 @@ describe('Test helpers', () => {
         expect((supplierable.setSupplier as jest.Mock<any, any>).mock.calls[0]).toContain('111');
         expect((supplierable.setGoodId as jest.Mock<any, any>).mock.calls).toHaveLength(1);
         expect((supplierable.setGoodId as jest.Mock<any, any>).mock.calls[0]).toContain('222');
+    });
+
+    describe('dropCyrillicIfMixed', () => {
+        it('удаляет кириллицу из смешанной строки и схлопывает пробелы', () => {
+            expect(dropCyrillicIfMixed('Микросхема C167CSL40MCAKXQLA2')).toEqual('C167CSL40MCAKXQLA2');
+            expect(dropCyrillicIfMixed('разъем IDC-10F')).toEqual('IDC-10F');
+            expect(dropCyrillicIfMixed('конденсатор 10 мкФ X7R')).toEqual('10 X7R');
+        });
+
+        it('оставляет как есть строку только из латиницы', () => {
+            expect(dropCyrillicIfMixed('IDC-10F')).toEqual('IDC-10F');
+            expect(dropCyrillicIfMixed('LM358N')).toEqual('LM358N');
+        });
+
+        it('оставляет как есть строку только из кириллицы (+знаки/цифры)', () => {
+            expect(dropCyrillicIfMixed('конденсатор')).toEqual('конденсатор');
+            expect(dropCyrillicIfMixed('резистор 10')).toEqual('резистор 10');
+        });
     });
 });
