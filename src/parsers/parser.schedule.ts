@@ -125,7 +125,7 @@ export class ParserSchedule implements IScheduleParsers {
         for (const file of files) {
             const ruleObject = [
                 { reg: /.*xlsx.zip/gm, parserClass: TriatronParser },
-                { reg: /ExpEmail.csv/gm, parserClass: MicroemParser },
+                { reg: /ExpEmail.*\.csv/gm, parserClass: MicroemParser },
                 { reg: /Unisvs R.zip/gm, parserClass: UnisvsParser },
             ].find((rule) => {
                 const res = file.match(rule.reg);
