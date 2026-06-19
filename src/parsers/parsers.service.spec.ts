@@ -9,6 +9,7 @@ import { CurrencyMock } from '../currency/currency.mock';
 import { CacheMock, CacheSet } from '../mocks/cache.mock';
 import { QueueAdd, QueueMock } from '../mocks/queue.mock';
 import { MockParser1, MockParser3, parseResponse, SupplierMock } from '../supplier/supplier.mock';
+import { PromelecParser } from './api-parsers/promelec.parser';
 import { SupplierDto } from '../supplier/supplier.dto';
 import { CurrencyDto } from '../currency/dto/currency.dto';
 import { UnitService } from '../unit/unit.service';
@@ -117,7 +118,7 @@ describe('ParsersService', () => {
     it('Test abstract parser getFromDb', async () => {
         const parser = new MockParser1({ search: '123', withCache: true, dbOnly: false }, service);
         await parser.getFromDb();
-        expect(find.mock.calls[0]).toEqual([{ alias: '123', supplier: 'first' }]);
+        expect(find.mock.calls[0]).toEqual([{ alias: '123', supplier: 'first', warehouses: { $ne: [] } }]);
     });
 
     it('Test abstract parser getFromCache', async () => {
@@ -125,6 +126,34 @@ describe('ParsersService', () => {
         const parser = new MockParser1({ search: '123', withCache: true, dbOnly: false }, service);
         await parser.getFromCache(response);
         expect(response.data).toHaveLength(1);
+    });
+
+    it('Test prepareSearch gates too short search without blocking', async () => {
+        const response = new ApiResponseDto();
+        const parser = new MockParser1({ search: '12', withCache: false, dbOnly: false }, service);
+        jest.spyOn(parser as any, 'getMinSearchLength').mockReturnValue(3);
+        await parser.prepareSearch(response);
+        expect(response.isFinished).toBe(true);
+        expect(response.data).toEqual([]);
+        expect(find).not.toHaveBeenCalled();
+        expect(CacheSet).not.toHaveBeenCalled();
+    });
+
+    it('Test prepareSearch trims search to max length', async () => {
+        const response = new ApiResponseDto();
+        const parser = new MockParser1({ search: '1234567', withCache: false, dbOnly: false }, service);
+        jest.spyOn(parser as any, 'getMaxSearchLength').mockReturnValue(4);
+        await parser.prepareSearch(response);
+        expect(response.isFinished).toBe(false);
+        expect(parser.getCacheKey()).toEqual('first : 1234');
+    });
+
+    it('Test prepareSearch applies filterSearch', async () => {
+        const response = new ApiResponseDto();
+        const parser = new MockParser1({ search: 'разъем IDC', withCache: false, dbOnly: false }, service);
+        jest.spyOn(parser as any, 'filterSearch').mockReturnValue('IDC');
+        await parser.prepareSearch(response);
+        expect(parser.getCacheKey()).toEqual('first : IDC');
     });
 
     it('Test abstract parser not getFromCache', async () => {
@@ -147,6 +176,20 @@ describe('ParsersService', () => {
         await parser3.checkError(response);
         expect(response.data).toHaveLength(1);
         expect(response.data[0]).toHaveProperty('source', 'Db');
+    });
+
+    it('Test checkError skips when already finished', async () => {
+        const response = new ApiResponseDto();
+        response.isFinished = true;
+        const parser3 = new MockParser3({ search: '123', withCache: false, dbOnly: false }, service);
+        await parser3.checkError(response);
+        expect(response.data).toEqual([]);
+        expect(find).not.toHaveBeenCalled();
+    });
+
+    it('Test promelec throws on error body', async () => {
+        const parser = new PromelecParser({ search: '12345', withCache: false, dbOnly: false }, service);
+        await expect(parser.parseResponse({ error: 'too short', error_id: 5 })).rejects.toThrow('too short');
     });
 
     it('Test abstract parser obtain error', async () => {

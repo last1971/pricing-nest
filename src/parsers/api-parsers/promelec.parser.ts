@@ -12,6 +12,9 @@ export class PromelecParser extends AbstractParser {
     getCurrencyAlfa(): string {
         return 'RUB';
     }
+    protected getMinSearchLength(): number {
+        return 5;
+    }
     async getResponse(): Promise<Observable<AxiosResponse<any, any>>> {
         const promelec = await this.parsers.getVault().get('promelec');
         return this.parsers.getHttp().post(promelec.URL_API as string, {
@@ -24,6 +27,7 @@ export class PromelecParser extends AbstractParser {
         });
     }
     async parseResponse(response: any): Promise<GoodDto[]> {
+        if (response.error) throw new Error(response.error);
         return response.map(
             (item): GoodDto =>
                 new GoodDto({

@@ -15,12 +15,24 @@ export class GetchipsParser extends AbstractParser {
         return 'USD';
     }
 
+    protected filterSearch(search: string): string {
+        return dropCyrillicIfMixed(search);
+    }
+
+    protected getMinSearchLength(): number {
+        return 4;
+    }
+
+    protected getMaxSearchLength(): number {
+        return 50;
+    }
+
     async getResponse(): Promise<Observable<AxiosResponse<any, any>>> {
         const getchips = await this.parsers.getVault().get('getchips');
         return this.parsers.getHttp().get(getchips.URL_API as string, {
             params: {
                 token: getchips.TOKEN,
-                input: dropCyrillicIfMixed(this.search),
+                input: this.search,
                 qty: 1,
                 //currency_code: 1, // USD
             },

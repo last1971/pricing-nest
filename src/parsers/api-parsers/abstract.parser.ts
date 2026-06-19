@@ -32,10 +32,31 @@ export abstract class AbstractParser {
     getCacheKey(): string {
         return this.getAlias() + ' : ' + this.search;
     }
+    protected filterSearch(search: string): string {
+        return search;
+    }
+    protected getMinSearchLength(): number {
+        return 3;
+    }
+    protected getMaxSearchLength(): number | undefined {
+        return undefined;
+    }
+    async prepareSearch(response: ApiResponseDto): Promise<ApiResponseDto> {
+        const filtered = this.filterSearch(this.search);
+        if (filtered.length < this.getMinSearchLength()) {
+            response.data = [];
+            response.isFinished = true;
+            return response;
+        }
+        const max = this.getMaxSearchLength();
+        this.search = max ? filtered.slice(0, max) : filtered;
+        return response;
+    }
     async getFromDb(): Promise<GoodDto[]> {
         return this.parsers.getGoodService().find({
             alias: this.search,
             supplier: this.getSupplier().id,
+            warehouses: { $ne: [] },
         });
     }
     async getFromCache(response: ApiResponseDto): Promise<ApiResponseDto> {
@@ -53,7 +74,7 @@ export abstract class AbstractParser {
         return response;
     }
     async checkError(response: ApiResponseDto): Promise<ApiResponseDto> {
-        if (await this.parsers.getCache().get<any>('error : ' + this.getAlias())) {
+        if (!response.isFinished && (await this.parsers.getCache().get<any>('error : ' + this.getAlias()))) {
             response.data = await this.getFromDb();
             response.isFinished = true;
         }
@@ -137,6 +158,7 @@ export abstract class AbstractParser {
     abstract parseResponse(response: any): Promise<GoodDto[]>;
     async parse(): Promise<GoodDto[]> {
         const response = new ApiResponseDto();
+        await this.prepareSearch(response);
         await this.checkError(response);
         await this.getFromCache(response);
         await this.getFromHttp(response);
