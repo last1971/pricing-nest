@@ -8,25 +8,7 @@ import { PriceDto } from '../../good/dtos/price.dto';
 import { times, isString } from 'lodash';
 import { WarehouseDto } from '../../good/dtos/warehouse.dto';
 import { DateTime } from 'luxon';
-
-// Платан отдаёт невалидный JSON: внутренние кавычки в текстовых полях экранированы как /" вместо \".
-// Чиним итеративно: парсим, при ошибке заменяем ближайшую перед местом ошибки /" на \" и повторяем.
-// Валидный JSON (например значение-URL, заканчивающееся на /) парсится с первой попытки и не трогается.
-export function repairPlatanJson(raw: string): any {
-    let s = raw;
-    for (let guard = 0; guard <= raw.length; guard++) {
-        try {
-            return JSON.parse(s);
-        } catch (e) {
-            const pos = Number((e as Error).message.match(/position (\d+)/)?.[1]);
-            if (Number.isNaN(pos)) throw e;
-            const idx = s.lastIndexOf('/"', pos);
-            if (idx === -1) throw e;
-            s = s.slice(0, idx) + '\\"' + s.slice(idx + 2);
-        }
-    }
-    return JSON.parse(s);
-}
+import { repairSupplierJson } from './repair-json';
 
 export class PlatanParser extends AbstractParser {
     getAlias(): string {
@@ -48,7 +30,7 @@ export class PlatanParser extends AbstractParser {
         const retails: Map<string, any> = new Map<string, any>();
         let responseWithoutErrors;
         try {
-            responseWithoutErrors = isString(response) ? repairPlatanJson(response) : response;
+            responseWithoutErrors = isString(response) ? repairSupplierJson(response) : response;
         } catch (e) {
             const pos = parseInt(e.message.match(/position (\d+)/)?.[1] || '0');
             throw new Error(`retail JSON error at pos ${pos}: ${response.substring(pos - 30, pos + 30)}`);
@@ -71,7 +53,7 @@ export class PlatanParser extends AbstractParser {
         const wholesales = await firstValueFrom(this.parsers.getHttp().get(url.toString(), { transformResponse: (data) => data }));
         let data;
         try {
-            data = repairPlatanJson(wholesales.data);
+            data = repairSupplierJson(wholesales.data);
         } catch (e) {
             const pos = parseInt(e.message.match(/position (\d+)/)?.[1] || '0');
             throw new Error(`wholesale JSON error at pos ${pos}: ${wholesales.data.substring(pos - 30, pos + 30)}`);

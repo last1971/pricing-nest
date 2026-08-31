@@ -4,6 +4,8 @@ import { GoodDto } from '../../good/dtos/good.dto';
 import { PriceDto } from '../../good/dtos/price.dto';
 import { Observable } from 'rxjs';
 import { AxiosResponse } from 'axios';
+import { isString } from 'lodash';
+import { repairSupplierJson } from './repair-json';
 
 export class PromelecParser extends AbstractParser {
     getAlias(): string {
@@ -17,18 +19,23 @@ export class PromelecParser extends AbstractParser {
     }
     async getResponse(): Promise<Observable<AxiosResponse<any, any>>> {
         const promelec = await this.parsers.getVault().get('promelec');
-        return this.parsers.getHttp().post(promelec.URL_API as string, {
-            method: 'items_data_find',
-            login: promelec.LOGIN,
-            password: promelec.PASSWORD,
-            customer_id: promelec.CUSTOMER_ID,
-            name: this.search,
-            extended: 1,
-        });
+        return this.parsers.getHttp().post(
+            promelec.URL_API as string,
+            {
+                method: 'items_data_find',
+                login: promelec.LOGIN,
+                password: promelec.PASSWORD,
+                customer_id: promelec.CUSTOMER_ID,
+                name: this.search,
+                extended: 1,
+            },
+            { transformResponse: (data) => data },
+        );
     }
     async parseResponse(response: any): Promise<GoodDto[]> {
-        if (response.error) throw new Error(response.error);
-        return response.map(
+        const data = isString(response) ? repairSupplierJson(response) : response;
+        if (data.error) throw new Error(data.error);
+        return data.map(
             (item): GoodDto =>
                 new GoodDto({
                     updatedAt: new Date(),
