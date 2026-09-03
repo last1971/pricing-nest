@@ -22,5 +22,6 @@
   {"alias" :  "elsin", "deliveryTime": 10, "telegram": "@golovach_photo"},
   {"alias" :  "trigger", "deliveryTime": 2, "www": "https://trigger.ru/"},
   {"alias" :  "beltrix", "deliveryTime": 15, "www": "https://beltrix.ru/"},
-  {"alias" :  "positron", "deliveryTime": 6, "telegram": "@BYN67"}
+  {"alias" :  "positron", "deliveryTime": 6, "telegram": "@BYN67"},
+  {"alias" :  "fulcrum", "deliveryTime": 14, "www": "https://shop.fulcrum.ru/"}
 ]
