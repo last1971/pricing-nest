@@ -23,5 +23,6 @@
   {"alias" :  "trigger", "deliveryTime": 2, "www": "https://trigger.ru/"},
   {"alias" :  "beltrix", "deliveryTime": 15, "www": "https://beltrix.ru/"},
   {"alias" :  "positron", "deliveryTime": 6, "telegram": "@BYN67"},
-  {"alias" :  "fulcrum", "deliveryTime": 14, "www": "https://shop.fulcrum.ru/"}
+  {"alias" :  "fulcrum", "deliveryTime": 14, "www": "https://shop.fulcrum.ru/"},
+  {"alias" :  "ecomp", "deliveryTime": 14, "www": "https://www.eltech.spb.ru/"}
 ]

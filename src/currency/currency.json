@@ -1,4 +1,5 @@
 [
   { "alfa3": "USD", "number3": "840", "name": "US Dollar" },
-  { "alfa3": "RUB", "number3": "643", "name": "Russian Ruble" }
+  { "alfa3": "RUB", "number3": "643", "name": "Russian Ruble" },
+  { "alfa3": "CNY", "number3": "156", "name": "Chinese Yuan" }
 ]
