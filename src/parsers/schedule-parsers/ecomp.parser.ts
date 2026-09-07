@@ -4,6 +4,7 @@ import { GoodDto } from '../../good/dtos/good.dto';
 import { WarehouseDto } from '../../good/dtos/warehouse.dto';
 import { CurrencyDto } from '../../currency/dto/currency.dto';
 import { ftpDownload } from '../../helpers/ftp';
+import { vatRate, withVat } from '../../helpers/vat';
 
 export const ECOMP_GOLD_FILE = 'Gold.xlsx';
 export const ECOMP_ORDER_FILE = 'GoldOrder.xlsx';
@@ -29,6 +30,7 @@ export interface EcompItem {
 
 const toNumber = (value: unknown): number => Number(value) || 0;
 
+// Цены в прайсе без НДС, наружу отдаём с НДС на дату парсинга (см. helpers/vat).
 // Один код в файле идёт несколькими строками (партии). Партии суммируем,
 // цену берём минимальную, срок — ближайший.
 export function mergeLot(existing: EcompLot | undefined, lot: EcompLot): EcompLot {
@@ -115,13 +117,14 @@ function lotWarehouse(
     deliveryTime: number,
     multiple: number,
     currency: CurrencyDto,
+    vat: number,
 ): WarehouseDto {
     return {
         name,
         deliveryTime: deliveryTime + lot.weeks * 7,
         quantity: lot.quantity,
         multiple,
-        prices: [{ value: lot.price, min: 1, max: 0, currency: currency.id, isOrdinary: false }],
+        prices: [{ value: withVat(lot.price, vat), min: 1, max: 0, currency: currency.id, isOrdinary: false }],
     };
 }
 
@@ -130,11 +133,12 @@ export function buildEcompWarehouses(
     deliveryTime: number,
     usd: CurrencyDto,
     cny: CurrencyDto,
+    vat: number,
 ): WarehouseDto[] {
     return [
-        ...(item.stock ? [lotWarehouse('CENTER', item.stock, deliveryTime, item.multiple, usd)] : []),
-        ...(item.transit ? [lotWarehouse('TRANSIT', item.transit, deliveryTime, item.multiple, usd)] : []),
-        ...(item.order ? [lotWarehouse('PRODUCED', item.order, deliveryTime, item.multiple, cny)] : []),
+        ...(item.stock ? [lotWarehouse('CENTER', item.stock, deliveryTime, item.multiple, usd, vat)] : []),
+        ...(item.transit ? [lotWarehouse('TRANSIT', item.transit, deliveryTime, item.multiple, usd, vat)] : []),
+        ...(item.order ? [lotWarehouse('PRODUCED', item.order, deliveryTime, item.multiple, cny, vat)] : []),
     ];
 }
 
@@ -155,6 +159,7 @@ export class EcompParser extends ScheduleParser {
 
     async parse(): Promise<void> {
         const cny = await this.schedule.getCurrencies().alfa3('CNY');
+        const vat = vatRate();
         const items = parseEcompGold(await this.download(ECOMP_GOLD_FILE));
         parseEcompOrder(await this.download(ECOMP_ORDER_FILE), items);
         const promises: Promise<any>[] = Array.from(items.values()).map((item) => {
@@ -169,7 +174,7 @@ export class EcompParser extends ScheduleParser {
                     ...(item.producer ? [{ name: 'producer', stringValue: item.producer }] : []),
                     ...(item.remark ? [{ name: 'remark', stringValue: item.remark }] : []),
                 ],
-                warehouses: buildEcompWarehouses(item, this.supplier.deliveryTime, this.currency, cny),
+                warehouses: buildEcompWarehouses(item, this.supplier.deliveryTime, this.currency, cny, vat),
             });
             return this.schedule.getGoods().createOrUpdate(good);
         });

@@ -167,35 +167,35 @@ describe('buildEcompWarehouses', () => {
         order: { quantity: 500, price: 9.9, weeks: 3 },
     };
 
-    it('склад в USD, транзит и заказ со сроком по неделям, заказ в CNY', () => {
-        expect(buildEcompWarehouses(item, 14, usd, cny)).toEqual([
+    it('склад в USD, транзит и заказ со сроком по неделям, заказ в CNY, цены с НДС', () => {
+        expect(buildEcompWarehouses(item, 14, usd, cny, 22)).toEqual([
             {
                 name: 'CENTER',
                 deliveryTime: 14,
                 quantity: 100,
                 multiple: 10,
-                prices: [{ value: 1.5, min: 1, max: 0, currency: 'usd', isOrdinary: false }],
+                prices: [{ value: 1.83, min: 1, max: 0, currency: 'usd', isOrdinary: false }],
             },
             {
                 name: 'TRANSIT',
                 deliveryTime: 28,
                 quantity: 300,
                 multiple: 10,
-                prices: [{ value: 1.5, min: 1, max: 0, currency: 'usd', isOrdinary: false }],
+                prices: [{ value: 1.83, min: 1, max: 0, currency: 'usd', isOrdinary: false }],
             },
             {
                 name: 'PRODUCED',
                 deliveryTime: 35,
                 quantity: 500,
                 multiple: 10,
-                prices: [{ value: 9.9, min: 1, max: 0, currency: 'cny', isOrdinary: false }],
+                prices: [{ value: 12.078, min: 1, max: 0, currency: 'cny', isOrdinary: false }],
             },
         ]);
     });
 
     it('без партий — без складов', () => {
         expect(
-            buildEcompWarehouses({ ...item, stock: undefined, transit: undefined, order: undefined }, 14, usd, cny),
+            buildEcompWarehouses({ ...item, stock: undefined, transit: undefined, order: undefined }, 14, usd, cny, 22),
         ).toEqual([]);
     });
 });
