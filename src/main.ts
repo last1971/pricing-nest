@@ -9,7 +9,7 @@ import * as qs from 'qs';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
-    app.getHttpAdapter().getInstance().set('query parser', (str) => qs.parse(str, { allowPrototypes: false }));
+    app.getHttpAdapter().getInstance().set('query parser', (str) => qs.parse(str, { allowPrototypes: false, arrayLimit: 50 }));
     app.useGlobalPipes(new ValidationPipe({ transform: true }));
     app.use(cookieParser());
     await app.get(SeedService).execute();
