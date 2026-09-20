@@ -149,6 +149,21 @@ describe('MpnService', () => {
         expect(client.resolve).not.toHaveBeenCalled();
     });
 
+    it('refresh=true ignores cache and rewrites it', async () => {
+        store.set('mpn : RC0402FR0710KL', { found: true, source: 'live', mpn: 'STALE' });
+        client.resolve.mockResolvedValue(exactResolve);
+        client.part.mockResolvedValue(partResponse);
+
+        const dto = await service.part('RC0402FR-0710KL', undefined, true);
+
+        expect(client.resolve).toHaveBeenCalledTimes(1);
+        expect(dto).toMatchObject({ found: true, source: 'live', mpn: 'RC0402FR-0710KL' });
+        expect(cache.set).toHaveBeenCalledWith(
+            'mpn : RC0402FR0710KL',
+            expect.objectContaining({ mpn: 'RC0402FR-0710KL' }),
+            30 * DAY_MS,
+        );
+    });
     it('cached miss under plain key does not shadow a manufacturer-hinted request', async () => {
         store.set('mpn : 1N4148', { found: false, source: 'live', candidates: [] });
         client.resolve.mockResolvedValue(ambiguousResolve);

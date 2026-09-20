@@ -17,6 +17,6 @@ export class MpnController {
     @ApiBadGatewayResponse({ description: 'mpn.cc недоступен или ответил не по контракту' })
     @Get('part')
     async part(@Query() query: MpnPartQueryDto): Promise<MpnPartDto> {
-        return this.service.part(query.q, query.manufacturer);
+        return this.service.part(query.q, query.manufacturer, query.refresh);
     }
 }

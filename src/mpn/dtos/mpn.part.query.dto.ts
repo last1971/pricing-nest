@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString, Length, Matches } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsBoolean, IsOptional, IsString, Length, Matches } from 'class-validator';
 
 /** Не меньше 4 букв/цифр после нормализации — единственный гейт на длину MPN. */
 export const MIN_MPN_ALNUM = 4;
@@ -23,4 +24,10 @@ export class MpnPartQueryDto {
     @IsString()
     @Length(1, 120)
     manufacturer?: string;
+
+    @ApiPropertyOptional({ example: true, description: 'Перечитать карточку с mpn.cc, минуя кэш (кнопка «обновить»)' })
+    @IsOptional()
+    @Transform(({ value }) => value === true || value === 'true' || value === '1')
+    @IsBoolean()
+    refresh?: boolean;
 }

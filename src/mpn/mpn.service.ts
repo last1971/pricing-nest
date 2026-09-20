@@ -74,7 +74,7 @@ export class MpnService {
         return (q ?? '').toUpperCase().replace(/[^A-Z0-9]/g, '');
     }
 
-    async part(query: string, manufacturer?: string): Promise<MpnPartDto> {
+    async part(query: string, manufacturer?: string, refresh = false): Promise<MpnPartDto> {
         const normalized = MpnService.normalize(query);
         if (normalized.length < MIN_MPN_ALNUM) {
             throw new BadRequestException('MPN is too short');
@@ -85,10 +85,14 @@ export class MpnService {
 
         // Найденная карточка годится при любой подсказке производителя; промах без подсказки
         // (например, 1N4148 у восьми производителей) не должен глушить запрос с подсказкой.
-        const plain = await this.cache.get<MpnPartDto>(foundKey);
-        const cached = plain?.found || (plain && !manufacturerSlug) ? plain : await this.cache.get<MpnPartDto>(missKey);
-        if (cached) {
-            return { ...cached, source: 'cache' };
+        // refresh — кнопка «обновить»: кэш не читаем, но перезаписываем свежим ответом.
+        if (!refresh) {
+            const plain = await this.cache.get<MpnPartDto>(foundKey);
+            const cached =
+                plain?.found || (plain && !manufacturerSlug) ? plain : await this.cache.get<MpnPartDto>(missKey);
+            if (cached) {
+                return { ...cached, source: 'cache' };
+            }
         }
         await this.assertNotBlocked();
 
