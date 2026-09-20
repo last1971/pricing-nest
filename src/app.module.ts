@@ -17,6 +17,7 @@ import { ApiRequestStatModule } from './api-request-stat/api-request-stat.module
 import { MailModule } from './mail/mail.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { VaultModule } from 'vault-module/lib/vault.module';
+import { MpnModule } from './mpn/mpn.module';
 
 @Module({
     imports: [
@@ -85,6 +86,7 @@ import { VaultModule } from 'vault-module/lib/vault.module';
         GoodModule,
         ApiRequestStatModule,
         MailModule,
+        MpnModule,
     ],
     controllers: [AppController],
     providers: [AppService],
