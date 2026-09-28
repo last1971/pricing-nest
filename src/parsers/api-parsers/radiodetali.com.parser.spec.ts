@@ -123,6 +123,14 @@ describe('RadiodetaliComParser', () => {
         ]);
     });
 
+    it('should map marking "Да" to true', async () => {
+        const marked = { ...item, ext: { ...item.ext, marking: 'Да' } };
+
+        const goods = await parser.parseResponse({ item: [marked] });
+
+        expect(goods[0].warehouses[0].options.marking).toBe(true);
+    });
+
     it('should skip marking and tnved when empty', async () => {
         const noMarking = { ...item, ext: { ...item.ext, marking: null, tnved: '' } };
 
@@ -137,7 +145,7 @@ describe('RadiodetaliComParser', () => {
 
         expect(goods[0].warehouses[0].options).toEqual({
             location_id: undefined,
-            marking: 'Нет',
+            marking: false,
             tnved: '8542339000',
             refusal: {
                 number: '0038',

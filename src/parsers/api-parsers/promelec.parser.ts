@@ -64,6 +64,9 @@ export class PromelecParser extends AbstractParser {
                             deliveryTime: 8,
                             quantity: item.quant,
                             multiple: item.price_unit ?? 1,
+                            options: {
+                                ...this.parseMarking(item),
+                            },
                             prices: this.parsePrices(item.pricebreaks, item),
                         },
                     ].concat(
@@ -77,14 +80,19 @@ export class PromelecParser extends AbstractParser {
                                     vendor.delivery === 0
                                         ? 'Элкит'
                                         : vendor.delivery === 2
-                                        ? 'М А Г А З И Н'
-                                        : vendor.comment ?? 'Л А Б А З',
+                                          ? 'М А Г А З И Н'
+                                          : (vendor.comment ?? 'Л А Б А З'),
+                                ...this.parseMarking(item),
                             },
                             prices: this.parsePrices(vendor.pricebreaks, vendor),
                         })),
                     ),
                 }),
         );
+    }
+
+    private parseMarking(item: any): { marking?: boolean } {
+        return item.flag_marking === undefined || item.flag_marking === null ? {} : { marking: !!+item.flag_marking };
     }
 
     private parsePrices(data: any, item: any): any {

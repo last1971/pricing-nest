@@ -49,7 +49,7 @@ export class RadiodetaliComParser extends AbstractParser {
             url: ext.refusal_url,
         };
         return {
-            ...(ext.marking ? { marking: ext.marking } : {}),
+            ...(ext.marking ? { marking: String(ext.marking).trim().toLowerCase() === 'да' } : {}),
             ...(ext.tnved ? { tnved: ext.tnved } : {}),
             ...(Object.values(permit).some((v) => v) ? { permit } : {}),
             ...(Object.values(refusal).some((v) => v) ? { refusal } : {}),
