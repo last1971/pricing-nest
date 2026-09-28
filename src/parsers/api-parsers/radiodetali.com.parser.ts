@@ -49,6 +49,8 @@ export class RadiodetaliComParser extends AbstractParser {
             url: ext.refusal_url,
         };
         return {
+            ...(ext.marking ? { marking: ext.marking } : {}),
+            ...(ext.tnved ? { tnved: ext.tnved } : {}),
             ...(Object.values(permit).some((v) => v) ? { permit } : {}),
             ...(Object.values(refusal).some((v) => v) ? { refusal } : {}),
         };

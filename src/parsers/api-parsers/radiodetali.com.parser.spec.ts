@@ -123,11 +123,22 @@ describe('RadiodetaliComParser', () => {
         ]);
     });
 
+    it('should skip marking and tnved when empty', async () => {
+        const noMarking = { ...item, ext: { ...item.ext, marking: null, tnved: '' } };
+
+        const goods = await parser.parseResponse({ item: [noMarking] });
+
+        expect(goods[0].warehouses[0].options.marking).toBeUndefined();
+        expect(goods[0].warehouses[0].options.tnved).toBeUndefined();
+    });
+
     it('should put refusal letter into warehouse options and skip empty permit', async () => {
         const goods = await parser.parseResponse({ item: [item] });
 
         expect(goods[0].warehouses[0].options).toEqual({
             location_id: undefined,
+            marking: 'Нет',
+            tnved: '8542339000',
             refusal: {
                 number: '0038',
                 url: 'https://radiodetali.com/api/connectors/1153b886477abaa89844707336eadf2c/doc/2732',
