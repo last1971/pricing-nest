@@ -11,6 +11,8 @@ import { ApiResponseDto } from './api.response.dto';
 import { Source } from '../../good/dtos/source.enum';
 import { MAIL_ERROR_MESSAGE } from '../../mail/mail.constants';
 
+export const API_TIMEOUT_DEFAULT = 60000;
+
 export abstract class AbstractParser {
     protected search: string;
     protected withCache: boolean;
@@ -89,6 +91,8 @@ export abstract class AbstractParser {
         return `${error.message} [${axiosError.response.status}] ${body.slice(0, 1000)}`;
     }
     async obtainError(error: Error, response: ApiResponseDto) {
+        // Ответ пришёл уже после таймаута — ошибка по этому запросу уже записана
+        if (response.isFinished) return;
         const coeff = await this.parsers.getStatService().todayErrorCount(this.getSupplier());
         const message = this.buildErrorMessage(error);
         response.errorMessage = message;
@@ -96,7 +100,9 @@ export abstract class AbstractParser {
         const milliseconds = (await this.parsers.getConfigService().get<number>('CACHE_ERROR_EXP')) * coeff;
         const time = DateTime.now();
         const exp = time.plus(Duration.fromObject({ milliseconds }));
-        await this.parsers.getCache().set('error : ' + this.getAlias(), { blockedUntil: exp.toISO(), error: message }, milliseconds);
+        await this.parsers
+            .getCache()
+            .set('error : ' + this.getAlias(), { blockedUntil: exp.toISO(), error: message }, milliseconds);
         await this.parsers.getQueue().add(MAIL_ERROR_MESSAGE, {
             time: time.toLocaleString(DateTime.DATETIME_FULL),
             duration: exp.toLocaleString(DateTime.DATETIME_FULL),
@@ -123,37 +129,61 @@ export abstract class AbstractParser {
             await this.parsers.getQueue().add('keys', this.getCacheKey());
         }
     }
+    // Сколько ждём поставщика целиком (все его запросы и разбор ответа), мс
+    protected getTimeout(): number {
+        return parseInt(this.parsers.getConfigService().get('API_TIMEOUT')) || API_TIMEOUT_DEFAULT;
+    }
+    // Не ответил вовремя — это ошибка: товары берём из базы, поставщик блокируется
+    // через obtainError, и следующие поиски его не ждут, пока не истечёт блок
+    async withTimeout(request: Promise<GoodDto[]>, response: ApiResponseDto): Promise<GoodDto[]> {
+        const ms = this.getTimeout();
+        let timer: NodeJS.Timeout;
+        const timeout = new Promise<GoodDto[]>((resolve) => {
+            timer = setTimeout(async () => {
+                await this.obtainError(new Error(`Timeout: no answer in ${ms / 1000} s`), response);
+                resolve(await this.getFromDb());
+            }, ms);
+        });
+        try {
+            return await Promise.race([request, timeout]);
+        } finally {
+            clearTimeout(timer);
+        }
+    }
     async getFromHttp(response): Promise<ApiResponseDto> {
         if (!response.isFinished) {
-            response.data = await firstValueFrom(
-                (await this.getResponse())
-                    .pipe(
-                        map((res) => {
-                            return res.data;
-                        }),
-                    )
-                    .pipe(
-                        map(async (res) => {
-                            try {
-                                return await this.parseResponse(res);
-                            } catch (error) {
-                                await this.obtainError(error, response);
-                                return await this.getFromDb();
-                            }
-                        }),
-                    )
-                    .pipe(
-                        catchError(async (error: AxiosError) => {
-                            await this.obtainError(error, response);
-                            return await this.getFromDb();
-                        }),
-                    ),
-            );
+            response.data = await this.withTimeout(this.requestFromHttp(response), response);
             response.isFinished = true;
             await this.saveStat(response);
             await this.saveToCache(response);
         }
         return response;
+    }
+    async requestFromHttp(response: ApiResponseDto): Promise<GoodDto[]> {
+        return await firstValueFrom(
+            (await this.getResponse())
+                .pipe(
+                    map((res) => {
+                        return res.data;
+                    }),
+                )
+                .pipe(
+                    map(async (res) => {
+                        try {
+                            return await this.parseResponse(res);
+                        } catch (error) {
+                            await this.obtainError(error, response);
+                            return await this.getFromDb();
+                        }
+                    }),
+                )
+                .pipe(
+                    catchError(async (error: AxiosError) => {
+                        await this.obtainError(error, response);
+                        return await this.getFromDb();
+                    }),
+                ),
+        );
     }
     abstract parseResponse(response: any): Promise<GoodDto[]>;
     async parse(): Promise<GoodDto[]> {

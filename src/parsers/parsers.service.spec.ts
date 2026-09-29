@@ -74,7 +74,10 @@ describe('ParsersService', () => {
                         ),
                         get: () =>
                             new Observable((s) =>
-                                s.error({ response: { status: 422, data: { message: 'resp' } }, message: 'test error' }),
+                                s.error({
+                                    response: { status: 422, data: { message: 'resp' } },
+                                    message: 'test error',
+                                }),
                             ),
                     },
                 },
@@ -250,16 +253,18 @@ describe('ParsersService', () => {
         ]);
         expect(CacheSet.mock.calls).toHaveLength(2);
         expect(CacheSet.mock.calls[0][0]).toEqual('error : second');
-        expect(CacheSet.mock.calls[0][1]).toEqual(expect.objectContaining({ error: 'test error [422] {"message":"resp"}' }));
+        expect(CacheSet.mock.calls[0][1]).toEqual(
+            expect.objectContaining({ error: 'test error [422] {"message":"resp"}' }),
+        );
         expect(CacheSet.mock.calls[0][1]).toHaveProperty('blockedUntil');
         expect(CacheSet.mock.calls[0][2]).toEqual(60);
         expect(CacheSet.mock.calls[1]).toEqual(['first : 123', [{ source: 'Api' }, { source: 'Api' }]]);
+        // Поставщики опрашиваются параллельно — порядок записей в очередь не фиксирован
         expect(QueueAdd.mock.calls).toHaveLength(4);
-        expect(QueueAdd.mock.calls[1][0]).toEqual(MAIL_ERROR_MESSAGE);
-        expect(QueueAdd.mock.calls[0][0]).toEqual('apiRequestStats');
-        expect(QueueAdd.mock.calls[0][1]).toHaveProperty('isSuccess', true);
-        expect(QueueAdd.mock.calls[2]).toEqual(['keys', 'first : 123']);
-        expect(QueueAdd.mock.calls[3][1]).toHaveProperty('isSuccess', false);
+        expect(QueueAdd.mock.calls.filter(([name]) => name === MAIL_ERROR_MESSAGE)).toHaveLength(1);
+        expect(QueueAdd.mock.calls).toContainEqual(['keys', 'first : 123']);
+        const stats = QueueAdd.mock.calls.filter(([name]) => name === 'apiRequestStats');
+        expect(stats.map(([, stat]) => stat.isSuccess).sort()).toEqual([false, true]);
     });
 
     it('Test http search', async () => {
