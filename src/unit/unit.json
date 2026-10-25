@@ -1,5 +1,6 @@
 [
   { "baseUnit": { "name": "штука" } },
+  { "baseUnit": { "name": "грамм" } },
   {
     "baseUnit": { "name": "метр" },
     "units": [
