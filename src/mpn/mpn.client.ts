@@ -38,6 +38,10 @@ export class MpnUpstreamError extends Error {
 const MIN_RETRY_AFTER_MS = 60_000;
 // Один запрос наружу; общий бюджет клика держит MpnService.
 const REQUEST_TIMEOUT_MS = 10_000;
+// Не чаще одного запроса наружу за это время, на весь процесс (MPN_CC_MIN_INTERVAL_MS). mpn.cc банит IP
+// за частые запросы (25.10.2026: бан на 14 часов после ~2 запросов/с); один вызов /mpn/part — это 2–5 запросов
+// наружу (resolve, карточка, acquire, повтор), поэтому ограничитель стоит здесь, а не у вызывающих.
+const DEFAULT_MIN_INTERVAL_MS = 2_500;
 
 /**
  * HTTP к api.mpn.cc. Только сетевой слой: заголовки, таймаут, разбор 429/404.
@@ -49,6 +53,10 @@ export class MpnClient {
     private readonly logger = new Logger(MpnClient.name);
     private readonly baseUrl: string;
     private readonly userAgent: string;
+    private readonly minIntervalMs: number;
+    /** Очередь на выход: следующий запрос стартует не раньше, чем через minIntervalMs после старта предыдущего. */
+    private queue: Promise<void> = Promise.resolve();
+    private lastStartedAt = 0;
 
     constructor(
         private readonly http: HttpService,
@@ -56,6 +64,19 @@ export class MpnClient {
     ) {
         this.baseUrl = (config.get<string>('MPN_CC_URL') ?? 'https://api.mpn.cc').replace(/\/+$/, '');
         this.userAgent = config.get<string>('MPN_CC_USER_AGENT') ?? 'elcopro-trade/1.0 (+https://trade.elcopro.ru)';
+        const interval = Number(config.get<string>('MPN_CC_MIN_INTERVAL_MS'));
+        this.minIntervalMs = Number.isFinite(interval) && interval >= 0 ? interval : DEFAULT_MIN_INTERVAL_MS;
+    }
+
+    /** Ждёт своей очереди на выход наружу; параллельные вызовы выстраиваются друг за другом. */
+    private throttle(): Promise<void> {
+        const turn = this.queue.then(async () => {
+            const wait = this.lastStartedAt + this.minIntervalMs - Date.now();
+            if (wait > 0) await new Promise((resolve) => setTimeout(resolve, wait));
+            this.lastStartedAt = Date.now();
+        });
+        this.queue = turn.catch(() => undefined);
+        return turn;
     }
 
     /** GET /v1/resolve?q= — одна каноническая запись либо кандидаты. */
@@ -86,6 +107,7 @@ export class MpnClient {
     }
 
     private async request<T>(config: AxiosRequestConfig): Promise<T> {
+        await this.throttle();
         try {
             const response = await firstValueFrom(
                 this.http.request<T>({
