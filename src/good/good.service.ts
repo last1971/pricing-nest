@@ -51,12 +51,12 @@ export class GoodService {
     async setParameters(newGood: GoodDocument, setParameters: ParameterDto[]): Promise<void> {
         const parameters: ParameterDto[] = newGood.parameters
             ? (newGood.parameters.map((parameter: ParameterDocument) => {
-                const { _id, __v, unit, ...rest } = parameter.toObject();
-                return {
-                    ...rest,
-                    ...(unit ? { unit: String(unit) } : {}),
-                } as ParameterDto;
-            }) as ParameterDto[])
+                  const { _id, __v, unit, ...rest } = parameter.toObject();
+                  return {
+                      ...rest,
+                      ...(unit ? { unit: String(unit) } : {}),
+                  } as ParameterDto;
+              }) as ParameterDto[])
             : [];
         let modified = false;
         setParameters.forEach((parameter) => {
@@ -82,6 +82,20 @@ export class GoodService {
             filter.alias = { $regex: new RegExp(alias(filter.alias), 'i') };
         }
         return this.goodModel.find(filter);
+    }
+
+    /**
+     * Товары одного поставщика постранично (сайт заводит карточки и обновляет цены пачками): по alias поставщика,
+     * сортировка по коду, inStock — только с остатком хотя бы на одном складе. Неизвестный alias — пустой список.
+     */
+    @ModelToDto(GoodDto)
+    async findBySupplierAlias(alias: string, skip: number, limit: number, inStock: boolean): Promise<GoodDto[]> {
+        const supplier = this.allSuppliers.find((s) => s.alias === alias);
+        if (!supplier) return [];
+        const filter: any = { supplier: supplier.id };
+        if (inStock) filter['warehouses.quantity'] = { $gt: 0 };
+        const docs = await this.goodModel.find(filter).sort({ code: 1 }).skip(skip).limit(limit);
+        return docs as unknown as GoodDto[];
     }
 
     @ModelToDto(GoodDto)

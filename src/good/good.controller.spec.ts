@@ -9,6 +9,7 @@ describe('GoodController', () => {
     let controller: GoodController;
     const setGood = jest.fn();
     const findByIds = jest.fn();
+    const findBySupplierAlias = jest.fn();
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
@@ -16,7 +17,7 @@ describe('GoodController', () => {
             providers: [
                 {
                     provide: GoodService,
-                    useValue: { setGood, findByIds },
+                    useValue: { setGood, findByIds, findBySupplierAlias },
                 },
             ],
         }).compile();
@@ -28,6 +29,12 @@ describe('GoodController', () => {
         expect(controller).toBeDefined();
     });
 
+    it('bySupplier передаёт alias, skip, limit (не больше 2000) и inStock', async () => {
+        findBySupplierAlias.mockResolvedValue([]);
+        await controller.bySupplier('compel', 10, 5000, false);
+        expect(findBySupplierAlias).toHaveBeenCalledWith('compel', 10, 2000, false);
+    });
+
     it('setGood ', async () => {
         await controller.setGoodId(new SetGoodIdDto());
         expect(setGood.mock.calls).toHaveLength(1);
@@ -37,8 +44,22 @@ describe('GoodController', () => {
         const dto = new GetRawResponseDto();
         dto.ids = ['id1', 'id2'];
         const mockGoods: GoodDto[] = [
-            { id: 'id1', code: 'code1', alias: 'alias1', supplier: 'supplier1', warehouses: [], updatedAt: new Date() } as GoodDto,
-            { id: 'id2', code: 'code2', alias: 'alias2', supplier: 'supplier2', warehouses: [], updatedAt: new Date() } as GoodDto,
+            {
+                id: 'id1',
+                code: 'code1',
+                alias: 'alias1',
+                supplier: 'supplier1',
+                warehouses: [],
+                updatedAt: new Date(),
+            } as GoodDto,
+            {
+                id: 'id2',
+                code: 'code2',
+                alias: 'alias2',
+                supplier: 'supplier2',
+                warehouses: [],
+                updatedAt: new Date(),
+            } as GoodDto,
         ];
         findByIds.mockResolvedValue(mockGoods);
 

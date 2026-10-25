@@ -1,8 +1,18 @@
-import { Controller, Post, Query, Body } from '@nestjs/common';
+import {
+    Controller,
+    Post,
+    Query,
+    Body,
+    Get,
+    Param,
+    ParseBoolPipe,
+    ParseIntPipe,
+    DefaultValuePipe,
+} from '@nestjs/common';
 import { SetGoodIdDto } from './dtos/set.good.id.dto';
 import { GetRawResponseDto } from './dtos/get-raw-response.dto';
 import { GoodService } from './good.service';
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { GoodDto } from './dtos/good.dto';
 @ApiTags('good')
 @Controller('good')
@@ -33,6 +43,31 @@ export class GoodController {
         type: GoodDto,
         description: 'Get raw response data for goods by IDs',
     })
+    @ApiOperation({
+        summary: 'Товары поставщика постранично',
+        description:
+            'Все товары поставщика по alias (sort по коду), skip/limit для пачек; inStock=true — только с остатком.',
+    })
+    @ApiParam({ name: 'alias', example: 'compel' })
+    @ApiQuery({ name: 'skip', required: false, example: 0 })
+    @ApiQuery({ name: 'limit', required: false, example: 500 })
+    @ApiQuery({ name: 'inStock', required: false, example: true })
+    @ApiOkResponse({ isArray: true, type: GoodDto })
+    @Get('supplier/:alias')
+    async bySupplier(
+        @Param('alias') alias: string,
+        @Query('skip', new DefaultValuePipe(0), ParseIntPipe) skip: number,
+        @Query('limit', new DefaultValuePipe(500), ParseIntPipe) limit: number,
+        @Query('inStock', new DefaultValuePipe(true), ParseBoolPipe) inStock: boolean,
+    ): Promise<GoodDto[]> {
+        return this.goodService.findBySupplierAlias(
+            alias,
+            Math.max(0, skip),
+            Math.min(Math.max(1, limit), 2000),
+            inStock,
+        );
+    }
+
     @Post('raw-response')
     async getRawResponse(@Body() dto: GetRawResponseDto): Promise<GoodDto[]> {
         return this.goodService.findByIds(dto.ids);
