@@ -12,6 +12,14 @@ export class Currency {
 
     @Prop({ required: true })
     name: string;
+
+    /** Курс ЦБ РФ: рублей за одну единицу валюты (у RUB — 1); пусто, пока ни разу не обновлялся */
+    @Prop()
+    rate?: number;
+
+    /** На какую дату курс ЦБ */
+    @Prop()
+    rateDate?: Date;
 }
 
 export const CurrencySchema = SchemaFactory.createForClass(Currency);

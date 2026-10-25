@@ -12,4 +12,9 @@ export class CurrencyDto {
 
     @IsNotEmpty()
     name: string;
+
+    /** Курс ЦБ РФ, рублей за единицу валюты (RUB — 1); нет, пока курс не загружен */
+    rate?: number;
+
+    rateDate?: Date;
 }
