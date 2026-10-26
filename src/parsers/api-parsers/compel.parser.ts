@@ -22,6 +22,10 @@ export class CompelParser extends AbstractParser {
     getCurrencyAlfa(): string {
         return 'USD';
     }
+    // search_item_name_h отдаёт склады в locations, search_item_ext (compeldms) — предложения в proposals
+    protected usesLocations(): boolean {
+        return true;
+    }
     async getResponse(): Promise<Observable<AxiosResponse<any, any>>> {
         const compel = await this.parsers.getVault().get('compel');
         return this.parsers.getHttp().post(compel.API_URL as string, {
@@ -59,7 +63,7 @@ export class CompelParser extends AbstractParser {
                               ]
                             : []),
                     ],
-                    warehouses: (this.getAlias() === 'compel'
+                    warehouses: (this.usesLocations()
                         ? item.locations
                         : item.proposals.filter((location) => !location.location_id.trim())
                     ).map(

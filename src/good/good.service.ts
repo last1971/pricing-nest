@@ -98,6 +98,14 @@ export class GoodService {
         return docs as unknown as GoodDto[];
     }
 
+    // Товары поставщика по его кодам (для живого остатка корзины)
+    async findBySupplierCodes(alias: string, codes: string[]): Promise<GoodDto[]> {
+        const supplier = this.allSuppliers.find((s) => s.alias === alias);
+        if (!supplier || codes.length === 0) return [];
+        const docs = await this.goodModel.find({ supplier: supplier.id, code: { $in: codes } });
+        return docs as unknown as GoodDto[];
+    }
+
     @ModelToDto(GoodDto)
     async findByIds(ids: string[]): Promise<GoodDto[]> {
         return this.goodModel.find({ id: { $in: ids } });

@@ -7,6 +7,9 @@ export class CompelDmsParser extends CompelParser {
     getAlias(): string {
         return 'compeldms';
     }
+    protected usesLocations(): boolean {
+        return false;
+    }
     async getResponse(): Promise<Observable<AxiosResponse<any, any>>> {
         const compel = await this.parsers.getVault().get('compel');
         return this.parsers.getHttp().post(compel.API_URL as string, {
