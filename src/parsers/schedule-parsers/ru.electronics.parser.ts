@@ -111,6 +111,51 @@ export function ruelWarehouses(
     ].filter((w) => w.prices.length > 0);
 }
 
+const text = (value: unknown): string => (typeof value === 'string' ? value.trim() : '');
+
+// Фото: link_photo7 (700 px), дополнительные — номер из addphoto через «_» к основной (…/bmp7/39582_2.jpg)
+export function ruelImages(good: any): string[] {
+    const main = text(good.link?.link_photo7) || text(good.link?.link_photo);
+    if (!main) return [];
+    const extra = text(good.addphoto)
+        .split(',')
+        .map((n) => n.trim())
+        .filter((n) => /^\d+$/.test(n))
+        .map((n) => main.replace(/(\.[a-z]+)$/i, `_${n}$1`));
+    return [main, ...extra];
+}
+
+// Вес из техинфо «Вес»: «450 г», «1,2 кг» → граммы
+export function ruelWeightGrams(good: any): number {
+    const value = text(find(toArray(good.techinfo?.parameter), { name: 'Вес' })?.value);
+    const match = value.replace(',', '.').match(/^([\d.]+)\s*(кг|г)(?![а-яё])/i);
+    if (!match) return 0;
+    const number = parseFloat(match[1]) * (match[2].toLowerCase() === 'кг' ? 1000 : 1);
+    return Number.isFinite(number) && number > 0 ? number : 0;
+}
+
+// Раздел, фото, описание, вес, характеристики, документация — для карточки на сайте (владелец 28.10.2026).
+// Раздел — подгруппа ruelectronics (categoryCode = subgroup_id), имя — «группа / подгруппа».
+export function ruelContentParameters(good: any): { name: string; stringValue?: string; numericValue?: number }[] {
+    const parameters: { name: string; stringValue?: string; numericValue?: number }[] = [];
+    const add = (name: string, value: string) => value && parameters.push({ name, stringValue: value });
+    add('categoryCode', text(good.subgroup_id));
+    add('category', [text(good.group_name), text(good.subgroup_name)].filter(Boolean).join(' / '));
+    add('className', text(good.class_name));
+    add('complexName', text(good.complex_name));
+    add('description', text(good.description));
+    add('images', ruelImages(good).join('\n'));
+    add('datasheet', text(good.link?.link_file));
+    add('scheme', text(good.link?.link_scheme));
+    const techinfo = toArray(good.techinfo?.parameter)
+        .map((p: any) => ({ name: text(p?.name), value: text(p?.value) }))
+        .filter((p) => p.name && p.value);
+    add('techinfo', techinfo.length ? JSON.stringify(techinfo) : '');
+    const weight = ruelWeightGrams(good);
+    if (weight) parameters.push({ name: 'weight', numericValue: weight });
+    return parameters;
+}
+
 export class RuElectronicsParser extends ScheduleParser {
     protected supplierAlias = 'ruelectronics';
     protected currencyAlfa3 = 'RUB';
@@ -138,6 +183,7 @@ export class RuElectronicsParser extends ScheduleParser {
                         ...(good.brand ? [{ name: 'producer', stringValue: good.brand }] : []),
                         ...(packageQuantity ? [{ name: 'packageQuantity', numericValue: packageQuantity }] : []),
                         ...(body ? [{ name: 'case', stringValue: body.value }] : []),
+                        ...ruelContentParameters(good),
                     ],
                     warehouses: ruelWarehouses(good, this.supplier.deliveryTime, this.currency.id),
                 }),

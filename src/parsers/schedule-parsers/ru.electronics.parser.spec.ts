@@ -6,6 +6,9 @@ import {
     ruelPrices,
     ruelWarehouses,
     toArray,
+    ruelContentParameters,
+    ruelImages,
+    ruelWeightGrams,
 } from './ru.electronics.parser';
 
 // Товары в том виде, как их отдаёт xml2js (explicitArray: false, mergeAttrs: true)
@@ -169,5 +172,75 @@ describe('ruelWarehouses', () => {
     it('без цен склады не создаются', () => {
         const item = good({ price: '0.00', optprice: '0.00', vipprice: '0.00' });
         expect(ruelWarehouses(item, 11, 'rub', now)).toEqual([]);
+    });
+});
+
+describe('ruelImages', () => {
+    it('основное фото 700 px и дополнительные из addphoto через «_»', () => {
+        const good = {
+            link: {
+                link_photo: 'https://www.zip-2002.ru/bmp/39582.jpg',
+                link_photo7: 'https://www.zip-2002.ru/bmp7/39582.jpg',
+            },
+            addphoto: '1,2',
+        };
+        expect(ruelImages(good)).toEqual([
+            'https://www.zip-2002.ru/bmp7/39582.jpg',
+            'https://www.zip-2002.ru/bmp7/39582_1.jpg',
+            'https://www.zip-2002.ru/bmp7/39582_2.jpg',
+        ]);
+    });
+
+    it('без ссылок — пусто', () => {
+        expect(ruelImages({ link: '' })).toEqual([]);
+    });
+});
+
+describe('ruelWeightGrams', () => {
+    it('граммы и килограммы, мусор — 0', () => {
+        expect(ruelWeightGrams({ techinfo: { parameter: { name: 'Вес', value: '450 г' } } })).toBe(450);
+        expect(ruelWeightGrams({ techinfo: { parameter: [{ name: 'Вес', value: '1,2 кг' }] } })).toBe(1200);
+        expect(ruelWeightGrams({ techinfo: { parameter: { name: 'Вес', value: 'около' } } })).toBe(0);
+        expect(ruelWeightGrams({})).toBe(0);
+    });
+});
+
+describe('ruelContentParameters', () => {
+    it('раздел — подгруппа, характеристики, описание, документация; пустое не пишется', () => {
+        const good = {
+            group_id: '92',
+            group_name: 'АКУСТИЧЕСКИЕ КОМПОНЕНТЫ',
+            subgroup_id: '448',
+            subgroup_name: 'Динамики',
+            class_name: 'Динамик',
+            complex_name: '',
+            description: '',
+            techinfo: {
+                parameter: [
+                    { name: 'Мощность', value: '0,1 Вт' },
+                    { name: 'Вес', value: '20 г' },
+                    { name: 'Пусто', value: '' },
+                ],
+            },
+            link: {
+                link_photo7: 'https://www.zip-2002.ru/bmp7/25468.jpg',
+                link_file: 'http://old.zip-2002.ru/jpg/file.php?id=1',
+            },
+        };
+        expect(ruelContentParameters(good)).toEqual([
+            { name: 'categoryCode', stringValue: '448' },
+            { name: 'category', stringValue: 'АКУСТИЧЕСКИЕ КОМПОНЕНТЫ / Динамики' },
+            { name: 'className', stringValue: 'Динамик' },
+            { name: 'images', stringValue: 'https://www.zip-2002.ru/bmp7/25468.jpg' },
+            { name: 'datasheet', stringValue: 'http://old.zip-2002.ru/jpg/file.php?id=1' },
+            {
+                name: 'techinfo',
+                stringValue: JSON.stringify([
+                    { name: 'Мощность', value: '0,1 Вт' },
+                    { name: 'Вес', value: '20 г' },
+                ]),
+            },
+            { name: 'weight', numericValue: 20 },
+        ]);
     });
 });
