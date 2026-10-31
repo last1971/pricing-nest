@@ -129,5 +129,13 @@ describe('PriceService', () => {
             const result = await service.offers('promelec', ['1185005']);
             expect(result['1185005'].source).toBe(Source.Db);
         });
+
+        it('Promelec: спрашивает код даже до появления товара в накопленной базе', async () => {
+            findBySupplierCodes.mockResolvedValue([]);
+            const fresh = { code: '6079', source: Source.Api, warehouses: [{ name: 'CENTER', quantity: 1620 }] };
+            liveParse.mockResolvedValue([fresh]);
+            const result = await service.offers('promelec', ['6079']);
+            expect(result['6079']).toEqual(fresh);
+        });
     });
 });

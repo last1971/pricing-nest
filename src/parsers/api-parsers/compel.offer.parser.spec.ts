@@ -1,6 +1,7 @@
 import { CompelOfferParser } from './compel.offer.parser';
 import { PromelecOfferParser } from './promelec.offer.parser';
 import { ParsersService } from '../parsers.service';
+import { ApiResponseDto } from './api.response.dto';
 
 describe('Checkout offers', () => {
     const post = jest.fn();
@@ -36,5 +37,15 @@ describe('Checkout offers', () => {
         const body = post.mock.calls.at(-1)[1];
         expect(body).toMatchObject({ method: 'items_data_get', item_id: 6078, extended: 1 });
         expect(body.name).toBeUndefined();
+    });
+
+    it.each([CompelOfferParser, PromelecOfferParser])('сбой одного товара не блокирует остальные котировки и не рассылает письма', async Parser => {
+        const parser = new Parser({ search: 'TDA7850', withCache: false, dbOnly: false }, parsers);
+        const response = new ApiResponseDto();
+        expect(await parser.checkError(response)).toBe(response);
+        await parser.obtainError(new Error('secret API payload'), response);
+        expect(response.isSuccess).toBe(false);
+        expect(response.errorMessage).not.toContain('secret');
+        expect(response.isFinished).toBe(false);
     });
 });

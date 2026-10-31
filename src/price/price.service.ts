@@ -47,6 +47,13 @@ export class PriceService {
         const result: Record<string, GoodDto | null> = {};
         codes.forEach((code) => (result[code] = null));
         const goods = await this.goodService.findBySupplierCodes(alias, codes);
+        const inDb = new Set(goods.map(g => g.code));
+        if (alias === 'promelec' && parsers === OFFER_PARSERS) {
+            // Код уже есть в заказе, даже если позиция ещё не попала в накопленную базу поиска.
+            for (const code of codes) {
+                if (!inDb.has(code) && /^[1-9]\d*$/.test(code)) goods.push(new GoodDto({ code, alias: code, warehouses: [] }));
+            }
+        }
         for (const part of chunk(goods, LIVE_PARALLEL)) {
             await Promise.all(
                 part.map(async (good) => {
@@ -57,7 +64,10 @@ export class PriceService {
                         return;
                     }
                     const parser = new parserClass({ search: name, withCache: false, dbOnly: false }, this.parsers);
-                    if (parser instanceof PromelecOfferParser) parser.supplierCode = good.code;
+                    if (parser instanceof PromelecOfferParser) {
+                        parser.supplierCode = good.code;
+                        parser.lookupByCode = !inDb.has(good.code);
+                    }
                     try {
                         const found = (await parser.parse()).find((g) => g.code === good.code && g.source === Source.Api);
                         result[good.code] = found ?? fromDb;
