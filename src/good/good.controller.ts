@@ -1,3 +1,5 @@
+import * as fs from 'fs/promises';
+import * as path from 'path';
 import {
     Controller,
     Post,
@@ -66,6 +68,15 @@ export class GoodController {
             Math.min(Math.max(1, limit), 2000),
             inStock,
         );
+    }
+
+    @Get('supplier/:alias/catalog-status')
+    async catalogStatus(@Param('alias') alias: string): Promise<Record<string, unknown>> {
+        if (alias !== 'promelec') return { completed: false };
+        try {
+            const status = JSON.parse(await fs.readFile(path.resolve('var/catalog/promelec-status.json'), 'utf8'));
+            return { completed: status.completed === true, phase: status.phase, total: status.total, imported: status.imported, updatedAt: status.updatedAt };
+        } catch { return { completed: false }; }
     }
 
     @Post('raw-response')

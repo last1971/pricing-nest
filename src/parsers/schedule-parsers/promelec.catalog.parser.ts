@@ -83,7 +83,14 @@ export class PromelecCatalogParser extends ScheduleParser {
         } finally { fs.closeSync(fd); }
         fs.renameSync(temporary, target);
         const imported = await this.importSnapshot(target);
-        this.status({ completed: true, phase: 'complete', total: imported, pages, cursor });
+        this.status({ completed: false, phase: 'cleanup', total: imported, pages, cursor });
+    }
+
+    protected async finish(): Promise<void> {
+        await super.finish();
+        let previous: Record<string, unknown> = {};
+        try { previous = JSON.parse(fs.readFileSync(path.join(this.directory, 'promelec-status.json'), 'utf8')); } catch { /* first run */ }
+        this.status({ ...previous, completed: true, phase: 'complete' });
     }
 
     private async importSnapshot(file: string): Promise<number> {
