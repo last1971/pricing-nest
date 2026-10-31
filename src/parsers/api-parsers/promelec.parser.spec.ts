@@ -121,6 +121,13 @@ describe('PromelecParser', () => {
         expect(goods[0].warehouses[0].options.marking).toBe(true);
     });
 
+    it('does not persist nonfinite or nonpositive source prices', async () => {
+        for (const price_unit of [0, -1]) {
+            const goods = await parser.parseResponse([{ ...item, price_unit }]);
+            expect(goods[0].warehouses[0].prices).toEqual([]);
+        }
+    });
+
     it('should throw on error response', async () => {
         await expect(parser.parseResponse({ error: 'bad login' })).rejects.toThrow('bad login');
     });

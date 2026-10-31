@@ -48,6 +48,21 @@ export class GoodService {
             await this.setParameters(newGood, good.parameters);
         }
     }
+    /** Full supplier source snapshot: replace its fields, preserving client goodId mappings. */
+    async upsertCatalogBatch(goods: GoodDto[]): Promise<void> {
+        if (!goods.length) return;
+        await this.goodModel.bulkWrite(goods.map(good => {
+            const normalized = new this.goodModel(good);
+            return { updateOne: {
+            filter: { supplier: good.supplier, code: good.code },
+            update: {
+                $set: { alias: alias(good.alias), source: Source.Db, warehouses: normalized.warehouses, parameters: normalized.parameters ?? [], updatedAt: good.updatedAt },
+                $setOnInsert: { id: good.id },
+            },
+            upsert: true,
+        } }; }), { ordered: true });
+    }
+
     async setParameters(newGood: GoodDocument, setParameters: ParameterDto[]): Promise<void> {
         const parameters: ParameterDto[] = newGood.parameters
             ? (newGood.parameters.map((parameter: ParameterDocument) => {

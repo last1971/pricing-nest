@@ -176,6 +176,7 @@ export class PromelecParser extends AbstractParser {
                           ]),
                 ];
             })
-            .flat();
+            .flat()
+            .filter((price) => Number.isFinite(price.value) && price.value > 0);
     }
 }

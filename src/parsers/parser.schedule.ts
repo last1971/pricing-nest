@@ -34,6 +34,7 @@ import { TriggerParser } from './schedule-parsers/trigger.parser';
 import { BeltrixParser } from './schedule-parsers/beltrix.parser';
 import { PositronParser } from './schedule-parsers/positron.parser';
 import { FulcrumParser } from './schedule-parsers/fulcrum.parser';
+import { PromelecCatalogParser } from './schedule-parsers/promelec.catalog.parser';
 import { EcompParser } from './schedule-parsers/ecomp.parser';
 
 @Injectable()
@@ -55,6 +56,7 @@ export class ParserSchedule implements IScheduleParsers {
         '0 56 23 * * *': [PositronParser],
         '0 58 23 * * *': [FulcrumParser],
         '0 30 3 * * *': [EcompParser],
+        '0 5 0 * * *': [PromelecCatalogParser],
     };
     constructor(
         private schedulerRegistry: SchedulerRegistry,
