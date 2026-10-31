@@ -1,7 +1,7 @@
 [
   {"alias" : "compel", "deliveryTime": 12},
   {"alias" : "compeldms", "deliveryTime":  6},
-  {"alias" : "promelec", "deliveryTime":  8},
+  {"alias" : "promelec", "deliveryTime":  14},
   {"alias" : "rct", "deliveryTime": 12},
   {"alias" : "platan", "deliveryTime": 10},
   {"alias" : "mars", "deliveryTime": 11},

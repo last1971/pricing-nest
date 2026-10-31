@@ -17,16 +17,18 @@ export class PromelecParser extends AbstractParser {
     protected getMinSearchLength(): number {
         return 5;
     }
+    protected lookupParameters(): { method: string; name?: string; item_id?: number } {
+        return { method: 'items_data_find', name: this.search };
+    }
     async getResponse(): Promise<Observable<AxiosResponse<any, any>>> {
         const promelec = await this.parsers.getVault().get('promelec');
         return this.parsers.getHttp().post(
             promelec.URL_API as string,
             {
-                method: 'items_data_find',
+                ...this.lookupParameters(),
                 login: promelec.LOGIN,
                 password: promelec.PASSWORD,
                 customer_id: promelec.CUSTOMER_ID,
-                name: this.search,
                 extended: 1,
             },
             { transformResponse: (data) => data },
@@ -47,7 +49,14 @@ export class PromelecParser extends AbstractParser {
                         { name: 'name', stringValue: item.name },
                         ...(item.producer_name ? [{ name: 'producer', stringValue: item.producer_name }] : []),
                         ...(item.package ? [{ name: 'case', stringValue: item.package }] : []),
-                        ...(item.description ? [{ name: 'remark', stringValue: item.description }] : []),
+                        // remark оставляем для прежних клиентов; description понимает импорт Sylius.
+                        ...(item.description
+                            ? [
+                                  { name: 'remark', stringValue: item.description },
+                                  { name: 'description', stringValue: item.description },
+                              ]
+                            : []),
+                        ...this.catalogParameters(item),
                         ...(item.pack_quant
                             ? [
                                   {
@@ -61,18 +70,19 @@ export class PromelecParser extends AbstractParser {
                     warehouses: [
                         {
                             name: 'CENTER',
-                            deliveryTime: 8,
+                            deliveryTime: this.getSupplier().deliveryTime,
                             quantity: item.quant,
-                            multiple: item.price_unit ?? 1,
+                            multiple: item.quant_unit ?? 1,
                             options: {
                                 ...this.parseMarking(item),
+                                ...this.pickupOnly(item),
                             },
                             prices: this.parsePrices(item.pricebreaks, item),
                         },
                     ].concat(
                         (item.vendors ?? []).map((vendor) => ({
                             name: 'Vendor' + vendor.vendor,
-                            deliveryTime: 8 + vendor.delivery,
+                            deliveryTime: this.getSupplier().deliveryTime + Math.max(0, Number(vendor.delivery) || 0),
                             quantity: vendor.quant,
                             multiple: vendor.mpq ?? 1,
                             options: {
@@ -83,12 +93,59 @@ export class PromelecParser extends AbstractParser {
                                           ? 'М А Г А З И Н'
                                           : (vendor.comment ?? 'Л А Б А З'),
                                 ...this.parseMarking(item),
+                                ...this.pickupOnly(item),
                             },
                             prices: this.parsePrices(vendor.pricebreaks, vendor),
                         })),
                     ),
                 }),
         );
+    }
+
+    /** Поля расширенного ответа API: не теряем категории и содержимое карточки. */
+    private catalogParameters(item: any): { name: string; stringValue?: string; numericValue?: number }[] {
+        const result: { name: string; stringValue?: string; numericValue?: number }[] = [];
+        const categoryCode = [item.class2_id, item.class1_id, item.class0_id].find(
+            (code) => code !== undefined && code !== null && String(code).trim() !== '' && String(code) !== '0',
+        );
+        if (categoryCode !== undefined) result.push({ name: 'categoryCode', stringValue: String(categoryCode) });
+        const category = [item.class0name, item.class1name, item.class2name]
+            .filter((value) => typeof value === 'string' && value.trim() !== '')
+            .map((value) => value.trim())
+            .join(' / ');
+        if (category) result.push({ name: 'category', stringValue: category });
+        for (const [field, parameter] of Object.entries({
+            remark: 'supplierRemark',
+            photo_url: 'images',
+            datasheet: 'datasheet',
+            description_eng: 'descriptionEnglish',
+            packaging: 'packaging',
+            mounting_type: 'mountingType',
+            temperature: 'temperature',
+            tnved: 'tnved',
+        })) {
+            if (typeof item[field] === 'string' && item[field].trim() !== '') {
+                result.push({ name: parameter, stringValue: item[field].trim() });
+            }
+        }
+        const techinfo = [];
+        if (typeof item.mounting_type === 'string' && /[a-zа-я]/i.test(item.mounting_type)) {
+            techinfo.push({ name: 'Тип монтажа', value: item.mounting_type.trim() });
+        }
+        if (typeof item.temperature === 'string' && /\d/.test(item.temperature)) {
+            techinfo.push({ name: 'Рабочая температура', value: item.temperature.trim() });
+        }
+        if (techinfo.length) result.push({ name: 'techinfo', stringValue: JSON.stringify(techinfo) });
+        if (item.weight !== undefined && item.weight !== null && Number.isFinite(Number(item.weight)) && Number(item.weight) > 0) {
+            result.push({ name: 'weight', numericValue: Number(item.weight) });
+        }
+        return result;
+    }
+
+    private pickupOnly(item: any): { pickupOnly?: boolean } {
+        return typeof item.remark === 'string' && item.remark.toLowerCase().includes('самовывоз')
+            ? { pickupOnly: true }
+            : {};
     }
 
     private parseMarking(item: any): { marking?: boolean } {

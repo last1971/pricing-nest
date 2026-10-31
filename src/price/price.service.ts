@@ -8,8 +8,11 @@ import { LiveStockDto } from './dtos/live.stock.dto';
 import { Source } from '../good/dtos/source.enum';
 import { WarehouseDto } from '../good/dtos/warehouse.dto';
 import { chunk } from 'lodash';
+import { CompelOfferParser } from '../parsers/api-parsers/compel.offer.parser';
+import { PromelecOfferParser } from '../parsers/api-parsers/promelec.offer.parser';
 
 const LIVE_PARSERS = { compel: CompelLiveParser };
+const OFFER_PARSERS = { compel: CompelOfferParser, promelec: PromelecOfferParser };
 const LIVE_PARALLEL = 5;
 export const LIVE_MAX_CODES = 50;
 
@@ -30,22 +33,37 @@ export class PriceService {
     // Живой остаток по кодам поставщика: спрашиваем API точным именем, не ответил — остаток из базы (суточный файл).
     // Нет такого кода у поставщика — null. Параллельно не больше LIVE_PARALLEL запросов.
     async live(alias: string, codes: string[]): Promise<Record<string, LiveStockDto | null>> {
-        const parserClass = LIVE_PARSERS[alias];
-        const result: Record<string, LiveStockDto | null> = {};
+        const goods = await this.fetchLive(alias, codes, LIVE_PARSERS);
+        return Object.fromEntries(Object.entries(goods).map(([code, good]) => [code, good ? this.stock(good.warehouses ?? [], good.source === Source.Api ? 'api' : 'db') : null]));
+    }
+
+    /** Полный ответ для Sylius: выбор разрешённых складов и наценка остаются общими с импортом. */
+    async offers(alias: string, codes: string[]): Promise<Record<string, GoodDto | null>> {
+        return this.fetchLive(alias, codes, OFFER_PARSERS);
+    }
+
+    private async fetchLive(alias: string, codes: string[], parsers: Record<string, typeof CompelLiveParser | typeof PromelecOfferParser>): Promise<Record<string, GoodDto | null>> {
+        const parserClass = parsers[alias];
+        const result: Record<string, GoodDto | null> = {};
         codes.forEach((code) => (result[code] = null));
         const goods = await this.goodService.findBySupplierCodes(alias, codes);
         for (const part of chunk(goods, LIVE_PARALLEL)) {
             await Promise.all(
                 part.map(async (good) => {
                     const name = good.parameters?.find((p) => p.name === 'name')?.stringValue ?? good.alias;
-                    const fromDb = this.stock(good.warehouses ?? [], 'db');
+                    const fromDb = new GoodDto({ ...good, source: Source.Db });
                     if (!parserClass) {
                         result[good.code] = fromDb;
                         return;
                     }
                     const parser = new parserClass({ search: name, withCache: false, dbOnly: false }, this.parsers);
-                    const found = (await parser.parse()).find((g) => g.code === good.code && g.source === Source.Api);
-                    result[good.code] = found ? this.stock(found.warehouses ?? [], 'api') : fromDb;
+                    if (parser instanceof PromelecOfferParser) parser.supplierCode = good.code;
+                    try {
+                        const found = (await parser.parse()).find((g) => g.code === good.code && g.source === Source.Api);
+                        result[good.code] = found ?? fromDb;
+                    } catch {
+                        result[good.code] = fromDb;
+                    }
                 }),
             );
         }

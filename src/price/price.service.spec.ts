@@ -4,10 +4,16 @@ import { GoodService } from '../good/good.service';
 import { ParsersService } from '../parsers/parsers.service';
 import { CompelLiveParser } from '../parsers/api-parsers/compel.live.parser';
 import { Source } from '../good/dtos/source.enum';
+import { PromelecOfferParser } from '../parsers/api-parsers/promelec.offer.parser';
+import { CompelOfferParser } from '../parsers/api-parsers/compel.offer.parser';
 
 jest.mock('../parsers/api-parsers/compel.live.parser');
+jest.mock('../parsers/api-parsers/promelec.offer.parser');
+jest.mock('../parsers/api-parsers/compel.offer.parser');
 const liveParse = jest.fn();
 (CompelLiveParser as jest.Mock).mockImplementation(() => ({ parse: liveParse }));
+(PromelecOfferParser as jest.Mock).mockImplementation(() => ({ parse: liveParse }));
+(CompelOfferParser as jest.Mock).mockImplementation(() => ({ parse: liveParse }));
 const findBySupplierCodes = jest.fn();
 
 describe('PriceService', () => {
@@ -107,6 +113,21 @@ describe('PriceService', () => {
             const result = await service.live('promelec', ['1185005']);
             expect(CompelLiveParser).not.toHaveBeenCalled();
             expect(result['1185005'].source).toBe('db');
+        });
+
+        it.each(['compel', 'promelec'])('offers %s: одно совпадение по коду, все склады и цены передаются вместе', async alias => {
+            findBySupplierCodes.mockResolvedValue([dbGood]);
+            const fresh = { ...dbGood, source: Source.Api, warehouses: [{ name: 'Vendor2', quantity: 57, prices: [{ value: 493.7 }] }] };
+            liveParse.mockResolvedValue([{ ...fresh, code: 'another' }, fresh]);
+            expect(await service.offers(alias, ['1185005', 'missing'])).toEqual({ '1185005': fresh, missing: null });
+            expect(liveParse).toHaveBeenCalledTimes(1);
+        });
+
+        it('offers: ошибка API не выдаёт сохранённые данные за свежие', async () => {
+            findBySupplierCodes.mockResolvedValue([{ ...dbGood, source: Source.Api }]);
+            liveParse.mockRejectedValue(new Error('timeout'));
+            const result = await service.offers('promelec', ['1185005']);
+            expect(result['1185005'].source).toBe(Source.Db);
         });
     });
 });

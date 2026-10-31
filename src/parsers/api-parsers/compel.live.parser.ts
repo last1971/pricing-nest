@@ -18,6 +18,9 @@ export class CompelLiveParser extends CompelParser {
     protected getTimeout(): number {
         return parseInt(this.parsers.getConfigService().get('LIVE_API_TIMEOUT')) || LIVE_API_TIMEOUT_DEFAULT;
     }
+    protected calculatePrice(): boolean {
+        return false;
+    }
     async getResponse(): Promise<Observable<AxiosResponse<any, any>>> {
         const compel = await this.parsers.getVault().get('compel');
         return this.parsers.getHttp().post(compel.API_URL as string, {
@@ -26,7 +29,7 @@ export class CompelLiveParser extends CompelParser {
             params: {
                 user_hash: compel.HASH,
                 query_string: this.search,
-                calc_price: false,
+                calc_price: this.calculatePrice(),
                 calc_qty: true,
             },
         });

@@ -87,4 +87,11 @@ export class PriceController {
     async updatePrices(@Param('alias') alias: string): Promise<void> {
         await this.parserSchedule.updateParse(alias);
     }
+
+    @ApiOperation({ summary: 'Живые остатки и закупочные ценовые ступени для подтверждения заказа' })
+    @Get('offers/:alias')
+    async offers(@Param('alias') alias: string, @Query('codes') codes: string): Promise<Record<string, GoodDto | null>> {
+        const list = [...new Set((codes ?? '').split(',').map(c => c.trim()).filter(Boolean))];
+        return this.service.offers(alias, list.slice(0, LIVE_MAX_CODES));
+    }
 }
