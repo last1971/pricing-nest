@@ -1,8 +1,6 @@
 import { PromelecParser } from './promelec.parser';
 import { SupplierDto } from '../../supplier/supplier.dto';
 import { LIVE_API_TIMEOUT_DEFAULT } from './compel.live.parser';
-import { ApiResponseDto } from './api.response.dto';
-import { markOfferFailure } from './offer.request.policy';
 
 /** Отдельный ключ ошибок: оформление не блокирует обычный поиск поставщика. */
 export class PromelecOfferParser extends PromelecParser {
@@ -20,8 +18,6 @@ export class PromelecOfferParser extends PromelecParser {
         }
         return super.lookupParameters();
     }
-    async checkError(response: ApiResponseDto): Promise<ApiResponseDto> { return response; }
-    async obtainError(_error: Error, response: ApiResponseDto): Promise<void> { await markOfferFailure(response); }
     protected getTimeout(): number {
         return parseInt(this.parsers.getConfigService().get('LIVE_API_TIMEOUT')) || LIVE_API_TIMEOUT_DEFAULT;
     }

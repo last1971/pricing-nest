@@ -39,13 +39,15 @@ describe('Checkout offers', () => {
         expect(body.name).toBeUndefined();
     });
 
-    it.each([CompelOfferParser, PromelecOfferParser])('сбой одного товара не блокирует остальные котировки и не рассылает письма', async Parser => {
-        const parser = new Parser({ search: 'TDA7850', withCache: false, dbOnly: false }, parsers);
+    it.each([CompelOfferParser, PromelecOfferParser])('пауза после ошибки сохраняет штатный fallback к БД, без нового запроса поставщику', async Parser => {
+        const stored = [{ code: '350979', source: 'Db', warehouses: [] }];
+        const get = jest.fn().mockResolvedValue({ blockedUntil: '2099-01-01' });
+        const context = { ...parsers, getCache: () => ({ get }), getGoodService: () => ({ find: jest.fn().mockResolvedValue(stored) }) } as unknown as ParsersService;
+        const parser = new Parser({ search: 'TDA7850', withCache: false, dbOnly: false }, context);
         const response = new ApiResponseDto();
         expect(await parser.checkError(response)).toBe(response);
-        await parser.obtainError(new Error('secret API payload'), response);
-        expect(response.isSuccess).toBe(false);
-        expect(response.errorMessage).not.toContain('secret');
-        expect(response.isFinished).toBe(false);
+        expect(response.data).toEqual(stored);
+        expect(response.isFinished).toBe(true);
+        expect(get).toHaveBeenCalledWith('error : ' + parser.getAlias());
     });
 });
